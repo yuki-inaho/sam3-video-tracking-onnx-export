@@ -1,0 +1,125 @@
+--- /home/inaho-omen/Project/sam3/sam3/model_builder.py	2025-11-20 14:49:52.634575293 +0900
++++ /home/inaho-omen/Project/sam3_onnx_sandbox/outputs/sam3_equiv_source/sam3/model_builder.py	2026-05-20 22:49:29.731666686 +0900
+@@ -66,7 +66,10 @@
+     )
+ 
+ 
+-def _create_vit_backbone(compile_mode=None):
++def _create_vit_backbone(compile_mode=None, use_rope_real: bool = True):
++    # use_rope_real is accepted for API consistency; vitdet.py ViT Attention
++    # uses its own complex RoPE path which is numerically equivalent (D3).
++    # Forwarding to ViT is deferred to D5 (vitdet.py patch).
+     """Create ViT backbone for visual feature extraction."""
+     return ViT(
+         img_size=1008,
+@@ -363,7 +366,7 @@
+     return maskmem_backbone
+ 
+ 
+-def _create_tracker_transformer():
++def _create_tracker_transformer(use_rope_real: bool = True):
+     """Create the SAM3 Tracker transformer components."""
+     # Self attention
+     self_attention = RoPEAttention(
+@@ -374,7 +377,7 @@
+         rope_theta=10000.0,
+         feat_sizes=[72, 72],
+         use_fa3=False,
+-        use_rope_real=False,
++        use_rope_real=use_rope_real,
+     )
+ 
+     # Cross attention
+@@ -388,7 +391,7 @@
+         feat_sizes=[72, 72],
+         rope_k_repeat=True,
+         use_fa3=False,
+-        use_rope_real=False,
++        use_rope_real=use_rope_real,
+     )
+ 
+     # Encoder layer
+@@ -429,7 +432,10 @@
+ 
+ 
+ def build_tracker(
+-    apply_temporal_disambiguation: bool, with_backbone: bool = False, compile_mode=None
++    apply_temporal_disambiguation: bool,
++    with_backbone: bool = False,
++    compile_mode=None,
++    use_rope_real: bool = True,
+ ) -> Sam3TrackerPredictor:
+     """
+     Build the SAM3 Tracker module for video tracking.
+@@ -440,7 +446,7 @@
+ 
+     # Create model components
+     maskmem_backbone = _create_tracker_maskmem_backbone()
+-    transformer = _create_tracker_transformer()
++    transformer = _create_tracker_transformer(use_rope_real=use_rope_real)
+     backbone = None
+     if with_backbone:
+         vision_backbone = _create_vision_backbone(compile_mode=compile_mode)
+@@ -496,13 +502,17 @@
+ 
+ 
+ def _create_vision_backbone(
+-    compile_mode=None, enable_inst_interactivity=True
++    compile_mode=None,
++    enable_inst_interactivity=True,
++    use_rope_real: bool = True,
+ ) -> Sam3DualViTDetNeck:
+     """Create SAM3 visual backbone with ViT and neck."""
+     # Position encoding
+     position_encoding = _create_position_encoding(precompute_resolution=1008)
+     # ViT backbone
+-    vit_backbone: ViT = _create_vit_backbone(compile_mode=compile_mode)
++    vit_backbone: ViT = _create_vit_backbone(
++        compile_mode=compile_mode, use_rope_real=use_rope_real
++    )
+     vit_neck: Sam3DualViTDetNeck = _create_vit_neck(
+         position_encoding,
+         vit_backbone,
+@@ -563,6 +573,7 @@
+     enable_segmentation=True,
+     enable_inst_interactivity=False,
+     compile=False,
++    use_rope_real: bool = True,
+ ):
+     """
+     Build SAM3 image model
+@@ -586,7 +597,9 @@
+     # Create visual components
+     compile_mode = "default" if compile else None
+     vision_encoder = _create_vision_backbone(
+-        compile_mode=compile_mode, enable_inst_interactivity=enable_inst_interactivity
++        compile_mode=compile_mode,
++        enable_inst_interactivity=enable_inst_interactivity,
++        use_rope_real=use_rope_real,
+     )
+ 
+     # Create text components
+@@ -656,6 +669,7 @@
+     apply_temporal_disambiguation: bool = True,
+     device="cuda" if torch.cuda.is_available() else "cpu",
+     compile=False,
++    use_rope_real: bool = True,
+ ) -> Sam3VideoInferenceWithInstanceInteractivity:
+     """
+     Build SAM3 dense tracking model.
+@@ -673,10 +687,13 @@
+         )
+ 
+     # Build Tracker module
+-    tracker = build_tracker(apply_temporal_disambiguation=apply_temporal_disambiguation)
++    tracker = build_tracker(
++        apply_temporal_disambiguation=apply_temporal_disambiguation,
++        use_rope_real=use_rope_real,
++    )
+ 
+     # Build Detector components
+-    visual_neck = _create_vision_backbone()
++    visual_neck = _create_vision_backbone(use_rope_real=use_rope_real)
+     text_encoder = _create_text_encoder(bpe_path)
+     backbone = SAM3VLBackbone(scalp=1, visual=visual_neck, text=text_encoder)
+     transformer = _create_sam3_transformer(has_presence_token=has_presence_token)
