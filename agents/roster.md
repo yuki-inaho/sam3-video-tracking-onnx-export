@@ -1,0 +1,81 @@
+# エージェント・ロスター（統括の唯一の記録源）
+
+統括: Claude (Opus 4.7) — 直接実装はしない。計画/ハンドオフ/証跡レビュー/統合/記録を担当。
+Plan(正本): `temp/workdoc_May20-2026_sam3_onnx_video_export.md` の §9（detector→tracker→video E2E, MUST=手順D16）。
+共通憲章: `CLAUDE.md`。役割: `.claude/roles/worker.txt`（作業=sonnet）, `.claude/roles/audit.txt`（監査=opus）。
+
+## MUST目標
+SAM3 video tracking 全体（detector＋memory-based tracker＋memory bank＋フレーム間伝搬）の ONNX 推論が公式デモ同等に動くこと。memory bank は Python側（`PythonMemoryBank`）で管理。
+
+## ロスター
+
+| agent_id | name | model | scope | workspace | allowed_actions | forbidden_actions | status | last_update | evidence_returned |
+| :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
+| abb0e838be11e8312 | recon-detector | (Explore) | SAM3 detector/tracker構造・demo・ONNX阻害の読取調査 | sandbox+official | read-only | 一切の変更 | completed | 2026-05-20 22:07 | workdoc §8 (F-7〜F-13) |
+| ad26e343fe3e7b0d8 (現,C-4) | sam3-worker | opus | 手順D1–D17 の実装・export・検証。**割当ごとに新規spawn**。記録源=workdoc/roster/repo状態 | sam3_onnx_sandbox | src/tools/tests/pyproject編集, outputs/logs出力, uv実行, §7記録更新 | 公式sam3編集, temp原本編集, commit/push, スコープ外変更, 暗黙fallback | running (C-4: maskmem tpos二重加算の修正+score再測定) | 2026-05-21 13:26 | C-2/C-3=MUST達成(mask IoU≥0.99)。C-4でscore完全クローズ狙い |
+| a9d27cf1bb11511bd (StageC済,opus) | sam3-audit | opus | worker成果の証拠ベース監査（承認/保留/差戻し）。**割当ごとに新規spawn**。audit_log.md記録義務 | sam3_onnx_sandbox | 読取＋検証目的の uv run pytest/onnx.load/python/grep/git 再実行 | 実装変更/コミット/状態変更 | idle | 2026-05-21 13:25 | Stage C(MUST)=条件付き承認: MUST達成(mask)確認, tpos二重加算摘発→C-4修正条件 |
+
+## 調整イベントログ
+
+| date_time | actor | action | evidence |
+| :-- | :-- | :-- | :-- |
+| 2026-05-20 22:06 | coordinator | persistent-subagent-coordinator スキル起動、recon委譲 | この節 |
+| 2026-05-20 22:07 | recon-detector | detector構造調査完了。detectorはmemory非依存だがMUSTはtracking含む | workdoc §8 |
+| 2026-05-20 22:1x | coordinator | Plan を MUST=完全video tracking に訂正、Stage A/B/C(手順D1–D17)へ再構成 | workdoc §9 |
+| 2026-05-20 22:15 | coordinator | sam3-worker(sonnet) 起動。割当=手順D1(uv環境)+D2(PyTorch baseline oracle) | roster, worker handoff |
+| 2026-05-20 22:20 | coordinator | 参考実装クローン: temp/sam3-onnx-wkentaro(+ sam3@onnxサブモジュール), temp/sam3-cpp-macos。いずれもimage detectorのみ | workdoc §9.5 |
+| 2026-05-20 22:30 | coordinator | sam3-worker D1+D2 完了報告受領・成果物検証OK(baseline npz masks/boxes/scores妥当) | outputs/reference/* |
+| 2026-05-20 22:31 | coordinator | （§9.6 transformers一次採用を一旦記録したが未起動のまま保留） | workdoc §9.6 |
+| 2026-05-20 22:40 | coordinator | **訂正**: ユーザー指摘を受け再検証。facebookresearch/sam3 が memory_attention＋実数RoPE(use_rope_real)を確実に保有と grep 確認。§9.6 transformers一次採用を撤回し facebookresearch を一次に戻す(§9.6.1)。DoD に memory_attention実通過＋アブレーション証明を追加。**注: sam3-audit は未起動だった（前行の起動記録は誤記、本行で訂正）** | workdoc §9.6.1, §9.3 DoD-D-MUST-a/b |
+| 2026-05-20 22:44 | sam3-audit | D1+D2 監査=**承認**。worker申告と全整合、制約違反なし。指摘[注意]: D2のsynthetic記述↔実装不一致(統括が修正済), [情報]: egg-infoがeditable path depで公式リポ生成され得る(Stage B留意) | 監査レポート |
+| 2026-05-20 22:45 | coordinator | D2記述をbaseline実装に合わせ修正。sam3-worker を再開し手順D3(facebookresearch use_rope_real のRoPE cos/sin等価性確立)を割当 | workdoc 手順D2, §9.6.1 |
+| 2026-05-20 22:46 | coordinator | 訂正: sam3-worker は「再開」不可だった（完了済背景エージェントは名前アドレス不可）。新規 worker(agentId a47f3d33dab480313, sonnet) を自己完結ハンドオフで起動しD3割当。記録源はworkdoc/roster/リポジトリ状態(エージェント記憶に依存しない) | roster |
+| 2026-05-20 22:50 | sam3-worker | 手順D3 完了: apply_rotary_enc_real(cos/sin)==apply_rotary_enc(complex) を4テストで証明(self+cross repeat_k, rtol/atol=1e-4)。rope_equivalent.py を src/ 昇格。統括が再実行で4 passed確認。注: D3テストは初回からgreen(red未提示)=軽微TDD逸脱、監査観点に記録 | tests/test_vit_rope_equiv.py |
+| 2026-05-20 22:51 | coordinator | 新規worker起動し手順D4(detector ViTのuse_rope_real=True等価ソース生成+出力等価検証)を割当。D3+D4を1ブロックとしD4後にopus監査予定 | workdoc 手順D4 |
+| 2026-05-20 23:1x | sam3-worker | 手順D4 完了: sam3_source_patcher/create_equivalent_sam3_source を src/tools 昇格(PoC bug=_create_vit_backbone署名 を1件追加修正,計13置換)、等価ソース生成、use_rope_real配線。出力 vs D2 baseline=IoU1.0/score差0(bit一致)。TDD red→green実提示。28 passed | patches/0001_*.patch, tests/test_source_patcher.py, test_equiv_detector_matches_baseline.py |
+| 2026-05-20 23:1x | coordinator | **F-D4確認(grep/diff)**: RoPEは2系統。ViT image encoder=vitdet.py独自complex RoPE(use_rope_real対象外,真の阻害)、tracker=transformer.py RoPEAttention(use_rope_real,D4配線済)。wkentaro fork が ViT用 apply_rotary_enc2(cos/sin) を提供(diff確認)。D5を D5-1(ViT cos/sin化移植)+D5-2(ONNX export)に分割。次opus監査はStage A image encoder export完了時 | workdoc §9.7 |
+| 2026-05-20 23:1x | coordinator | 新規worker起動し手順D5-1(wkentaro apply_rotary_enc2 を等価ソース vitdet.py へ移植, ViT出力等価+complex不在検証)を割当 | workdoc §9.7 |
+| 2026-05-20 23:20 | sam3-worker | 手順D5-1 完了: 等価ソース vitdet.py に apply_rotary_enc2(cos/sin)+forward分岐+freqs_cos/sin切替を移植(patcher拡張 VITDET_REPLACEMENTS)。TDD red→green実提示, complex非実行を inspect+実行時切替で証明, rtol/atol=1e-4一致。patches/0002保存。32 passed。統括が再実行で4 passed確認 | tests/test_vit_rope2_equiv.py, patches/0002 |
+| 2026-05-20 23:21 | coordinator | 新規worker起動し手順D5-2(freqs_cis→cos/sin swap helper + image encoder ONNX export + ORT parity, wkentaro export_onnx.py参照)を割当。本ステップ完了でStage A image encoder確立→opusブロック監査予定 | workdoc §9.7 D5-2 |
+| 2026-05-20 23:50 | sam3-worker | 手順D5-2 完了: image_encoder.onnx(1.7GB,8316node,31op,complex不在=Cos/Sin使用)生成, onnx.checker通過, ORT parity(pos_enc≤6e-8/fpn≤1.74e-4). replace_rope_freqs+ImageEncoderWrapper実装. get_abs_posのinterpolate/bool分岐は固定1008²で定数化(wkentaro準拠). TDD red→green. 35 passed. 統括が成果物存在+公式sam3無改変を確認 | outputs/onnx/image_encoder.onnx, tests/test_image_encoder_onnx.py |
+| 2026-05-20 23:51 | coordinator | opus監査起動: Stage A image encoderブロック(D3,D4,D5-1,D5-2)。export方法論(変種ロード/freqs差替/固定shape/parity)は後続全モジュールで再利用のため厳密検証 | audit handoff |
+| 2026-05-21 | sam3-audit | Stage A(D3,D4,D5-1,D5-2)監査=**条件付き承認**。中核export方法論は健全・後続再利用可。但し[重大]parity間欠NaN(フルスイート3回中1回 test_ort_parity backbone_fpn_0 全NaN, ORT MergeShapeInfo Concat{4}vs{5}), [警告]出力shapeが動的(固定shape申告と乖離,Range/Mod/Shape残存), [注意]replace_rope_freqs適用範囲vsガード不整合。memory_attention前に是正必須 | 監査レポート |
+| 2026-05-21 | coordinator | 監査の重大/警告を受け Stage B前に手順D5-3(静的shape化+parity決定性+test isolation+replace_rope_freqsスコープ明示)を新設。修正worker起動 | workdoc §9.8 |
+| 2026-05-21 | coordinator | D5-3修正の待ち時間を活用し、Stage B事前調査(memory_attention/memory_encoder/propagate_in_videoの入出力契約・RoPE経路・動的shape懸念)を read-only Explore(ac32376a9a187c288)へ並行委譲。D5-3 worker(sandbox編集)とは非競合(公式tracker読取) | recon handoff |
+| 2026-05-21 07:55 | recon(Explore ac32376a9a187c288) | Stage B事前調査**完了**。memory cross-attn=TransformerEncoderCrossAttention(decoder.py:617, RoPEAttention self+cross, 現状use_rope_real=False/complex, rope_k_repeat=True). memory_encoder=SimpleMaskEncoder(memory.py:158). 固定shape鍵: num_maskmem=7・obj_ptr≤16→memトークン≤36304パディング固定, d_model=256/mem_dim=64/feat 72×72/image1008/stride14. 動的箇所: 可変メモリ本数・obj_ptr数・is_init_cond_frame分岐(decoder.py:655-677)→Python側制御。complex残存はrope.pyのみ(vitdet以外無) | recon report |
+| 2026-05-21 07:56 | coordinator | 進捗診断: 律速はD5-3(間欠NaN根因究明)。worker は workdoc §7 に逐次記録しつつ NaN根因(vitdet get_abs_pos の If node→ORT MergeShapeInfo {4}vs{5})を特定・freeze_abs_pos_for_exportで修正・静的shape化・3回連続41 passed を申告。最終pytest実行中(8GB,~7分)。完了通知待ち→統括検証→Stage B | workdoc §7, ps |
+| 2026-05-21 08:00 | sam3-worker | 手順D5-3 完了(所要~7.7h/416tool=NaN根因究明の多数反復)。NaN根因=vitdet get_abs_pos の If node→freeze_abs_pos_for_exportで消去, _patch_output_dimsで静的shape化, conftest sys.modules isolation, replace_rope_freqs scope明示+test。41 passed×3 | image_encoder.py, rope_freqs.py, conftest.py, test_rope_freqs_scope.py |
+| 2026-05-21 08:00 | coordinator | D5-3統括検証: image_encoder.onnx op17種/Complex・If不在/全6出力静的整数shape を独立確認。Stage A image encoder=完了・条件付き承認の是正完了とみなす。Stage Bへ | onnx.load検証 |
+| 2026-05-21 08:05 | coordinator | Stage B設計を§9.9に記録(recon契約: TransformerEncoderCrossAttention/SimpleMaskEncoder, mem tokens≤36304固定, use_rope_real=True化)+効率ルール(対象テストのみ/フルスイート3x禁止/image_encoder.onnx不再export/ダミー固定テンソル単体export)。手順B-1(memory cross-attn ONNX export=MUST臨界)を新規worker起動 | workdoc §9.9 |
+| 2026-05-21 08:20 | sam3-worker | **手順B-1完了(MUST山場)**: memory cross-attn TransformerEncoderCrossAttention を ONNX export。8 RoPEAttention全て use_rope_real=True実行確認, op24種complex/If不在, ORT parity max_abs_diff=2.86e-6(実config36352メモリトークン/7フレームでも成立,NaN=0), num_k_exclude_rope=64でRoPEをmaskmemのみ適用。3 passed | outputs/onnx/memory_attention*.onnx, tests/test_memory_attention_onnx.py |
+| 2026-05-21 08:20 | coordinator | B-1統括検証(両onnx 24ops/complex・If不在)。MUST最大の不確実性(memory bank ありtrackingのONNX化)が実証的にクリア。手順B-2(SimpleMaskEncoder=memory_encoder export)を新規worker起動 | onnx.load検証, workdoc §9.9 |
+| 2026-05-21 08:25 | coordinator | ユーザー要望: 監査の途中過程可視化。.claude/roles/audit.txt に§13「作業記録の義務」追加(監査開始/主要検証/完了をagents/audit_log.mdに記録)。agents/audit_log.md 新設+D1/D2・Stage A監査を遡及記録。今後の監査ハンドオフでも本義務を明示する | audit.txt §13, agents/audit_log.md |
+
+## Watchdog プロトコル（統括の自己監視, 2026-05-21 ユーザー要望）
+統括は**起動するたび（worker/audit完了通知・watchdog起床・ユーザー入力時）の冒頭で stall-check を実行**し、完全停止を自己検知する。
+- stall-check 信号: [1]現役agent出力file age, [2]記録file(workdoc§7/roster/audit_log)のmtime, [3]`find src tools tests outputs logs -mmin -20` の変更有無, [4]活動中 uv/python/pytest プロセス(etime)。
+- **信頼信号=[2]+[3]**（[1].outputは完了まで153byteで不変＝非信頼。[4]はステップ間ギャップで空になり得る）。
+- 判定: [3]直近20分に変更 or [2]直近更新 or [4]活動プロセス有 → **ACTIVE**。全て>20分停滞＋完了通知無 → **完全停止疑い**。
+- 停止検知時アクション: 当該agentを pkill→原因をroster/audit_log記録→自己完結ハンドオフで再ディスパッチ→ユーザー報告。
+- 維持: ScheduleWakeup で ~20分 fallback 起床を再武装し続ける（完了通知が先着すれば即処理）。
+| 2026-05-21 08:35 | sam3-worker | 手順B-2完了: SimpleMaskEncoder(memory_encoder)を ONNX export。memory_encoder.onnx 24-25op/complex・If不在, ORT parity(features≤9.1e-4/pos_enc≤6e-8), 静的shape, antialias=True→False(差4.76e-7)を等価ソース追加patch。3 passed。統括検証OK。指摘: §9.9のpos_enc shapeは256でなく64ch(PositionEmbeddingSine num_pos_feats=64)=worker記録に正値 | outputs/onnx/memory_encoder.onnx |
+| 2026-05-21 08:35 | coordinator | B-2統括検証(24op/complex不在/静的[1,64,72,72]×2)。手順B-3(SAM decode head: prompt_encoder+mask_decoder+object-pointer, ryouchinsa TrackerMaskDecoderWrapper参照)を新規worker起動。decode経路のRoPE有無を確認させる(sam/mask_decoder.pyはRoPE無, model/decoder.pyは有=B-1系統) | workdoc §9.9 B-3 |
+| 2026-05-21 08:40 | coordinator | ユーザー要望のフリーズ防止 watchdog を**永続プロセス化**(Monitor task bnnll8nvt, persistent, 15分間隔)。各tickで stall-check(find -mmin16 + pgrep)し統括へ通知: FREEZE-ALERT(変更0&proc0)→統括が当該agent終了→再ディスパッチ / OK→軽い進捗確認のみ。停止は TaskStop bnnll8nvt(MUST達成時)。ScheduleWakeup(08:53)は本watchdogに置換するため再武装しない | Monitor bnnll8nvt |
+| 2026-05-21 08:45 | sam3-worker | 手順B-3完了: decode_head(prompt_encoder+mask_decoder+obj_ptr_proj)を ONNX export。38op/complex・If不在/RoPE無(標準attn), ORT parity(masks≤8.4e-5,iou≤2.2e-7,obj_score≤5.7e-6,obj_ptr≤1.3e-6), obj_ptr出力含む。3 passed。統括検証OK。**Stage B 全モジュール完了** | outputs/onnx/decode_head.onnx |
+| 2026-05-21 08:45 | coordinator | Stage B完了(image_encoder/memory_attention/memory_encoder/decode_head 全complex不在・parity達成)。opus監査起動: Stage B(B-1,B-2,B-3)厳密監査。MUST臨界memory_attentionのnum_k_exclude_rope=64・36352固定・parityを重点検証。audit_log.md記録義務 | audit handoff |
+| 2026-05-21 08:53 | coordinator(watchdog) | 旧ScheduleWakeup起床→stall-check=ACTIVE(audit_log 1min前更新, Stage B監査が9 passed+B-1実config36352 parity2.86e-6+use_rope_real独立再現中)。邪魔せず継続。ScheduleWakeupは再武装せず(Monitor watchdog bnnll8nvtが一次)。観測: 監査agentのdate が統括Bashより約10分進(クロック差,影響なし) | agents/audit_log.md, stall-check |
+| 2026-05-21 09:05 | sam3-audit | **Stage B監査=条件付き承認**(audit_log.md 87行記録)。全4 onnx complex/If不在・静的shape・checker OK・9 passed。B-1 MUST独立再現: 実config36352/exclude64 parity2.86e-6, num_k_exclude_rope=64がproduction call site一致, 8 RoPEAttention use_rope_real=True→真のmemory-bank tracking可。条件: Stage Cで ONNX外Python処理(sigmoid前/no_obj_embed_spatial後/mask gating/memory bank組立/conv_s0,s1)を実装必須。指摘[警告]full-config parity未pytest化, [注意]test docstring誤 | agents/audit_log.md |
+| 2026-05-21 09:05 | coordinator | Stage B条件付き承認を受理。§9.10にStage C設計(監査特定のPython側処理リスト+C-1/C-2/C-3分解)を記録。手順C-1(公式video predictor oracle+Python側定数/projection抽出)を新規worker起動 | workdoc §9.10 |
+| 2026-05-21 09:25 | sam3-worker | 手順C-1完了: 公式 Sam3TrackerPredictor で PyTorch memory-bank tracking oracle取得(6フレーム,obj_id=1一貫,~4400px/frame)。backbone重みremap(detector.backbone→backbone,missing=0), GTX1070 OOM→bfloat16で解決(明示), propagate_preflight=True。定数11個+oracle npz+vis6枚抽出。8 passed。統括検証OK(npzはobject array=allow_pickle要) | outputs/reference/video_oracle_all.npz, constants/ |
+| 2026-05-21 09:25 | coordinator | 手順C-2(PythonMemoryBank orchestrator: 4 onnx+C-1定数でフレームループ, §9.10のPython側処理実装)+C-3(video E2E vs oracle=MUST判定D16+アブレーション)を新規worker起動。最終統合。incremental(frame0→1→full)指示, 進捗を§7逐次記録させる | workdoc §9.10 C-2/C-3 |
+| 2026-05-21 10:30 | coordinator(watchdog点検) | C-2/C-3 worker は**ACTIVE**(PID 2285642 .venv/bin/python が frame1 の memory bank 組立戦略3種を実験中, IoU調整)。DoD-D-MUST-a既PASS(memory_attention invocations=5/log)。watchdog欠陥発見(統括のagents編集が混入=偽OK / インラインpython取りこぼし)→bnnll8nvt停止、**b2zxwninn**に改良(worker専用domain src/tools/tests/outputs/logs + cwd=sandbox python検出)。Watchdogプロトコルも本基準に更新 | logs/video_e2e.log, ps |
+| 2026-05-21 10:48 | coordinator | ユーザー指示で **作業エージェントを sonnet→opus 交代**。sonnet(ae7318)停止(孤児プロセス無/VRAM解放確認)。sonnet停止前の oracle memory組立解析(dynamic onnx化/maskmem tpos/obj_ptr tpos=t_diff÷6/cond frame binary mask/非cond参照範囲)を opus へ知見ハンドオフ(jsonl実体153B無のため文脈継承はディスク状態＋ハンドオフ)。**opus worker a339476b358d570da 起動**(C-2/C-3=MUST)。**§7逐次記入を厳命**。以降は本opusをresume(SendMessage)継続し文脈保持 | opus handoff |
+| 2026-05-21 10:48 | coordinator | watchdog v2(b2zxwninn)欠陥(serena MCPがcwd=sandbox pythonとして常時proc≥2→freeze検知不能)→停止し **v3(bavixj2m0)** に。serena/mcp/bash除外し .venv python/uv run/pytest の cwd=sandbox のみカウント | Monitor bavixj2m0 |
+| 2026-05-21 12:06 | coordinator(進捗観測) | opus worker(a339476b) ACTIVE・~1h17m: run_onnx_video.py(CLI)+diag_prompt.py(memory prompt組立の診断)+onnx_video.log 作成、orchestrator.py 書換中。memory prompt の数値突合(最難関)を集中デバッグ。**IoU結果未(video_e2e.log空)**。§7逐次記入はまだ無し→worker中断回避のため統括が本roster に観測記録(完了時にworker §7記入想定, 未記入なら統括補完) | find -mmin16, logs |
+| 2026-05-21 12:51 | coordinator(進捗観測) | **MUSTほぼ達成**: opus worker の C-3 E2E結果(logs/video_e2e.log,§7): per-frame mask IoU 全6フレーム≥0.99(f0-5: .9984/.9937/.9921/.9935/.9939/.9915)=DoD-D-MUST(IoU≥0.90)達成。track id=1一貫。memory_attention invoke=5(MUST-a)。アブレーション logit差14.6-15.4≫0.5(MUST-b=memory寄与の決定的証拠)。唯一: object_score相対差 f4=.065/f5=.080>0.05 FAIL(bf16 oracle vs fp32 ONNX dtype差, worker閾値非緩和で正直報告)。tracker image_encoder(SAM2 neck)新規export等の修正。worker §7記入済(可視性回復)。worker実行継続中(score差解消/最終化) | logs/video_e2e.log §7 C-2/C-3 |
+| 2026-05-21 12:51 | sam3-worker(opus) | **C-2/C-3完了・MUST達成(IoU基準)**: per-frame mask IoU 全6≥0.99, obj_id一貫, memory_attention invoke=5(MUST-a), アブレーションlogit差14.6-15.4(MUST-b=memory寄与実証)。score f4/f5のみFAIL(bf16/fp32 dtype,閾値非緩和)。F-14:tracker用image_encoder_tracker.onnx新規export(detectorと別neck,fpn2 diff4.38), F-15:decode_head multimask=True再export, F-16:score差=dtype。§7全節目記入済。4 passed/1 failed | logs/video_e2e.log §9.11 |
+| 2026-05-21 12:55 | coordinator | **MUST=達成と認定(option①)**: mask IoU≥0.99+memory寄与実証+track-id一貫=ユーザーMUST充足。score f4/f5はconfidence値のdtype caveat(検出は一致,非緩和)。§9.11記録。Stage C opus監査起動(MUST claim第三者検証+新規image_encoder_tracker parity+F-14/15/16妥当性+score dtype帰属検証)。audit_log.md記録義務 | workdoc §9.11 |
+| 2026-05-21 13:25 | sam3-audit(opus,StageC) | **Stage C(MUST claim)監査=条件付き承認**(audit_log.md記録)。MUST達成確認: mask IoU全6≥0.99(公式fp32 head比較でも≥0.9928), memory_attention invoke=5, ablation 14.6-15.4(memory寄与実証), obj_id一貫, 閾値非緩和, complex/If不在。**摘発**: video_orchestrator.py:367-368,387-388 で maskmem_tpos_enc を prompt(value)+prompt_pos(key)両方加算=公式(prompt_posのみ)とlogic差。worker の score=純dtype主張を diag_video_fp32(fp32同士でもf4=.052/f5=.080乖離)で部分反証。判定:(a)MUST達成,(b)score f4/f5はrefinement(tracking破綻でない),(c)tpos修正+再測定が score完全クローズ最有力 | agents/audit_log.md, /tmp/audit_diag_fp32.log |
+| 2026-05-21 13:26 | coordinator | 監査摘発のtpos二重加算を opus worker で精密修正(prompt_posのみに)+score再測定+F-16記述訂正+§7記入 を割当(C-4=MUST refinement)。なんちゃって達成排除・全DoD完全pass狙い | workdoc §9.11 |
+| 2026-05-21 13:50 | sam3-worker(opus,C-4) | **C-4完了・全DoD-D-MUST完全pass(5 passed,閾値非緩和)**: tpos二重加算をvalue除去(key保持,公式一致)で修正→score f4:.065→.025/f5:.080→.008 全PASS, mask IoU向上(.998+全), memory invoke=5, ablation 15.2-16.2, obj_id一貫。F-16訂正(主因=logic, dtypeでない)。監査の診断が正鵠 | logs/video_e2e.log 13:47 |
+| 2026-05-21 13:50 | coordinator | **MUST完全達成を実ログで独立確認**(video_e2e.log: mask IoU/score/MUST-a/MUST-b/obj_id 全PASS)。§9.13記録。クローズアウト: watchdog bavixj2m0停止(稼働worker無)。残(任意,MUST外): D17品質ゲート/full-config36352 pytest化/commit | workdoc §9.13 |
