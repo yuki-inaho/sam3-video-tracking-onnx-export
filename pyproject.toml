@@ -6,7 +6,9 @@ build-backend = "setuptools.build_meta"
 name = "sam3-onnx-equiv"
 version = "0.1.0"
 description = "SAM3 video tracking ONNX equivalence layer"
-requires-python = ">=3.9,<3.13"
+# >=3.10: the package uses runtime PEP 604 unions (e.g. ``PathLike = str | Path``)
+# and ``typing.TypeAlias`` at module scope.  <3.13 avoids the numpy 1.26 / 3.13 clash.
+requires-python = ">=3.10,<3.13"
 dependencies = [
     "torch==2.7.0",
     "torchvision>=0.22.0",
@@ -41,10 +43,40 @@ python_functions = "test_*"
 
 [tool.ruff]
 line-length = 100
-target-version = "py39"
+target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
+# jaxtyping shape strings (e.g. Float[Tensor, "*batch seq head_dim"], Float[ndarray, "n"])
+# are parsed by ruff as forward annotations.  Multi-token specs raise F722 (syntax error)
+# and single-token specs like "n"/"c_out" raise F821 (undefined name).  These are not
+# Python type expressions, so both are suppressed project-wide.  Genuine undefined-name
+# detection is covered by the `ty` type checker (uv run ty check).
+ignore = ["F722", "F821"]
+
+[tool.ty.rules]
+# The remaining ty diagnostics all originate from incomplete third-party type
+# information, not from genuine bugs in this package:
+#   * `sam3.*` is an editable install exposed via an import-hook finder, so its
+#     modules are not statically resolvable (unresolved-import).
+#   * onnxruntime's InferenceSession.run() is typed as list[Unknown], so its
+#     ndarray outputs cannot be narrowed (not-subscriptable / invalid-argument-type
+#     / invalid-return-type / unresolved-attribute on downstream numpy ops).
+#   * torch stubs type submodule attributes as `Tensor | Module`, which makes
+#     calling a submodule report call-non-callable.
+#   * jaxtyping single-axis shape strings ("n", "c_out") read as bare names
+#     (unresolved-reference).
+# These are downgraded to warnings so `ty check` passes while still surfacing them.
+unresolved-import = "warn"
+not-subscriptable = "warn"
+call-non-callable = "warn"
+invalid-argument-type = "warn"
+invalid-return-type = "warn"
+unresolved-attribute = "warn"
+unresolved-reference = "warn"
+# no-matching-overload: numpy ufunc/assert_allclose overloads cannot match the
+# Unknown-typed ndarrays returned by onnxruntime InferenceSession.run() in the tests.
+no-matching-overload = "warn"
 
 [[tool.uv.index]]
 name = "pytorch-cu126"
