@@ -224,7 +224,7 @@ def apply_rotary_enc_complex_reference(
     return q_out, k_out
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class RotaryExportSpec:
     """Small deterministic RoPE export shape specification."""
 

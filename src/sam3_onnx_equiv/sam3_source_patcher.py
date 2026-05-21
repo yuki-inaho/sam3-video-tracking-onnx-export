@@ -16,7 +16,7 @@ from typing import TypeAlias
 PathLike: TypeAlias = str | Path
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class PatchResult:
     """Result of creating an equivalent SAM3 source copy."""
 
@@ -25,7 +25,7 @@ class PatchResult:
     modified_files: tuple[Path, ...]
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class TextReplacement:
     """A single exact text rewrite with a human-readable audit label."""
 
@@ -205,11 +205,11 @@ VITDET_REPLACEMENTS: tuple[TextReplacement, ...] = (
             "    freqs_sin: torch.Tensor,\n"
             "    repeat_freqs_k: bool = False,\n"
             ") -> Tuple[torch.Tensor, torch.Tensor]:\n"
-            "    \"\"\"ONNX-safe cos/sin RoPE equivalent to apply_rotary_enc (complex).\n"
+            '    """ONNX-safe cos/sin RoPE equivalent to apply_rotary_enc (complex).\n'
             "\n"
             "    Replaces torch.polar / view_as_complex / view_as_real with real-valued\n"
             "    arithmetic.  freqs_cos = freqs_cis.real, freqs_sin = freqs_cis.imag.\n"
-            "    \"\"\"\n"
+            '    """\n'
             "    xq_reshaped = xq.view(*xq.shape[:-1], -1, 2)\n"
             "    xq_cos = xq_reshaped[..., 0]\n"
             "    xq_sin = xq_reshaped[..., 1]\n"
@@ -261,15 +261,16 @@ VITDET_REPLACEMENTS: tuple[TextReplacement, ...] = (
             "        if not self.use_rope:\n"
             "            return q, k\n"
             "\n"
-            "        if hasattr(self, \"freqs_cis\"):\n"
-            "            # Standard PyTorch path: complex RoPE (numerically equivalent to cos/sin).\n"
+            '        if hasattr(self, "freqs_cis"):\n'
+            "            # Standard PyTorch path: complex RoPE "
+            "(numerically equivalent to cos/sin).\n"
             "            assert self.freqs_cis is not None\n"
             "            return apply_rotary_enc(q, k, freqs_cis=self.freqs_cis)\n"
             "        # ONNX-export path: cos/sin RoPE (no complex ops).\n"
             "        # Activated by replacing freqs_cis buffer with freqs_cos / freqs_sin.\n"
-            "        assert hasattr(self, \"freqs_cos\") and hasattr(self, \"freqs_sin\"), (\n"
-            "            \"_apply_rope: freqs_cis is absent but freqs_cos / freqs_sin are not \"\n"
-            "            \"registered.  Call model.replace_rope_freqs() before export.\"\n"
+            '        assert hasattr(self, "freqs_cos") and hasattr(self, "freqs_sin"), (\n'
+            '            "_apply_rope: freqs_cis is absent but freqs_cos / freqs_sin are not "\n'
+            '            "registered.  Call model.replace_rope_freqs() before export."\n'
             "        )\n"
             "        return apply_rotary_enc2(q, k, self.freqs_cos, self.freqs_sin)\n"
         ),
@@ -320,9 +321,7 @@ def create_equivalent_source_copy(source_root: PathLike, output_root: PathLike) 
         patch_model_builder_text(copied_builder.read_text()), encoding="utf-8"
     )
     copied_vitdet = output_root / "sam3" / "model" / "vitdet.py"
-    copied_vitdet.write_text(
-        patch_vitdet_text(copied_vitdet.read_text()), encoding="utf-8"
-    )
+    copied_vitdet.write_text(patch_vitdet_text(copied_vitdet.read_text()), encoding="utf-8")
     return PatchResult(
         source_root=source_root,
         output_root=output_root,

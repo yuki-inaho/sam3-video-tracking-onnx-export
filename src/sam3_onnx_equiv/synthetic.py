@@ -26,7 +26,7 @@ BLACK: RgbColor = (0, 0, 0)
 RED: RgbColor = (255, 0, 0)
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class SyntheticCase:
     """Generated image, exact binary mask, and prompt metadata."""
 
