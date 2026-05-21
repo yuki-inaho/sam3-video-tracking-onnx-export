@@ -90,5 +90,8 @@ sam3 = { path = "/home/inaho-omen/Project/sam3", editable = true }
 
 [dependency-groups]
 dev = [
+    "ipykernel>=7.2.0",
+    "matplotlib>=3.10.9",
+    "nbconvert>=7.17.1",
     "onnxsim>=0.6.2",
 ]
