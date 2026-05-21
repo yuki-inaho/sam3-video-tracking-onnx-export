@@ -23,13 +23,13 @@
 SAM3_SRC := env_var_or_default("SAM3_SRC", "/home/inaho-omen/Project/sam3")
 
 # Equivalent-source output directory (relative to repo root).
-EQUIV_SOURCE := "outputs/sam3_equiv_source"
+EQUIV_SOURCE := env_var_or_default("EQUIV_SOURCE", "outputs/sam3_equiv_source")
 
 # SAM3 checkpoint file (relative to repo root).
-CHECKPOINT := "models/sam3.pt"
+CHECKPOINT := env_var_or_default("CHECKPOINT", "models/sam3.pt")
 
 # ONNX output directory (relative to repo root).
-ONNX_DIR := "outputs/onnx"
+ONNX_DIR := env_var_or_default("ONNX_DIR", "outputs/onnx")
 
 # ---------------------------------------------------------------------------
 # Default: list all targets
@@ -127,8 +127,8 @@ oracle: oracle-detector oracle-video
 # ONNX inference
 # ---------------------------------------------------------------------------
 
-MAX_FRAMES := ""
-EMULATE_BF16 := ""
+MAX_FRAMES := env_var_or_default("MAX_FRAMES", "")
+EMULATE_BF16 := env_var_or_default("EMULATE_BF16", "")
 
 # Run ONNX video orchestrator and compare with oracle (MAX_FRAMES / EMULATE_BF16 optional).
 run-video:
