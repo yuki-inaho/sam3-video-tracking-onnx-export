@@ -10,7 +10,7 @@ It must:
 
 The test imports apply_rotary_enc2 from the generated equiv-source at
 outputs/sam3_equiv_source/sam3/model/vitdet.py, and compares it against the
-official complex apply_rotary_enc from ~/Project/sam3/sam3/model/vitdet.py.
+official complex apply_rotary_enc from the SAM3_SRC checkout.
 
 If outputs/sam3_equiv_source does not yet contain apply_rotary_enc2, these tests
 will fail with ImportError or AttributeError (expected red state before D5-1 impl).
@@ -18,43 +18,58 @@ will fail with ImportError or AttributeError (expected red state before D5-1 imp
 
 from __future__ import annotations
 
+import importlib.util
 import sys
+import types
 from pathlib import Path
 
 import pytest
 import torch
 
+from sam3_onnx_equiv.path_config import equiv_source_root, sam3_source_root
+
+
+def _load_official_vitdet(sam3_official: Path) -> types.ModuleType:
+    """Load ``sam3.model.vitdet`` directly without triggering ``sam3/__init__.py``.
+
+    Adding the submodule root to ``sys.path`` and importing ``sam3.model.vitdet``
+    triggers ``sam3/__init__.py`` which transitively imports training-only code
+    (``decord``, etc.).  Loading via ``importlib.util`` avoids that chain.
+    """
+    vitdet_file = sam3_official / "sam3" / "model" / "vitdet.py"
+    spec = importlib.util.spec_from_file_location("sam3.model.vitdet", vitdet_file)
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules.setdefault("sam3.model.vitdet", mod)
+    spec.loader.exec_module(mod)  # type: ignore[union-attr]
+    return mod
+
+
 # ---------------------------------------------------------------------------
 # Official SAM3 imports (read-only source) -- complex reference
 # ---------------------------------------------------------------------------
-SAM3_OFFICIAL = Path("/home/inaho-omen/Project/sam3")
-if str(SAM3_OFFICIAL) not in sys.path:
-    sys.path.insert(0, str(SAM3_OFFICIAL))
+SAM3_OFFICIAL = sam3_source_root()
+if not (SAM3_OFFICIAL / "sam3" / "model" / "vitdet.py").exists():
+    pytest.skip(f"Official SAM3 vitdet.py not found: {SAM3_OFFICIAL}", allow_module_level=True)
 
-from sam3.model.vitdet import (  # noqa: E402
-    apply_rotary_enc,
-    compute_axial_cis,
-)
+_vitdet_mod = _load_official_vitdet(SAM3_OFFICIAL)
+apply_rotary_enc = _vitdet_mod.apply_rotary_enc
+compute_axial_cis = _vitdet_mod.compute_axial_cis
 
 # ---------------------------------------------------------------------------
 # Equiv-source imports -- cos/sin target (loaded from outputs/sam3_equiv_source)
 # ---------------------------------------------------------------------------
-EQUIV_VITDET = (
-    Path("/home/inaho-omen/Project/sam3_onnx_sandbox")
-    / "outputs"
-    / "sam3_equiv_source"
-    / "sam3"
-    / "model"
-    / "vitdet.py"
-)
+EQUIV_VITDET = equiv_source_root() / "sam3" / "model" / "vitdet.py"
 
 
 def _load_equiv_vitdet():
     """Dynamically load the equiv-source vitdet module.
 
-    The equiv-source vitdet.py uses relative imports (from .model_misc), so the
-    parent package (sam3.model) must be importable via sys.path before we can load it.
-    We add the equiv-source root to sys.path and import via the package hierarchy.
+    The equiv-source vitdet.py has a single relative import (``from .model_misc
+    import LayerScale``).  We load ``model_misc`` first via
+    ``importlib.util.spec_from_file_location``, then load ``vitdet`` the same
+    way.  This avoids adding the equiv-source root to ``sys.path`` and
+    triggering ``sam3/__init__.py`` → ``model_builder`` → ``decord``.
 
     Returns the module object so individual functions can be accessed.
     Raises ImportError with a diagnostic if the file is missing or apply_rotary_enc2
@@ -64,23 +79,31 @@ def _load_equiv_vitdet():
         raise ImportError(
             f"Equiv-source vitdet not found at {EQUIV_VITDET}. "
             "Run: uv run python tools/create_equivalent_sam3_source.py "
-            "--source-root /home/inaho-omen/Project/sam3 --output-root outputs/sam3_equiv_source"
+            '--source-root "$SAM3_SRC" --output-root outputs/sam3_equiv_source'
         )
-    # Add equiv-source root so that 'sam3' package resolves to the equiv copy
-    equiv_root = str(EQUIV_VITDET.parent.parent.parent)  # outputs/sam3_equiv_source
-    # Insert before official SAM3 path so equiv version takes precedence
-    if equiv_root not in sys.path:
-        sys.path.insert(0, equiv_root)
+    equiv_model_dir = EQUIV_VITDET.parent  # outputs/sam3_equiv_source/sam3/model
 
-    # Force re-import of sam3.model.vitdet from equiv-source
-    # (Remove cached modules to get the equiv version, not the official one)
-    for key in list(sys.modules.keys()):
-        if key.startswith("sam3.model") or key == "sam3":
-            del sys.modules[key]
+    # Step 1: load model_misc so that the relative import in vitdet.py resolves.
+    misc_file = equiv_model_dir / "model_misc.py"
+    if "sam3.model.model_misc" not in sys.modules:
+        spec_misc = importlib.util.spec_from_file_location("sam3.model.model_misc", misc_file)
+        assert spec_misc is not None and spec_misc.loader is not None
+        mod_misc = importlib.util.module_from_spec(spec_misc)
+        mod_misc.__package__ = "sam3.model"
+        sys.modules["sam3.model.model_misc"] = mod_misc
+        spec_misc.loader.exec_module(mod_misc)  # type: ignore[union-attr]
 
-    import importlib
-
-    mod = importlib.import_module("sam3.model.vitdet")
+    # Step 2: load vitdet directly (bypasses __init__.py chain).
+    cache_key = "sam3.model.vitdet_equiv"  # distinct key avoids collision with official mod
+    if cache_key not in sys.modules:
+        spec = importlib.util.spec_from_file_location(cache_key, EQUIV_VITDET)
+        assert spec is not None and spec.loader is not None
+        mod = importlib.util.module_from_spec(spec)
+        mod.__package__ = "sam3.model"
+        sys.modules[cache_key] = mod
+        spec.loader.exec_module(mod)  # type: ignore[union-attr]
+    else:
+        mod = sys.modules[cache_key]  # type: ignore[assignment]
 
     if not hasattr(mod, "apply_rotary_enc2"):
         raise ImportError(

@@ -61,6 +61,19 @@ wheels = [
 ]
 
 [[package]]
+name = "autopep8"
+version = "2.3.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pycodestyle" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/50/d8/30873d2b7b57dee9263e53d142da044c4600a46f2d28374b3e38b023df16/autopep8-2.3.2.tar.gz", hash = "sha256:89440a4f969197b69a995e4ce0661b031f455a9f776d2c5ba3dbd83466931758", size = 92210, upload-time = "2025-01-14T14:46:18.454Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9e/43/53afb8ba17218f19b77c7834128566c5bbb100a0ad9ba2e8e89d089d7079/autopep8-2.3.2-py2.py3-none-any.whl", hash = "sha256:ce8ad498672c845a0c3de2629c15b635ec2b05ef8177a6e7c91c74f3e9b51128", size = 45807, upload-time = "2025-01-14T14:46:15.466Z" },
+]
+
+[[package]]
 name = "beautifulsoup4"
 version = "4.14.3"
 source = { registry = "https://pypi.org/simple" }
@@ -1058,6 +1071,22 @@ wheels = [
 ]
 
 [[package]]
+name = "nbqa"
+version = "1.9.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "autopep8" },
+    { name = "ipython", version = "8.39.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "ipython", version = "9.13.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "tokenize-rt" },
+    { name = "tomli" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/aa/76/62d2609924cf34445148cd6b5de694cf64c179cc416cac93182579620e57/nbqa-1.9.1.tar.gz", hash = "sha256:a1f4bcf587c597302fed295951001fc4e1be4ce0e77e1ab1b25ac2fbe3db0cdd", size = 38348, upload-time = "2024-11-10T12:21:58.333Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/28/88/4789719fbbe166d12d345b3ac66b96105f10001b16e00a9765ba29261a21/nbqa-1.9.1-py3-none-any.whl", hash = "sha256:95552d2f6c2c038136252a805aa78d85018aef922586270c3a074332737282e5", size = 35259, upload-time = "2024-11-10T12:21:56.731Z" },
+]
+
+[[package]]
 name = "nest-asyncio"
 version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1612,6 +1641,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pycodestyle"
+version = "2.14.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/11/e0/abfd2a0d2efe47670df87f3e3a0e2edda42f055053c85361f19c0e2c1ca8/pycodestyle-2.14.0.tar.gz", hash = "sha256:c4b5b517d278089ff9d0abdec919cd97262a3367449ea1c8b49b91529167b783", size = 39472, upload-time = "2025-06-20T18:49:48.75Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d7/27/a58ddaf8c588a3ef080db9d0b7e0b97215cee3a45df74f3a94dbbf5c893a/pycodestyle-2.14.0-py2.py3-none-any.whl", hash = "sha256:dd6bf7cb4ee77f8e016f9c8e74a35ddd9f67e1d5fd4184d86c3b98e07099f42d", size = 31594, upload-time = "2025-06-20T18:49:47.491Z" },
+]
+
+[[package]]
 name = "pycparser"
 version = "3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1985,20 +2023,14 @@ wheels = [
 
 [[package]]
 name = "sam3"
-source = { editable = "../sam3" }
+source = { editable = "sam3" }
 dependencies = [
-    { name = "decord" },
-    { name = "einops" },
     { name = "ftfy" },
     { name = "huggingface-hub" },
     { name = "iopath" },
     { name = "numpy" },
-    { name = "psutil" },
     { name = "regex" },
     { name = "timm" },
-    { name = "torch" },
-    { name = "torchaudio" },
-    { name = "torchvision" },
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
@@ -2006,9 +2038,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "black", marker = "extra == 'dev'", specifier = "==24.2.0" },
-    { name = "decord" },
     { name = "decord", marker = "extra == 'notebooks'" },
-    { name = "einops" },
     { name = "einops", marker = "extra == 'notebooks'" },
     { name = "fairscale", marker = "extra == 'train'" },
     { name = "ftfy", specifier = "==6.1.1" },
@@ -2028,7 +2058,6 @@ requires-dist = [
     { name = "opencv-python", marker = "extra == 'dev'" },
     { name = "opencv-python", marker = "extra == 'notebooks'" },
     { name = "pandas", marker = "extra == 'dev'" },
-    { name = "psutil" },
     { name = "pycocotools", marker = "extra == 'dev'" },
     { name = "pycocotools", marker = "extra == 'notebooks'" },
     { name = "pytest", marker = "extra == 'dev'" },
@@ -2044,10 +2073,7 @@ requires-dist = [
     { name = "submitit", marker = "extra == 'train'" },
     { name = "tensorboard", marker = "extra == 'train'" },
     { name = "timm", specifier = ">=1.0.17" },
-    { name = "torch", specifier = "==2.7.0", index = "https://download.pytorch.org/whl/cu126" },
-    { name = "torchaudio", specifier = ">=2.7.0", index = "https://download.pytorch.org/whl/cu126" },
     { name = "torchmetrics", marker = "extra == 'train'" },
-    { name = "torchvision", specifier = ">=0.22.0", index = "https://download.pytorch.org/whl/cu126" },
     { name = "tqdm" },
     { name = "typing-extensions" },
     { name = "ufmt", marker = "extra == 'dev'", specifier = "==2.8.0" },
@@ -2088,9 +2114,11 @@ dev = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "decord" },
     { name = "ipykernel" },
     { name = "matplotlib" },
     { name = "nbconvert" },
+    { name = "nbqa" },
     { name = "onnxsim" },
 ]
 
@@ -2107,7 +2135,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'" },
     { name = "radon", marker = "extra == 'dev'" },
     { name = "ruff", marker = "extra == 'dev'" },
-    { name = "sam3", editable = "../sam3" },
+    { name = "sam3", editable = "sam3" },
     { name = "timm" },
     { name = "torch", specifier = "==2.7.0", index = "https://download.pytorch.org/whl/cu126" },
     { name = "torchvision", specifier = ">=0.22.0", index = "https://download.pytorch.org/whl/cu126" },
@@ -2117,9 +2145,11 @@ provides-extras = ["dev"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "decord", specifier = ">=0.6.0" },
     { name = "ipykernel", specifier = ">=7.2.0" },
     { name = "matplotlib", specifier = ">=3.10.9" },
     { name = "nbconvert", specifier = ">=7.17.1" },
+    { name = "nbqa", specifier = ">=1.9.1" },
     { name = "onnxsim", specifier = ">=0.6.2" },
 ]
 
@@ -2214,6 +2244,15 @@ wheels = [
 ]
 
 [[package]]
+name = "tokenize-rt"
+version = "6.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/69/ed/8f07e893132d5051d86a553e749d5c89b2a4776eb3a579b72ed61f8559ca/tokenize_rt-6.2.0.tar.gz", hash = "sha256:8439c042b330c553fdbe1758e4a05c0ed460dbbbb24a606f11f0dee75da4cad6", size = 5476, upload-time = "2025-05-23T23:48:00.035Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/33/f0/3fe8c6e69135a845f4106f2ff8b6805638d4e85c264e70114e8126689587/tokenize_rt-6.2.0-py2.py3-none-any.whl", hash = "sha256:a152bf4f249c847a66497a4a95f63376ed68ac6abf092a2f7cfb29d044ecff44", size = 6004, upload-time = "2025-05-23T23:47:58.812Z" },
+]
+
+[[package]]
 name = "tomli"
 version = "2.4.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2276,22 +2315,6 @@ wheels = [
     { url = "https://download-r2.pytorch.org/whl/cu126/torch-2.7.0%2Bcu126-cp311-cp311-win_amd64.whl", hash = "sha256:3fadb116d605e22ea95682f3efe7747989ac8f22a3d4c9ea3cc90c44050708e0", upload-time = "2025-04-22T18:17:04Z" },
     { url = "https://download-r2.pytorch.org/whl/cu126/torch-2.7.0%2Bcu126-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:4933a51bfb906f34b44c23c6ea28fdfef5bf14a3c79a43d5d798285e29eba295", upload-time = "2025-04-22T18:17:24Z" },
     { url = "https://download-r2.pytorch.org/whl/cu126/torch-2.7.0%2Bcu126-cp312-cp312-win_amd64.whl", hash = "sha256:30bd9e92038c391b3b08b541c9bc803cb54e45fda63b61f7469bba6de372b065", upload-time = "2025-04-22T18:17:29Z" },
-]
-
-[[package]]
-name = "torchaudio"
-version = "2.11.0+cu126"
-source = { registry = "https://download.pytorch.org/whl/cu126" }
-wheels = [
-    { url = "https://download-r2.pytorch.org/whl/cu126/torchaudio-2.11.0%2Bcu126-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:60898c30cf8a7c4837aecae9522e5e4a0e942fd9a37a4ea7c40726b78cc8ddec", upload-time = "2026-03-23T15:50:21Z" },
-    { url = "https://download-r2.pytorch.org/whl/cu126/torchaudio-2.11.0%2Bcu126-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:8352b8d541ebb4abe2bbb9b4523c6ba10c9736a702d265dff54a3bfe2f29265d", upload-time = "2026-03-23T15:50:21Z" },
-    { url = "https://download-r2.pytorch.org/whl/cu126/torchaudio-2.11.0%2Bcu126-cp310-cp310-win_amd64.whl", hash = "sha256:a3a4d763f582bccda1e1b44ccc2cf059040f5dcbdd897ef673644e812668594b", upload-time = "2026-03-23T15:50:21Z" },
-    { url = "https://download-r2.pytorch.org/whl/cu126/torchaudio-2.11.0%2Bcu126-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:8a35d88d4a96edc2d7e5038b359a637026ba7441fa6011fd217453f0f8698149", upload-time = "2026-03-23T15:50:21Z" },
-    { url = "https://download-r2.pytorch.org/whl/cu126/torchaudio-2.11.0%2Bcu126-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:233dca0d0048bc86ca0505c57fee08ff7c019d11dd14db397050d15d8fa94520", upload-time = "2026-03-23T15:50:21Z" },
-    { url = "https://download-r2.pytorch.org/whl/cu126/torchaudio-2.11.0%2Bcu126-cp311-cp311-win_amd64.whl", hash = "sha256:bb5f58154b78c618006716d1eebbe38a161149e6b46f88a0b1b12ce6ede0acd3", upload-time = "2026-03-23T15:50:21Z" },
-    { url = "https://download-r2.pytorch.org/whl/cu126/torchaudio-2.11.0%2Bcu126-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:2ccbbe4555d17c6a7d9bddf76a9c608d6e4ed9b9ecb63cc02f4c4bcf4ae8f05b", upload-time = "2026-03-23T15:50:21Z" },
-    { url = "https://download-r2.pytorch.org/whl/cu126/torchaudio-2.11.0%2Bcu126-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:fe8ba48c690cacc58087603c4d853580006e3d1c0ebe22c0d75f99a004bc981a", upload-time = "2026-03-23T15:50:21Z" },
-    { url = "https://download-r2.pytorch.org/whl/cu126/torchaudio-2.11.0%2Bcu126-cp312-cp312-win_amd64.whl", hash = "sha256:ca5b7815c6952c79c65dce9a78eb96be8b73a8b291f82ca473812a910cdc9fbc", upload-time = "2026-03-23T15:50:21Z" },
 ]
 
 [[package]]

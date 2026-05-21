@@ -19,8 +19,8 @@
 # ---------------------------------------------------------------------------
 
 # Upstream SAM3 repository root (source for equiv-source generation).
-# MUST be set to a valid path; no implicit fallback.
-SAM3_SRC := env_var_or_default("SAM3_SRC", "/home/inaho-omen/Project/sam3")
+# Override with SAM3_SRC in .env when the official checkout is elsewhere.
+SAM3_SRC := env_var_or_default("SAM3_SRC", "sam3")
 
 # Equivalent-source output directory (relative to repo root).
 EQUIV_SOURCE := env_var_or_default("EQUIV_SOURCE", "outputs/sam3_equiv_source")
@@ -142,11 +142,11 @@ run-video:
 
 # Run the full test suite.
 test:
-    uv run pytest -q
+    uv run python -m pytest -q
 
 # Run the MUST e2e test (memory-bank video tracking, mask IoU >= 0.90).
 e2e:
-    uv run pytest tests/test_video_e2e.py -q
+    uv run python -m pytest tests/test_video_e2e.py -q
 
 # ---------------------------------------------------------------------------
 # Quality gates
@@ -154,23 +154,37 @@ e2e:
 
 # Check formatting (non-destructive; exits non-zero if reformatting is needed).
 format-check:
-    uv run ruff format --check .
+    uv run python -m ruff format --check .
 
 # Apply auto-formatting.
 format:
-    uv run ruff format .
+    uv run python -m ruff format .
 
 # Lint (ruff check).
 lint:
-    uv run ruff check .
+    uv run python -m ruff check .
 
 # Static type check (ty).
 typecheck:
-    uv run ty check src tools tests
+    uv run python -m ty check src tools tests
 
 # Cyclomatic complexity gate (fail on grade C or worse).
 complexity:
-    uv run radon cc src -n C
+    uv run python -m radon cc src -n C
 
-# Run all quality gates (format-check + lint + typecheck + complexity).
-quality: format-check lint typecheck complexity
+# Check Jupyter notebook formatting with ruff via nbqa.
+format-notebooks-check:
+    uv run nbqa "ruff format --check" notebooks/sam3_onnx_video_demo.ipynb
+
+# Format Jupyter notebooks with ruff via nbqa.
+format-notebooks:
+    uv run nbqa "ruff format" notebooks/sam3_onnx_video_demo.ipynb
+
+# Lint Jupyter notebooks with ruff via nbqa.
+# E402: notebook cells import after top-level code by design.
+# E501: long f-strings in print cells are acceptable in demo notebooks.
+lint-notebooks:
+    uv run nbqa "ruff check --ignore E402,E501" notebooks/sam3_onnx_video_demo.ipynb
+
+# Run all quality gates (Python + notebook format/lint + typecheck + complexity).
+quality: format-check lint format-notebooks-check lint-notebooks typecheck complexity

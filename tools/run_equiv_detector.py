@@ -6,7 +6,7 @@ This script explicitly loads model_builder.py from the patched equiv source tree
 NOT shadowed — only model_builder is replaced.
 
 Design note (intentional equiv-source variant loading):
-    The editable install at ~/Project/sam3 provides the full sam3 package.
+    The official SAM3 checkout configured by the environment provides the full sam3 package.
     Only sam3.model_builder is patched (use_rope_real=True wiring).
     We load the patched model_builder.py file directly with importlib so that:
       - All other sam3.* submodules come from the installed package (no PYTHONPATH hack).

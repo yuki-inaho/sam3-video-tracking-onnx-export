@@ -113,6 +113,8 @@ tensorboard/
 CLAUDE.md
 CODEX.md
 temp/
+agents/
+patches/
 
 # Synthetic media outputs
 outputs/

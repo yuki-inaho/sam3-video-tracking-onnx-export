@@ -140,7 +140,7 @@ def run_detector() -> dict:
     if not CHECKPOINT_PATH.exists():
         msg = (
             f"Checkpoint not found: {CHECKPOINT_PATH}. "
-            "Copy models/sam3.pt from ~/Project/sam3/models/sam3.pt first."
+            "Set SAM3_SRC to the official checkout and copy its models/sam3.pt into models/ first."
         )
         logger.error(msg)
         raise FileNotFoundError(msg)

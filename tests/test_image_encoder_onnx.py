@@ -17,21 +17,21 @@ Run:
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import onnx
 import onnxruntime as ort
 import pytest
 import torch
 
+from sam3_onnx_equiv.path_config import checkpoint_path, equiv_source_root, onnx_dir, repo_root
+
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-SANDBOX_ROOT = Path("/home/inaho-omen/Project/sam3_onnx_sandbox")
-EQUIV_SOURCE_ROOT = SANDBOX_ROOT / "outputs" / "sam3_equiv_source"
-CHECKPOINT_PATH = SANDBOX_ROOT / "models" / "sam3.pt"
-ONNX_PATH = SANDBOX_ROOT / "outputs" / "onnx" / "image_encoder.onnx"
+SANDBOX_ROOT = repo_root()
+EQUIV_SOURCE_ROOT = equiv_source_root()
+CHECKPOINT_PATH = checkpoint_path()
+ONNX_PATH = onnx_dir() / "image_encoder.onnx"
 
 # ---------------------------------------------------------------------------
 # Constants

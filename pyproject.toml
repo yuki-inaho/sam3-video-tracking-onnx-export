@@ -47,7 +47,8 @@ target-version = "py310"
 # Demo notebooks use notebook idioms (config-before-import, top-level display
 # code) that conflict with library-grade lint (E402 etc.); exclude them from
 # ruff format/lint. Library code under src/tools/tests stays strict.
-extend-exclude = ["notebooks"]
+# sam3/ is a read-only Git submodule; upstream code is not reformatted here.
+extend-exclude = ["notebooks", "sam3"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
@@ -90,12 +91,14 @@ explicit = true
 [tool.uv.sources]
 torch = { index = "pytorch-cu126" }
 torchvision = { index = "pytorch-cu126" }
-sam3 = { path = "/home/inaho-omen/Project/sam3", editable = true }
+sam3 = { path = "sam3", editable = true }
 
 [dependency-groups]
 dev = [
+    "decord>=0.6.0",
     "ipykernel>=7.2.0",
     "matplotlib>=3.10.9",
     "nbconvert>=7.17.1",
+    "nbqa>=1.9.1",
     "onnxsim>=0.6.2",
 ]

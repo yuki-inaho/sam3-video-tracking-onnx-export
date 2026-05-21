@@ -153,7 +153,7 @@ def _load_tracker(checkpoint_path: Path, logger: logging.Logger) -> Any:
     if not checkpoint_path.exists():
         raise FileNotFoundError(
             f"Checkpoint not found: {checkpoint_path}. "
-            "Copy models/sam3.pt from ~/Project/sam3/models/sam3.pt."
+            "Set SAM3_SRC to the official checkout and copy its models/sam3.pt into models/."
         )
 
     logger.info("Building Sam3TrackerPredictor with ViT backbone ...")

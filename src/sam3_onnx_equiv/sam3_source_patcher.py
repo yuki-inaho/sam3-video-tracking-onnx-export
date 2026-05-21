@@ -4,6 +4,10 @@ This is intentionally conservative. It does not alter weights and it does not hi
 unsupported branches. The patcher only rewires builder defaults so that official
 RoPEAttention modules use the real-valued RoPE path that SAM3 already contains,
 and it leaves checkpoint loading semantics unchanged.
+
+Authored and validated against official SAM3 commit
+84cc43bca4347b772f17d1078a1ddb4c054655c2. Exact-once replacements are expected
+to fail loudly if the upstream source changes.
 """
 
 from __future__ import annotations

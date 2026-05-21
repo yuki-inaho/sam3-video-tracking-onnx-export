@@ -8,29 +8,50 @@ Covers:
         the lifted PoC implementation agrees with the official complex formulation.
 
 All tests use compute_axial_cis / apply_rotary_enc / apply_rotary_enc_real from the
-official SAM3 source at ~/Project/sam3 (read-only).  The PoC real-valued helpers are
+official SAM3 source configured by SAM3_SRC (read-only). The PoC real-valued helpers are
 imported from sam3_onnx_equiv.rope_equivalent (promoted from temp/).
 """
 
 from __future__ import annotations
 
+import importlib.util
 import sys
+import types
 from pathlib import Path
 
+import pytest
 import torch
+
+from sam3_onnx_equiv.path_config import sam3_source_root
+
+
+def _load_rope_module(sam3_path: Path) -> types.ModuleType:
+    """Load ``sam3.sam.rope`` directly without triggering ``sam3/__init__.py``.
+
+    Adding the submodule root to ``sys.path`` and importing ``sam3.sam.rope``
+    triggers ``sam3/__init__.py`` which transitively imports training-only code
+    (``decord``, etc.).  Loading via ``importlib.util`` avoids that chain.
+    """
+    rope_file = sam3_path / "sam3" / "sam" / "rope.py"
+    spec = importlib.util.spec_from_file_location("sam3.sam.rope", rope_file)
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules.setdefault("sam3.sam.rope", mod)
+    spec.loader.exec_module(mod)  # type: ignore[union-attr]
+    return mod
+
 
 # ---------------------------------------------------------------------------
 # Official SAM3 imports (read-only source)
 # ---------------------------------------------------------------------------
-SAM3_PATH = Path("/home/inaho-omen/Project/sam3")
-if str(SAM3_PATH) not in sys.path:
-    sys.path.insert(0, str(SAM3_PATH))
+SAM3_PATH = sam3_source_root()
+if not (SAM3_PATH / "sam3" / "sam" / "rope.py").exists():
+    pytest.skip(f"Official SAM3 rope.py not found: {SAM3_PATH}", allow_module_level=True)
 
-from sam3.sam.rope import (  # noqa: E402
-    apply_rotary_enc,
-    apply_rotary_enc_real,
-    compute_axial_cis,
-)
+_rope_mod = _load_rope_module(SAM3_PATH)
+apply_rotary_enc = _rope_mod.apply_rotary_enc
+apply_rotary_enc_real = _rope_mod.apply_rotary_enc_real
+compute_axial_cis = _rope_mod.compute_axial_cis
 
 # PoC helpers promoted to src/
 from sam3_onnx_equiv.rope_equivalent import (  # noqa: E402

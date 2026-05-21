@@ -1,16 +1,15 @@
 """Tests for sam3_source_patcher: verify exact-once text replacement.
 
-These tests run against the LIVE official SAM3 source at ~/Project/sam3,
+These tests run against the official SAM3 source configured by SAM3_SRC,
 so they confirm that MODEL_BUILDER_REPLACEMENTS are consistent with the
 current version of model_builder.py (fail fast if the upstream code changes).
 """
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
+from sam3_onnx_equiv.path_config import sam3_source_root
 from sam3_onnx_equiv.sam3_source_patcher import (
     MODEL_BUILDER_REPLACEMENTS,
     TextReplacement,
@@ -18,12 +17,14 @@ from sam3_onnx_equiv.sam3_source_patcher import (
     patch_model_builder_text,
 )
 
-SAM3_SOURCE_ROOT = Path("/home/inaho-omen/Project/sam3")
+SAM3_SOURCE_ROOT = sam3_source_root()
 MODEL_BUILDER_PATH = SAM3_SOURCE_ROOT / "sam3" / "model_builder.py"
 
 
 @pytest.fixture(scope="module")
 def model_builder_text() -> str:
+    if not MODEL_BUILDER_PATH.exists():
+        pytest.skip(f"Official SAM3 model_builder.py not found: {MODEL_BUILDER_PATH}")
     return MODEL_BUILDER_PATH.read_text(encoding="utf-8")
 
 
