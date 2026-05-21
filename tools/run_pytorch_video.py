@@ -61,28 +61,28 @@ LOG_PATH = REPO_ROOT / "logs" / "video_oracle.log"
 # Video parameters — explicitly declared per §9.9 OOM policy
 # §9.9 OOM record: GPU inference uses Sam3TrackerPredictor with bfloat16 autocast
 # which enters at __init__ (sam3_tracking_predictor.py:49-50).
-N_FRAMES = 6            # number of synthetic frames (>=4 per task spec)
-IMAGE_SIZE = 128        # synthetic frame resolution (saved as JPEG, SAM3 resamples to 1008)
-CIRCLE_RADIUS = 16      # circle radius in synthetic frame
-STEP = 12               # pixels right per frame
-JPEG_QUALITY = 95       # JPEG quality for frame serialization
+N_FRAMES = 6  # number of synthetic frames (>=4 per task spec)
+IMAGE_SIZE = 128  # synthetic frame resolution (saved as JPEG, SAM3 resamples to 1008)
+CIRCLE_RADIUS = 16  # circle radius in synthetic frame
+STEP = 12  # pixels right per frame
+JPEG_QUALITY = 95  # JPEG quality for frame serialization
 
 # Frame 0 prompt: point at the circle center on frame 0
-_FRAME0_CX = IMAGE_SIZE // 6 + 0 * STEP   # = IMAGE_SIZE//6 = 21 px
-_FRAME0_CY = IMAGE_SIZE // 2              # = 64 px
+_FRAME0_CX = IMAGE_SIZE // 6 + 0 * STEP  # = IMAGE_SIZE//6 = 21 px
+_FRAME0_CY = IMAGE_SIZE // 2  # = 64 px
 
 # Python-side constants to extract (§9.10 audit specification, tracker attributes)
 _CONSTANT_SPECS: list[dict[str, str]] = [
-    {"name": "maskmem_tpos_enc",       "attr": "maskmem_tpos_enc"},
-    {"name": "no_mem_embed",           "attr": "no_mem_embed"},
-    {"name": "no_mem_pos_enc",         "attr": "no_mem_pos_enc"},
-    {"name": "no_obj_embed_spatial",   "attr": "no_obj_embed_spatial"},
+    {"name": "maskmem_tpos_enc", "attr": "maskmem_tpos_enc"},
+    {"name": "no_mem_embed", "attr": "no_mem_embed"},
+    {"name": "no_mem_pos_enc", "attr": "no_mem_pos_enc"},
+    {"name": "no_obj_embed_spatial", "attr": "no_obj_embed_spatial"},
 ]
 _CONV_SPECS: list[dict[str, str]] = [
     {"name": "conv_s0_weight", "attr": "conv_s0", "param": "weight"},
-    {"name": "conv_s0_bias",   "attr": "conv_s0", "param": "bias"},
+    {"name": "conv_s0_bias", "attr": "conv_s0", "param": "bias"},
     {"name": "conv_s1_weight", "attr": "conv_s1", "param": "weight"},
-    {"name": "conv_s1_bias",   "attr": "conv_s1", "param": "bias"},
+    {"name": "conv_s1_bias", "attr": "conv_s1", "param": "bias"},
 ]
 
 NO_OBJ_SCORE: float = -1024.0  # sam3_tracker_base.py:24
@@ -91,6 +91,7 @@ NO_OBJ_SCORE: float = -1024.0  # sam3_tracker_base.py:24
 # ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
+
 
 def _setup_logging() -> logging.Logger:
     LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -110,9 +111,8 @@ def _setup_logging() -> logging.Logger:
 # Synthetic video frame generation
 # ---------------------------------------------------------------------------
 
-def _make_synthetic_frames(
-    n_frames: int, size: int, radius: int, step: int
-) -> list[Image.Image]:
+
+def _make_synthetic_frames(n_frames: int, size: int, radius: int, step: int) -> list[Image.Image]:
     """Generate N frames of a red circle moving right on a black background."""
     frames: list[Image.Image] = []
     start_x = size // 6
@@ -139,6 +139,7 @@ def _save_frames_to_dir(frames: list[Image.Image], tmp_dir: Path, quality: int) 
 # Model loading
 # ---------------------------------------------------------------------------
 
+
 def _load_tracker(checkpoint_path: Path, logger: logging.Logger) -> Any:
     """Build Sam3TrackerPredictor with ViT backbone and load checkpoint.
 
@@ -161,7 +162,7 @@ def _load_tracker(checkpoint_path: Path, logger: logging.Logger) -> Any:
 
     tracker = build_tracker(
         apply_temporal_disambiguation=False,  # simple tracking, no heuristics
-        with_backbone=True,                   # include ViT backbone for image encoding
+        with_backbone=True,  # include ViT backbone for image encoding
     )
     logger.info("Tracker structure built in %.1f s", time.time() - t0)
 
@@ -176,17 +177,13 @@ def _load_tracker(checkpoint_path: Path, logger: logging.Logger) -> Any:
 
     # Tracker-specific weights (strips 'tracker.' prefix)
     tracker_ckpt: dict[str, torch.Tensor] = {
-        k[len("tracker."):]: v
-        for k, v in ckpt.items()
-        if k.startswith("tracker.")
+        k[len("tracker.") :]: v for k, v in ckpt.items() if k.startswith("tracker.")
     }
     # Backbone weights: checkpoint stores them under 'detector.backbone.*';
     # standalone tracker expects them under 'backbone.*'.
     # (In the full video model the backbone is shared via the detector submodule.)
     backbone_ckpt: dict[str, torch.Tensor] = {
-        k[len("detector."):]: v
-        for k, v in ckpt.items()
-        if k.startswith("detector.backbone.")
+        k[len("detector.") :]: v for k, v in ckpt.items() if k.startswith("detector.backbone.")
     }
     tracker_ckpt.update(backbone_ckpt)
     logger.info(
@@ -197,9 +194,15 @@ def _load_tracker(checkpoint_path: Path, logger: logging.Logger) -> Any:
 
     missing, unexpected = tracker.load_state_dict(tracker_ckpt, strict=False)
     if missing:
-        logger.warning("Missing keys in tracker ckpt: %d keys (first 5: %s)", len(missing), missing[:5])
+        logger.warning(
+            "Missing keys in tracker ckpt: %d keys (first 5: %s)", len(missing), missing[:5]
+        )
     if unexpected:
-        logger.warning("Unexpected keys in tracker ckpt: %d keys (first 5: %s)", len(unexpected), unexpected[:5])
+        logger.warning(
+            "Unexpected keys in tracker ckpt: %d keys (first 5: %s)",
+            len(unexpected),
+            unexpected[:5],
+        )
     logger.info(
         "Checkpoint loaded in %.1f s (missing=%d, unexpected=%d)",
         time.time() - t1,
@@ -219,9 +222,11 @@ def _load_tracker(checkpoint_path: Path, logger: logging.Logger) -> Any:
         tracker = tracker.bfloat16()
         logger.info("Moving tracker to CUDA ...")
         tracker = tracker.cuda()
-        logger.info("Tracker on CUDA in %.1f s (GPU mem: %.1f GiB used)",
-                    time.time() - t2,
-                    torch.cuda.memory_allocated() / 1e9)
+        logger.info(
+            "Tracker on CUDA in %.1f s (GPU mem: %.1f GiB used)",
+            time.time() - t2,
+            torch.cuda.memory_allocated() / 1e9,
+        )
     else:
         logger.warning("CUDA not available — using CPU (slow).")
 
@@ -233,6 +238,7 @@ def _load_tracker(checkpoint_path: Path, logger: logging.Logger) -> Any:
 # ---------------------------------------------------------------------------
 # Oracle tracking
 # ---------------------------------------------------------------------------
+
 
 def _run_oracle_tracking(
     tracker: Any,
@@ -264,7 +270,7 @@ def _run_oracle_tracking(
             video_path=str(video_dir),
             video_height=video_h,
             video_width=video_w,
-            offload_video_to_cpu=True,    # save GPU memory; tracker streams frames per step
+            offload_video_to_cpu=True,  # save GPU memory; tracker streams frames per step
         )
         logger.info(
             "Inference state initialized: num_frames=%d video_size=%dx%d",
@@ -279,15 +285,18 @@ def _run_oracle_tracking(
         cy_norm = _FRAME0_CY / IMAGE_SIZE
         logger.info(
             "Adding point prompt at frame 0: center=(%d, %d) normalized=(%.3f, %.3f)",
-            _FRAME0_CX, _FRAME0_CY, cx_norm, cy_norm,
+            _FRAME0_CX,
+            _FRAME0_CY,
+            cx_norm,
+            cy_norm,
         )
         # Returns (frame_idx, obj_ids, low_res_masks, video_res_masks)
         _, out_obj_ids, _, out_video_masks = tracker.add_new_points_or_box(
             inference_state=inference_state,
             frame_idx=0,
             obj_id=1,
-            points=[[cx_norm, cy_norm]],   # (x, y) normalized
-            labels=[1],                     # 1=foreground
+            points=[[cx_norm, cy_norm]],  # (x, y) normalized
+            labels=[1],  # 1=foreground
         )
         logger.info(
             "add_new_points_or_box on frame 0: obj_ids=%s video_masks_shape=%s",
@@ -296,7 +305,9 @@ def _run_oracle_tracking(
         )
 
         # Propagate forward
-        logger.info("Propagating tracking forward through %d frames ...", inference_state["num_frames"])
+        logger.info(
+            "Propagating tracking forward through %d frames ...", inference_state["num_frames"]
+        )
         frame_indices: list[int] = []
         obj_ids_list: list[np.ndarray] = []
         masks_list: list[np.ndarray] = []
@@ -305,7 +316,11 @@ def _run_oracle_tracking(
 
         t0 = time.time()
         for (
-            frame_idx, obj_ids, low_res_masks, video_res_masks, obj_scores
+            frame_idx,
+            obj_ids,
+            low_res_masks,
+            video_res_masks,
+            obj_scores,
         ) in tracker.propagate_in_video(
             inference_state=inference_state,
             start_frame_idx=0,
@@ -317,7 +332,7 @@ def _run_oracle_tracking(
             ids_arr = np.array(obj_ids)
             # low_res_masks: (N_obj, 1, H, W) → binary via >0
             lrm = low_res_masks.cpu().float()
-            masks_bin = (lrm > 0).squeeze(1).numpy()   # (N_obj, H, W)
+            masks_bin = (lrm > 0).squeeze(1).numpy()  # (N_obj, H, W)
             scores_arr = obj_scores.cpu().float().numpy()  # (N_obj, 1) or (N_obj,)
             if scores_arr.ndim > 1:
                 scores_arr = scores_arr.squeeze(1)
@@ -350,6 +365,7 @@ def _run_oracle_tracking(
 # Oracle saving
 # ---------------------------------------------------------------------------
 
+
 def _save_oracle(
     frame_indices: list[int],
     obj_ids_list: list[np.ndarray],
@@ -374,6 +390,7 @@ def _save_oracle(
 # Visualization
 # ---------------------------------------------------------------------------
 
+
 def _save_visualizations(
     frames: list[Image.Image],
     frame_indices: list[int],
@@ -386,7 +403,7 @@ def _save_visualizations(
     for i, frame_idx in enumerate(frame_indices):
         src = frame_idx if frame_idx < len(frames) else len(frames) - 1
         img = frames[src].convert("RGBA")
-        masks = masks_list[i]   # (N_obj, H, W)
+        masks = masks_list[i]  # (N_obj, H, W)
         obj_ids = obj_ids_list[i]
         for j, _ in enumerate(obj_ids):
             if j >= len(masks):
@@ -407,6 +424,7 @@ def _save_visualizations(
 # ---------------------------------------------------------------------------
 # Constants / weights extraction
 # ---------------------------------------------------------------------------
+
 
 def _extract_constants(tracker: Any, logger: logging.Logger) -> None:
     """Extract Python-side constants and projection weights.
@@ -429,9 +447,15 @@ def _extract_constants(tracker: Any, logger: logging.Logger) -> None:
         arr = tensor.detach().cpu().float().numpy()
         fname = f"{name}.npy"
         np.save(CONSTANTS_DIR / fname, arr)
-        manifest.append({"name": name, "file": fname,
-                         "shape": list(arr.shape), "dtype": str(arr.dtype),
-                         "source_attr": source})
+        manifest.append(
+            {
+                "name": name,
+                "file": fname,
+                "shape": list(arr.shape),
+                "dtype": str(arr.dtype),
+                "source_attr": source,
+            }
+        )
         logger.info("Extracted %-30s shape=%-20s dtype=%s", name, str(tuple(arr.shape)), arr.dtype)
 
     # Tracker-level nn.Parameters
@@ -451,16 +475,23 @@ def _extract_constants(tracker: Any, logger: logging.Logger) -> None:
     # Scalar constants
     for name, val, source in [
         ("NO_OBJ_SCORE", NO_OBJ_SCORE, "sam3_tracker_base.py:24 (= -1024.0)"),
-        ("sigmoid_scale_for_mem_enc", tracker.sigmoid_scale_for_mem_enc,
-         "sam3_tracker_base.py:116 (default=20.0)"),
-        ("sigmoid_bias_for_mem_enc", tracker.sigmoid_bias_for_mem_enc,
-         "sam3_tracker_base.py:117 (default=-10.0)"),
+        (
+            "sigmoid_scale_for_mem_enc",
+            tracker.sigmoid_scale_for_mem_enc,
+            "sam3_tracker_base.py:116 (default=20.0)",
+        ),
+        (
+            "sigmoid_bias_for_mem_enc",
+            tracker.sigmoid_bias_for_mem_enc,
+            "sam3_tracker_base.py:117 (default=-10.0)",
+        ),
     ]:
         arr = np.array(val, dtype=np.float32)
         fname = f"{name}.npy"
         np.save(CONSTANTS_DIR / fname, arr)
-        manifest.append({"name": name, "file": fname,
-                         "shape": [], "dtype": "float32", "source_attr": source})
+        manifest.append(
+            {"name": name, "file": fname, "shape": [], "dtype": "float32", "source_attr": source}
+        )
         logger.info("Extracted scalar %-30s = %s", name, val)
 
     manifest_path = CONSTANTS_DIR / "manifest.json"
@@ -473,16 +504,24 @@ def _extract_constants(tracker: Any, logger: logging.Logger) -> None:
 # Main
 # ---------------------------------------------------------------------------
 
+
 def main() -> None:
     logger = _setup_logging()
     logger.info("=== Stage C-1: SAM3 Video Tracking Oracle (Sam3TrackerPredictor) ===")
-    logger.info("N_FRAMES=%d IMAGE_SIZE=%d CIRCLE_RADIUS=%d STEP=%d",
-                N_FRAMES, IMAGE_SIZE, CIRCLE_RADIUS, STEP)
+    logger.info(
+        "N_FRAMES=%d IMAGE_SIZE=%d CIRCLE_RADIUS=%d STEP=%d",
+        N_FRAMES,
+        IMAGE_SIZE,
+        CIRCLE_RADIUS,
+        STEP,
+    )
     logger.info("GPU available: %s", torch.cuda.is_available())
     if torch.cuda.is_available():
-        logger.info("GPU: %s (%.1f GiB total)",
-                    torch.cuda.get_device_name(0),
-                    torch.cuda.get_device_properties(0).total_memory / 1e9)
+        logger.info(
+            "GPU: %s (%.1f GiB total)",
+            torch.cuda.get_device_name(0),
+            torch.cuda.get_device_properties(0).total_memory / 1e9,
+        )
 
     # Step 1: load tracker
     tracker = _load_tracker(CHECKPOINT_PATH, logger)
@@ -504,8 +543,7 @@ def main() -> None:
 
     if len(frame_indices) == 0:
         logger.error(
-            "No frames yielded from propagate_in_video. "
-            "HARD ERROR — no implicit fallback (§9.9)."
+            "No frames yielded from propagate_in_video. HARD ERROR — no implicit fallback (§9.9)."
         )
         sys.exit(1)
 

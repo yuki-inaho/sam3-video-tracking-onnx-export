@@ -107,9 +107,7 @@ def run_equiv_detector(
     log.info("Found %d RoPEAttention modules", len(rope_modules))
     for m in rope_modules:
         if not m.use_rope_real:
-            raise RuntimeError(
-                f"RoPEAttention module has use_rope_real=False after patching: {m}"
-            )
+            raise RuntimeError(f"RoPEAttention module has use_rope_real=False after patching: {m}")
     log.info(
         "All %d RoPEAttention modules use real RoPE (complex path bypassed)",
         len(rope_modules),

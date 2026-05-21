@@ -44,12 +44,13 @@ def _load_tracker_head(dev):
         del sys.modules[k]
     from sam3.model_builder import build_tracker  # type: ignore
 
-    tracker = build_tracker(apply_temporal_disambiguation=False, with_backbone=False,
-                            use_rope_real=True)
+    tracker = build_tracker(
+        apply_temporal_disambiguation=False, with_backbone=False, use_rope_real=True
+    )
     ckpt = torch.load(str(CHECKPOINT_PATH), map_location="cpu", weights_only=True)
     if "model" in ckpt and isinstance(ckpt["model"], dict):
         ckpt = ckpt["model"]
-    state = {k[len("tracker."):]: v for k, v in ckpt.items() if k.startswith("tracker.")}
+    state = {k[len("tracker.") :]: v for k, v in ckpt.items() if k.startswith("tracker.")}
     tracker.load_state_dict(state, strict=False)
     tracker = tracker.to(dev).float().eval()
     # Move plain RoPE attrs (non-buffer) to device.
@@ -63,13 +64,18 @@ def _load_tracker_head(dev):
 
 
 def _mask_iou(a, b):
-    inter = (a & b).sum(); union = (a | b).sum()
+    inter = (a & b).sum()
+    union = (a | b).sum()
     return 1.0 if union == 0 else float(inter) / float(union)
 
 
 def main() -> None:
     from sam3_onnx_equiv.video_orchestrator import (
-        make_oracle_frames, _preprocess_frame, _conv1x1, Constants, VideoOrchestrator,
+        Constants,
+        VideoOrchestrator,
+        _conv1x1,
+        _preprocess_frame,
+        make_oracle_frames,
     )
 
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -78,15 +84,20 @@ def main() -> None:
     C = Constants(CONSTANTS_DIR)
 
     import onnxruntime as ort
-    enc = ort.InferenceSession(str(ONNX_DIR / "image_encoder_tracker.onnx"),
-                               providers=["CPUExecutionProvider"])
+
+    enc = ort.InferenceSession(
+        str(ONNX_DIR / "image_encoder_tracker.onnx"), providers=["CPUExecutionProvider"]
+    )
 
     tracker = _load_tracker_head(dev)
 
     cx = IMAGE_SIZE // 6
     cy = IMAGE_SIZE // 2
-    coords = torch.tensor([[[cx / IMAGE_SIZE * SAM3_IMAGE_SIZE,
-                             cy / IMAGE_SIZE * SAM3_IMAGE_SIZE]]], dtype=torch.float32, device=dev)
+    coords = torch.tensor(
+        [[[cx / IMAGE_SIZE * SAM3_IMAGE_SIZE, cy / IMAGE_SIZE * SAM3_IMAGE_SIZE]]],
+        dtype=torch.float32,
+        device=dev,
+    )
     labels = torch.tensor([[1]], dtype=torch.int32, device=dev)
 
     output_dict = {"cond_frame_outputs": {}, "non_cond_frame_outputs": {}}
@@ -95,14 +106,17 @@ def main() -> None:
         for fidx, frame in enumerate(frames):
             px = _preprocess_frame(frame)
             outs = enc.run(None, {"pixel_values": px})
-            pos2 = outs[2]; fpn0 = outs[3]; fpn1 = outs[4]; fpn2 = outs[5]
+            pos2 = outs[2]
+            fpn0 = outs[3]
+            fpn1 = outs[4]
+            fpn2 = outs[5]
             # conv_s0/s1 applied (forward_image does this in place); head expects projected hrf.
             hrf0 = torch.from_numpy(_conv1x1(fpn0, C.conv_s0_weight, C.conv_s0_bias)).to(dev)
             hrf1 = torch.from_numpy(_conv1x1(fpn1, C.conv_s1_weight, C.conv_s1_bias)).to(dev)
             # seq-first features (HW, B, C)
             vf2 = torch.from_numpy(fpn2[0].reshape(D_MODEL, HW).T[:, None, :]).to(dev)
             vp2 = torch.from_numpy(pos2[0].reshape(D_MODEL, HW).T[:, None, :]).to(dev)
-            vision_feats = [vf2]            # head uses [-1] for memory; high_res passed separately
+            vision_feats = [vf2]  # head uses [-1] for memory; high_res passed separately
             vision_pos = [vp2]
             feat_sizes = [(72, 72)]
             is_init = fidx == 0
@@ -110,27 +124,49 @@ def main() -> None:
             # current_vision_feats[:-1]); we pass them directly via _forward_sam_heads path.
             # Reproduce track_step's no-mask branch with our own high_res_features.
             pix_feat_with_mem = tracker._prepare_memory_conditioned_features(
-                frame_idx=fidx, is_init_cond_frame=is_init,
-                current_vision_feats=vision_feats, current_vision_pos_embeds=vision_pos,
-                feat_sizes=feat_sizes, output_dict=output_dict, num_frames=num_frames,
+                frame_idx=fidx,
+                is_init_cond_frame=is_init,
+                current_vision_feats=vision_feats,
+                current_vision_pos_embeds=vision_pos,
+                feat_sizes=feat_sizes,
+                output_dict=output_dict,
+                num_frames=num_frames,
             )
             sam_out = tracker._forward_sam_heads(
                 backbone_features=pix_feat_with_mem,
                 point_inputs={"point_coords": coords, "point_labels": labels} if is_init else None,
-                mask_inputs=None, high_res_features=[hrf0, hrf1],
+                mask_inputs=None,
+                high_res_features=[hrf0, hrf1],
                 multimask_output=tracker._use_multimask(
-                    is_init, {"point_coords": coords, "point_labels": labels} if is_init else None),
+                    is_init, {"point_coords": coords, "point_labels": labels} if is_init else None
+                ),
             )
-            (_, high_res_multimasks, ious, low_res_masks, high_res_masks, obj_ptr,
-             object_score_logits) = sam_out
+            (
+                _,
+                high_res_multimasks,
+                ious,
+                low_res_masks,
+                high_res_masks,
+                obj_ptr,
+                object_score_logits,
+            ) = sam_out
             maskmem_features, maskmem_pos_enc = tracker._encode_new_memory(
-                image=None, current_vision_feats=vision_feats, feat_sizes=feat_sizes,
-                pred_masks_high_res=high_res_masks, object_score_logits=object_score_logits,
-                is_mask_from_pts=is_init, output_dict=output_dict, is_init_cond_frame=is_init,
+                image=None,
+                current_vision_feats=vision_feats,
+                feat_sizes=feat_sizes,
+                pred_masks_high_res=high_res_masks,
+                object_score_logits=object_score_logits,
+                is_mask_from_pts=is_init,
+                output_dict=output_dict,
+                is_init_cond_frame=is_init,
             )
-            cur = {"maskmem_features": maskmem_features, "maskmem_pos_enc": maskmem_pos_enc,
-                   "obj_ptr": obj_ptr, "object_score_logits": object_score_logits,
-                   "pred_masks": low_res_masks}
+            cur = {
+                "maskmem_features": maskmem_features,
+                "maskmem_pos_enc": maskmem_pos_enc,
+                "obj_ptr": obj_ptr,
+                "object_score_logits": object_score_logits,
+                "pred_masks": low_res_masks,
+            }
             if is_init:
                 output_dict["cond_frame_outputs"][fidx] = cur
             else:
@@ -150,11 +186,15 @@ def main() -> None:
         pm = pt_low[i][0, 0] > 0
         om = res["masks"][i]
         iou = _mask_iou(pm, om)
-        ps = pt_score[i]; cs = float(res["scores"][i]); bs = float(bf16_scores[i][0])
+        ps = pt_score[i]
+        cs = float(res["scores"][i])
+        bs = float(bf16_scores[i][0])
         rel_pt = abs(cs - ps) / max(abs(ps), 1e-8)
         rel_bf = abs(cs - bs) / max(abs(bs), 1e-8)
-        print(f"  f{i}: IoU(onnx,ptfp32)={iou:.4f} | onnx={cs:.4f} ptfp32={ps:.4f} "
-              f"rel={rel_pt:.4f} || bf16={bs:.4f} rel_bf={rel_bf:.4f}")
+        print(
+            f"  f{i}: IoU(onnx,ptfp32)={iou:.4f} | onnx={cs:.4f} ptfp32={ps:.4f} "
+            f"rel={rel_pt:.4f} || bf16={bs:.4f} rel_bf={rel_bf:.4f}"
+        )
 
 
 if __name__ == "__main__":

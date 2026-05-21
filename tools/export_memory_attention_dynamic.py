@@ -47,7 +47,7 @@ EQUIV_SOURCE_ROOT = SANDBOX_ROOT / "outputs" / "sam3_equiv_source"
 CHECKPOINT_PATH = SANDBOX_ROOT / "models" / "sam3.pt"
 ONNX_DIR = SANDBOX_ROOT / "outputs" / "onnx"
 
-HW = 72 * 72    # 5184
+HW = 72 * 72  # 5184
 B = 1
 D_MODEL = 256
 MEM_DIM = 64
@@ -81,7 +81,10 @@ def export_one(num_k: int) -> None:
     trace_mem_len = HW + num_k
     log.info("Building memory_attention module (num_k_exclude_rope=%d) ...", num_k)
     wrapper = build_memory_attention_module(
-        EQUIV_SOURCE_ROOT, CHECKPOINT_PATH, mem_len=trace_mem_len, num_k_exclude_rope=num_k,
+        EQUIV_SOURCE_ROOT,
+        CHECKPOINT_PATH,
+        mem_len=trace_mem_len,
+        num_k_exclude_rope=num_k,
     )
 
     dummy_src = torch.zeros(HW, B, D_MODEL, dtype=torch.float32)
@@ -94,8 +97,13 @@ def export_one(num_k: int) -> None:
     dynamic_axes = {"prompt": {0: "mem_len"}, "prompt_pos": {0: "mem_len"}}
 
     ONNX_DIR.mkdir(parents=True, exist_ok=True)
-    log.info("Exporting %s (opset=%d, trace_mem_len=%d, num_k=%d) ...",
-             out_path.name, OPSET_VERSION, trace_mem_len, num_k)
+    log.info(
+        "Exporting %s (opset=%d, trace_mem_len=%d, num_k=%d) ...",
+        out_path.name,
+        OPSET_VERSION,
+        trace_mem_len,
+        num_k,
+    )
     with torch.no_grad():
         torch.onnx.export(
             wrapper,
@@ -121,20 +129,28 @@ def export_one(num_k: int) -> None:
     sess = ort.InferenceSession(str(out_path), providers=["CPUExecutionProvider"])
     for n_mask in [1, 2]:
         test_len = n_mask * HW + num_k
-        out = sess.run(None, {
-            "src": np.zeros((HW, 1, D_MODEL), np.float32),
-            "src_pos": np.zeros((HW, 1, D_MODEL), np.float32),
-            "prompt": np.zeros((test_len, 1, MEM_DIM), np.float32),
-            "prompt_pos": np.zeros((test_len, 1, MEM_DIM), np.float32),
-        })
+        out = sess.run(
+            None,
+            {
+                "src": np.zeros((HW, 1, D_MODEL), np.float32),
+                "src_pos": np.zeros((HW, 1, D_MODEL), np.float32),
+                "prompt": np.zeros((test_len, 1, MEM_DIM), np.float32),
+                "prompt_pos": np.zeros((test_len, 1, MEM_DIM), np.float32),
+            },
+        )
         assert out[0].shape == (HW, 1, D_MODEL), f"bad shape {out[0].shape}"
     log.info("Dynamic ONNX export COMPLETE (k=%d): %s", num_k, out_path)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--num-k", type=int, nargs="+", default=DEFAULT_NUM_K,
-                        help="obj_ptr token counts (= num_k_exclude_rope) to export.")
+    parser.add_argument(
+        "--num-k",
+        type=int,
+        nargs="+",
+        default=DEFAULT_NUM_K,
+        help="obj_ptr token counts (= num_k_exclude_rope) to export.",
+    )
     args = parser.parse_args()
     for num_k in args.num_k:
         export_one(num_k)

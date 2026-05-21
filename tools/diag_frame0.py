@@ -37,21 +37,23 @@ def _load_equiv_tracker():
         del sys.modules[k]
     from sam3.model_builder import build_tracker  # type: ignore
 
-    tracker = build_tracker(apply_temporal_disambiguation=False, with_backbone=True,
-                            use_rope_real=True)
+    tracker = build_tracker(
+        apply_temporal_disambiguation=False, with_backbone=True, use_rope_real=True
+    )
     ckpt = torch.load(str(CHECKPOINT_PATH), map_location="cpu", weights_only=True)
     if "model" in ckpt and isinstance(ckpt["model"], dict):
         ckpt = ckpt["model"]
-    state = {k[len("tracker."):]: v for k, v in ckpt.items() if k.startswith("tracker.")}
-    state.update({k[len("detector."):]: v for k, v in ckpt.items()
-                  if k.startswith("detector.backbone.")})
+    state = {k[len("tracker.") :]: v for k, v in ckpt.items() if k.startswith("tracker.")}
+    state.update(
+        {k[len("detector.") :]: v for k, v in ckpt.items() if k.startswith("detector.backbone.")}
+    )
     missing, unexpected = tracker.load_state_dict(state, strict=False)
     print(f"tracker load: missing={len(missing)} unexpected={len(unexpected)}")
     return tracker.cpu().float().eval()
 
 
 def main() -> None:
-    from sam3_onnx_equiv.video_orchestrator import make_oracle_frames, _preprocess_frame
+    from sam3_onnx_equiv.video_orchestrator import _preprocess_frame, make_oracle_frames
 
     frames = make_oracle_frames()
     frame0 = frames[0]
@@ -65,8 +67,7 @@ def main() -> None:
         backbone_out = tracker.forward_image(img_t)
         _, vision_feats, vision_pos, feat_sizes = tracker._prepare_backbone_features(backbone_out)
         # top-level feature (HW, B, C)
-        pt_fpn2 = vision_feats[-1]      # (5184,1,256)
-        pt_pos2 = vision_pos[-1]        # (5184,1,256)
+        pt_fpn2 = vision_feats[-1]  # (5184,1,256)
         # high res features (already conv-projected by forward_image)
         hrf = [
             x.permute(1, 2, 0).view(x.size(1), x.size(2), *s)
@@ -77,13 +78,14 @@ def main() -> None:
 
     # --- ONNX image encoder (tracker SAM2 neck) ---
     import onnxruntime as ort
-    sess = ort.InferenceSession(str(ONNX_DIR / "image_encoder_tracker.onnx"),
-                                providers=["CPUExecutionProvider"])
+
+    sess = ort.InferenceSession(
+        str(ONNX_DIR / "image_encoder_tracker.onnx"), providers=["CPUExecutionProvider"]
+    )
     enc = sess.run(None, {"pixel_values": pixel_values})
-    onnx_pos2 = enc[2]   # (1,256,72,72)
-    onnx_fpn2 = enc[5]   # (1,256,72,72)
-    onnx_fpn0 = enc[3]   # (1,256,288,288)
-    onnx_fpn1 = enc[4]   # (1,256,144,144)
+    onnx_fpn2 = enc[5]  # (1,256,72,72)
+    onnx_fpn0 = enc[3]  # (1,256,288,288)
+    onnx_fpn1 = enc[4]  # (1,256,144,144)
 
     # Reshape PT fpn2 (HW,1,256) -> (1,256,72,72) to compare with ONNX
     pt_fpn2_bchw = pt_fpn2[:, 0, :].T.reshape(1, D_MODEL, 72, 72).numpy()
@@ -94,7 +96,8 @@ def main() -> None:
     # conv_s0/s1 from constants applied to ONNX raw fpn? No: forward_image already
     # applied them in PT. The ONNX image_encoder returns RAW fpn (image_encoder wrapper
     # does NOT apply conv_s0/s1). Compare PT high_res (conv-projected) vs ONNX conv-projected.
-    from sam3_onnx_equiv.video_orchestrator import _conv1x1, Constants
+    from sam3_onnx_equiv.video_orchestrator import Constants, _conv1x1
+
     C = Constants(CONSTANTS_DIR)
     onnx_hrf0 = _conv1x1(onnx_fpn0, C.conv_s0_weight, C.conv_s0_bias)
     onnx_hrf1 = _conv1x1(onnx_fpn1, C.conv_s1_weight, C.conv_s1_bias)
@@ -106,42 +109,51 @@ def main() -> None:
     # --- PyTorch decode head via track_step (frame 0, is_init, point) ---
     cx = IMAGE_SIZE // 6
     cy = IMAGE_SIZE // 2
-    coords = torch.tensor([[[cx / IMAGE_SIZE * SAM3_IMAGE_SIZE,
-                             cy / IMAGE_SIZE * SAM3_IMAGE_SIZE]]], dtype=torch.float32)
+    coords = torch.tensor(
+        [[[cx / IMAGE_SIZE * SAM3_IMAGE_SIZE, cy / IMAGE_SIZE * SAM3_IMAGE_SIZE]]],
+        dtype=torch.float32,
+    )
     labels = torch.tensor([[1]], dtype=torch.int32)
     point_inputs = {"point_coords": coords, "point_labels": labels}
     output_dict = {"cond_frame_outputs": {}, "non_cond_frame_outputs": {}}
     with torch.inference_mode():
         out = tracker.track_step(
-            frame_idx=0, is_init_cond_frame=True,
+            frame_idx=0,
+            is_init_cond_frame=True,
             current_vision_feats=vision_feats,
             current_vision_pos_embeds=vision_pos,
-            feat_sizes=feat_sizes, image=img_t,
-            point_inputs=point_inputs, mask_inputs=None,
-            output_dict=output_dict, num_frames=6,
+            feat_sizes=feat_sizes,
+            image=img_t,
+            point_inputs=point_inputs,
+            mask_inputs=None,
+            output_dict=output_dict,
+            num_frames=6,
         )
-    pt_low = out["pred_masks"].float().numpy()       # (1,1,288,288)
+    pt_low = out["pred_masks"].float().numpy()  # (1,1,288,288)
     pt_score = float(out["object_score_logits"][0, 0])
     pt_px = int((pt_low[0, 0] > 0).sum())
     print(f"\n=== PT track_step frame0: score={pt_score:.4f} px={pt_px} ===")
 
     # --- ONNX decode head ---
-    dsess = ort.InferenceSession(str(ONNX_DIR / "decode_head.onnx"),
-                                 providers=["CPUExecutionProvider"])
-    onnx_pix = onnx_fpn2 + C.no_mem_embed.reshape(1, 1, 256).transpose(0, 2, 1).reshape(1, 256, 1, 1) * 0  # placeholder
+    dsess = ort.InferenceSession(
+        str(ONNX_DIR / "decode_head.onnx"), providers=["CPUExecutionProvider"]
+    )
     # Replicate orchestrator: pix_feat = fpn2_seq + no_mem_embed -> (1,256,72,72)
     fpn2_seq = onnx_fpn2[0].reshape(D_MODEL, HW).T[:, None, :]
     pix_seq = fpn2_seq + C.no_mem_embed
     pix_bchw = pix_seq.transpose(1, 2, 0).reshape(1, D_MODEL, 72, 72).astype(np.float32)
-    dout = dsess.run(None, {
-        "image_embeddings": pix_bchw,
-        "high_res_feat0": onnx_hrf0,
-        "high_res_feat1": onnx_hrf1,
-        "point_coords": coords.numpy(),
-        "point_labels": labels.numpy(),
-        "mask_input": np.zeros((1, 1, 288, 288), np.float32),
-        "has_mask_input": np.zeros((1,), np.float32),
-    })
+    dout = dsess.run(
+        None,
+        {
+            "image_embeddings": pix_bchw,
+            "high_res_feat0": onnx_hrf0,
+            "high_res_feat1": onnx_hrf1,
+            "point_coords": coords.numpy(),
+            "point_labels": labels.numpy(),
+            "mask_input": np.zeros((1, 1, 288, 288), np.float32),
+            "has_mask_input": np.zeros((1,), np.float32),
+        },
+    )
     onnx_low = dout[0]
     onnx_score = float(dout[2][0, 0])
     onnx_px = int((onnx_low[0, 0] > 0).sum())
@@ -150,8 +162,9 @@ def main() -> None:
     # IoU between PT and ONNX masks
     pm = pt_low[0, 0] > 0
     om = onnx_low[0, 0] > 0
-    inter = (pm & om).sum(); union = (pm | om).sum()
-    print(f"  PT-vs-ONNX mask IoU = {inter/union if union else 1.0:.4f}")
+    inter = (pm & om).sum()
+    union = (pm | om).sum()
+    print(f"  PT-vs-ONNX mask IoU = {inter / union if union else 1.0:.4f}")
 
     # Compare PT no-mem pix_feat against what track_step actually used
     # (track_step frame0 uses _prepare_memory_conditioned_features no-mem path internally)

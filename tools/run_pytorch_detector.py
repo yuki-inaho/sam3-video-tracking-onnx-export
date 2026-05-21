@@ -150,8 +150,8 @@ def run_detector() -> dict:
     # --- Load model (offline, no HuggingFace download) ---
     logger.info("Loading model from checkpoint (load_from_HF=False)...")
     t0 = time.time()
-    from sam3.model_builder import build_sam3_image_model
     from sam3.model.sam3_image_processor import Sam3Processor
+    from sam3.model_builder import build_sam3_image_model
 
     model = build_sam3_image_model(
         checkpoint_path=str(CHECKPOINT_PATH),
@@ -169,7 +169,11 @@ def run_detector() -> dict:
     )
 
     # --- Build synthetic input ---
-    logger.info("Generating synthetic image (black background, red circle, %dx%d)", IMAGE_RESOLUTION, IMAGE_RESOLUTION)
+    logger.info(
+        "Generating synthetic image (black background, red circle, %dx%d)",
+        IMAGE_RESOLUTION,
+        IMAGE_RESOLUTION,
+    )
     image = _make_synthetic_image(IMAGE_RESOLUTION)
 
     # --- Inference ---

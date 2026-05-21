@@ -27,7 +27,7 @@ sys.path.insert(0, str(SANDBOX_ROOT / "src"))
 
 from sam3_onnx_equiv.export.memory_attention import export_memory_attention  # noqa: E402
 
-_TWO_FRAME = 2 * 72 * 72       # 10368
+_TWO_FRAME = 2 * 72 * 72  # 10368
 _FULL = 7 * 72 * 72 + 16 * 4  # 36352
 
 EQUIV_SOURCE_ROOT = SANDBOX_ROOT / "outputs" / "sam3_equiv_source"
@@ -41,8 +41,7 @@ def main() -> None:
         "--mem-len",
         type=int,
         default=_TWO_FRAME,
-        help=f"Memory token length (default: {_TWO_FRAME} = 2-frame config). "
-             f"Full config: {_FULL}.",
+        help=f"Memory token length (default: {_TWO_FRAME} = 2-frame config). Full config: {_FULL}.",
     )
     parser.add_argument(
         "--num-k-exclude-rope",
@@ -67,11 +66,14 @@ def main() -> None:
     )
 
     import onnx  # noqa: PLC0415
+
     model = onnx.load(args.output)
     op_types = sorted({node.op_type for node in model.graph.node})
     print(f"\nOp types ({len(op_types)}): {op_types}")
     forbidden = {"ComplexFloat", "Complex", "Polar", "ViewAsComplex", "ViewAsReal"}
-    found = [op for op in op_types if op in forbidden or op.lower() in {f.lower() for f in forbidden}]
+    found = [
+        op for op in op_types if op in forbidden or op.lower() in {f.lower() for f in forbidden}
+    ]
     if found:
         print(f"WARNING: complex ops found: {found}")
     else:

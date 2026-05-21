@@ -15,8 +15,7 @@ import logging
 import sys
 from pathlib import Path
 
-logging.basicConfig(level=logging.INFO,
-                    format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 log = logging.getLogger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent

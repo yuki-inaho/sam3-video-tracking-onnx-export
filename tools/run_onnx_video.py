@@ -53,10 +53,17 @@ def _setup_logging() -> logging.Logger:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--max-frames", type=int, default=None,
-                        help="Limit number of frames (debug). Default: all 6.")
-    parser.add_argument("--emulate-bf16", action="store_true",
-                        help="Diagnostic: round stored memory to bf16 (emulate oracle).")
+    parser.add_argument(
+        "--max-frames",
+        type=int,
+        default=None,
+        help="Limit number of frames (debug). Default: all 6.",
+    )
+    parser.add_argument(
+        "--emulate-bf16",
+        action="store_true",
+        help="Diagnostic: round stored memory to bf16 (emulate oracle).",
+    )
     args = parser.parse_args()
 
     logger = _setup_logging()
@@ -101,6 +108,7 @@ def main() -> None:
         oracle_mask = oracle_masks[i][0].astype(bool)
         if oracle_mask.shape != orch_mask.shape:
             from PIL import Image as PILImage
+
             pil = PILImage.fromarray(oracle_mask.astype(np.uint8) * 255, mode="L")
             pil = pil.resize((orch_mask.shape[1], orch_mask.shape[0]), PILImage.NEAREST)
             oracle_mask = np.array(pil) > 127
@@ -110,7 +118,13 @@ def main() -> None:
         rel = abs(cs - os) / max(abs(os), 1e-8)
         logger.info(
             "  frame %d: IoU=%.4f | score onnx=%.4f oracle=%.4f rel=%.4f | px onnx=%d oracle=%d",
-            i, iou, cs, os, rel, int(orch_mask.sum()), int(oracle_mask.sum()),
+            i,
+            iou,
+            cs,
+            os,
+            rel,
+            int(orch_mask.sum()),
+            int(oracle_mask.sum()),
         )
 
 
