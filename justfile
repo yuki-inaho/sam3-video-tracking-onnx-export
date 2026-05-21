@@ -1,0 +1,176 @@
+# justfile — SAM3 ONNX export / oracle / inference / test / quality-gate
+#
+# All Python commands run via `uv run` (no bare python).
+# Portability: set SAM3_SRC to the upstream SAM3 repo root on your machine.
+# Every other path is relative to the repository root (justfile location).
+#
+# Usage:
+#   just sync           # install all deps (including dev + dev-group)
+#   just equiv-source   # generate equivalent SAM3 source (required before export)
+#   just export-all     # run all ONNX export steps in dependency order
+#   just oracle         # generate PyTorch oracle artefacts (slow, GPU recommended)
+#   just run-video      # run ONNX video orchestrator and compare with oracle
+#   just test           # run full test suite
+#   just e2e            # run MUST test (mask IoU >= 0.90)
+#   just quality        # run all quality gates (format-check + lint + typecheck + complexity)
+
+# ---------------------------------------------------------------------------
+# Configurable variables — override via environment or `just --set VAR value`
+# ---------------------------------------------------------------------------
+
+# Upstream SAM3 repository root (source for equiv-source generation).
+# MUST be set to a valid path; no implicit fallback.
+SAM3_SRC := env_var_or_default("SAM3_SRC", "/home/inaho-omen/Project/sam3")
+
+# Equivalent-source output directory (relative to repo root).
+EQUIV_SOURCE := "outputs/sam3_equiv_source"
+
+# SAM3 checkpoint file (relative to repo root).
+CHECKPOINT := "models/sam3.pt"
+
+# ONNX output directory (relative to repo root).
+ONNX_DIR := "outputs/onnx"
+
+# ---------------------------------------------------------------------------
+# Default: list all targets
+# ---------------------------------------------------------------------------
+
+_default:
+    @just --list
+
+# ---------------------------------------------------------------------------
+# Environment setup
+# ---------------------------------------------------------------------------
+
+# Install all dependencies: project extras (dev) + dependency-group (dev).
+sync:
+    uv sync --extra dev --group dev
+
+# ---------------------------------------------------------------------------
+# Equivalent-source generation (MUST run before any export)
+# ---------------------------------------------------------------------------
+
+# Generate SAM3 equivalent source copy with explicit real-valued RoPE wiring.
+# Reads from SAM3_SRC; writes to EQUIV_SOURCE.
+equiv-source:
+    @echo "SAM3_SRC={{ SAM3_SRC }}"
+    @echo "EQUIV_SOURCE={{ EQUIV_SOURCE }}"
+    uv run python tools/create_equivalent_sam3_source.py \
+        --source-root "{{ SAM3_SRC }}" \
+        --output-root "{{ EQUIV_SOURCE }}"
+
+# ---------------------------------------------------------------------------
+# ONNX export — individual targets
+# ---------------------------------------------------------------------------
+
+# Export detector image encoder (add_sam2_neck=False).
+export-image-encoder:
+    uv run python tools/export_image_encoder.py \
+        --equiv-source "{{ EQUIV_SOURCE }}" \
+        --checkpoint "{{ CHECKPOINT }}" \
+        --output "{{ ONNX_DIR }}/image_encoder.onnx"
+
+# Export tracker image encoder (SAM2 neck; uses repo-relative defaults in the tool).
+export-image-encoder-tracker:
+    uv run python tools/export_image_encoder_tracker.py
+
+# Export memory_attention with fixed mem_len (2-frame default).
+export-memory-attention:
+    uv run python tools/export_memory_attention.py \
+        --output "{{ ONNX_DIR }}/memory_attention.onnx"
+
+# Export memory_attention with dynamic maskmem dimension (per num_k_exclude_rope).
+export-memory-attention-dynamic:
+    uv run python tools/export_memory_attention_dynamic.py
+
+# Export memory encoder (SimpleMaskEncoder).
+export-memory-encoder:
+    uv run python tools/export_memory_encoder.py \
+        --equiv-source "{{ EQUIV_SOURCE }}" \
+        --checkpoint "{{ CHECKPOINT }}" \
+        --output "{{ ONNX_DIR }}/memory_encoder.onnx"
+
+# Export decode head (prompt_encoder + mask_decoder + obj_ptr_proj).
+export-decode-head:
+    uv run python tools/export_decode_head.py \
+        --equiv-source "{{ EQUIV_SOURCE }}" \
+        --checkpoint "{{ CHECKPOINT }}" \
+        --output "{{ ONNX_DIR }}/decode_head.onnx"
+
+# ---------------------------------------------------------------------------
+# ONNX export — combined
+# ---------------------------------------------------------------------------
+
+# Run all ONNX exports in dependency order.
+# equiv-source must already exist (run `just equiv-source` first).
+export-all: export-image-encoder export-image-encoder-tracker export-memory-attention export-memory-attention-dynamic export-memory-encoder export-decode-head
+
+# equiv-source + export-all as a single convenience target.
+build-all: equiv-source export-all
+
+# ---------------------------------------------------------------------------
+# Oracle generation (PyTorch reference; slow — GPU strongly recommended)
+# ---------------------------------------------------------------------------
+
+# Generate PyTorch detector oracle (outputs/reference/baseline_detector.npz).
+oracle-detector:
+    uv run python tools/run_pytorch_detector.py
+
+# Generate PyTorch video tracking oracle (outputs/reference/video_oracle_all.npz).
+oracle-video:
+    uv run python tools/run_pytorch_video.py
+
+# Generate both oracles.
+oracle: oracle-detector oracle-video
+
+# ---------------------------------------------------------------------------
+# ONNX inference
+# ---------------------------------------------------------------------------
+
+MAX_FRAMES := ""
+EMULATE_BF16 := ""
+
+# Run ONNX video orchestrator and compare with oracle (MAX_FRAMES / EMULATE_BF16 optional).
+run-video:
+    uv run python tools/run_onnx_video.py \
+        {{ if MAX_FRAMES != "" { "--max-frames " + MAX_FRAMES } else { "" } }} \
+        {{ if EMULATE_BF16 == "true" { "--emulate-bf16" } else { "" } }}
+
+# ---------------------------------------------------------------------------
+# Tests
+# ---------------------------------------------------------------------------
+
+# Run the full test suite.
+test:
+    uv run pytest -q
+
+# Run the MUST e2e test (memory-bank video tracking, mask IoU >= 0.90).
+e2e:
+    uv run pytest tests/test_video_e2e.py -q
+
+# ---------------------------------------------------------------------------
+# Quality gates
+# ---------------------------------------------------------------------------
+
+# Check formatting (non-destructive; exits non-zero if reformatting is needed).
+format-check:
+    uv run ruff format --check .
+
+# Apply auto-formatting.
+format:
+    uv run ruff format .
+
+# Lint (ruff check).
+lint:
+    uv run ruff check .
+
+# Static type check (ty).
+typecheck:
+    uv run ty check src tools tests
+
+# Cyclomatic complexity gate (fail on grade C or worse).
+complexity:
+    uv run radon cc src -n C
+
+# Run all quality gates (format-check + lint + typecheck + complexity).
+quality: format-check lint typecheck complexity
