@@ -52,24 +52,31 @@ Fixed-shape I/O contract:
 from __future__ import annotations
 
 import logging
-import sys
 from pathlib import Path
-from typing import Tuple
 
 import torch
 import torch.nn as nn
+from jaxtyping import Float, Int
+from torch import Tensor
+
+from sam3_onnx_equiv.export._equiv_loader import (
+    equiv_sam3_on_path,
+    evict_sam3_cache,
+    load_checkpoint,
+    patch_output_dims,
+)
 
 log = logging.getLogger(__name__)
 
 # Fixed dimensions.
 B = 1
-EMB_DIM = 256           # image_embeddings channel dim
-EMB_H = EMB_W = 72     # spatial resolution (1008 / 14)
-HRF0_C = 32             # high_res_feat0 channels (conv_s0: 256 // 8)
+EMB_DIM = 256  # image_embeddings channel dim
+EMB_H = EMB_W = 72  # spatial resolution (1008 / 14)
+HRF0_C = 32  # high_res_feat0 channels (conv_s0: 256 // 8)
 HRF0_H = HRF0_W = 288  # high_res_feat0 spatial (72 * 4)
-HRF1_C = 64             # high_res_feat1 channels (conv_s1: 256 // 4)
+HRF1_C = 64  # high_res_feat1 channels (conv_s1: 256 // 4)
 HRF1_H = HRF1_W = 144  # high_res_feat1 spatial (72 * 2)
-N_POINTS = 1            # fixed number of point prompts
+N_POINTS = 1  # fixed number of point prompts
 MASK_IN_H = MASK_IN_W = 288  # mask_input spatial (4 * 72)
 
 OPSET_VERSION = 18
@@ -93,10 +100,10 @@ _OUTPUT_NAMES = [
 
 # Known static output shapes for _patch_output_dims.
 _KNOWN_SHAPES: dict[str, list[int]] = {
-    "low_res_masks":       [B, 1, MASK_IN_H, MASK_IN_W],
-    "iou_scores":          [B, 1],
+    "low_res_masks": [B, 1, MASK_IN_H, MASK_IN_W],
+    "iou_scores": [B, 1],
     "object_score_logits": [B, 1],
-    "obj_ptr":             [B, EMB_DIM],
+    "obj_ptr": [B, EMB_DIM],
 }
 
 
@@ -136,14 +143,20 @@ class DecodeHeadWrapper(nn.Module):
 
     def forward(
         self,
-        image_embeddings: torch.Tensor,   # (B, 256, 72, 72)
-        high_res_feat0: torch.Tensor,     # (B, 32, 288, 288) conv_s0-projected
-        high_res_feat1: torch.Tensor,     # (B, 64, 144, 144) conv_s1-projected
-        point_coords: torch.Tensor,       # (B, N, 2)  float32
-        point_labels: torch.Tensor,       # (B, N)     int32
-        mask_input: torch.Tensor,         # (B, 1, 288, 288) prior mask logits
-        has_mask_input: torch.Tensor,     # (1,)       float32; 1.0 if mask valid
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        image_embeddings: Float[Tensor, "1 256 72 72"],  # (B, 256, 72, 72)
+        high_res_feat0: Float[Tensor, "1 32 288 288"],  # conv_s0-projected
+        high_res_feat1: Float[Tensor, "1 64 144 144"],  # conv_s1-projected
+        point_coords: Float[Tensor, "1 n 2"],  # (B, N, 2)  float32
+        point_labels: Int[Tensor, "1 n"],  # (B, N)     int32
+        mask_input: Float[Tensor, "1 1 288 288"],  # (B, 1, 288, 288) prior mask logits
+        # jaxtyping single-axis shape "b"; quotes are required (noqa: UP037 false positive).
+        has_mask_input: Float[Tensor, "b"],  # noqa: UP037  # (1,) float32; 1.0 if mask valid
+    ) -> tuple[
+        Float[Tensor, "1 1 288 288"],
+        Float[Tensor, "1 1"],
+        Float[Tensor, "1 1"],
+        Float[Tensor, "1 256"],
+    ]:
         """Forward through decode head.
 
         multimask_output=False is baked in to avoid Python if-branch in ONNX graph.
@@ -169,9 +182,9 @@ class DecodeHeadWrapper(nn.Module):
         # has_mask_input is (1,) float32 → broadcast multiply.
         mask_embed = self.prompt_encoder.mask_downscaling(mask_input)  # (B, 256, 72, 72)
         # no_mask_embed: (1, 256, 1, 1) → expanded to (B, 256, 72, 72)
-        no_mask_embed = self.prompt_encoder.no_mask_embed.weight.reshape(
-            1, -1, 1, 1
-        ).expand(batch_size, -1, EMB_H, EMB_W)
+        no_mask_embed = self.prompt_encoder.no_mask_embed.weight.reshape(1, -1, 1, 1).expand(
+            batch_size, -1, EMB_H, EMB_W
+        )
         # Blend: if has_mask=1.0 → use mask_embed; else → use no_mask_embed.
         has = has_mask_input.view(1, 1, 1, 1)  # broadcast shape
         dense_embeddings = has * mask_embed + (1.0 - has) * no_mask_embed  # (B, 256, 72, 72)
@@ -202,33 +215,27 @@ class DecodeHeadWrapper(nn.Module):
             # Best-IoU selection (mirrors _forward_sam_heads:361-368).
             # low_res_multimasks: (B, 3, 288, 288); iou_scores: (B, 3);
             # sam_output_tokens: (B, 3, 256).
-            best_iou_inds = torch.argmax(iou_scores, dim=-1)            # (B,)
+            best_iou_inds = torch.argmax(iou_scores, dim=-1)  # (B,)
             batch_inds = torch.arange(low_res_multimasks.size(0), device=low_res_multimasks.device)
-            low_res_masks = low_res_multimasks[batch_inds, best_iou_inds].unsqueeze(1)  # (B,1,288,288)
-            iou_out = iou_scores[batch_inds, best_iou_inds].unsqueeze(1)                # (B,1)
-            sam_output_token = sam_output_tokens[batch_inds, best_iou_inds]             # (B,256)
+            low_res_masks = low_res_multimasks[batch_inds, best_iou_inds].unsqueeze(
+                1
+            )  # (B,1,288,288)
+            iou_out = iou_scores[batch_inds, best_iou_inds].unsqueeze(1)  # (B,1)
+            sam_output_token = sam_output_tokens[batch_inds, best_iou_inds]  # (B,256)
         else:
-            low_res_masks = low_res_multimasks       # (B, 1, 288, 288)
-            iou_out = iou_scores                     # (B, 1)
+            low_res_masks = low_res_multimasks  # (B, 1, 288, 288)
+            iou_out = iou_scores  # (B, 1)
             sam_output_token = sam_output_tokens[:, 0]  # (B, 256)
 
         # --- Object pointer ---
         is_obj_appearing = (object_score_logits > 0).float()  # (B, 1)
-        obj_ptr = self.obj_ptr_proj(sam_output_token)          # (B, 256)
+        obj_ptr = self.obj_ptr_proj(sam_output_token)  # (B, 256)
         # Blend: obj present → proj(token), absent → no_obj_ptr
         obj_ptr = (
-            is_obj_appearing * obj_ptr
-            + (1.0 - is_obj_appearing) * self.no_obj_ptr
+            is_obj_appearing * obj_ptr + (1.0 - is_obj_appearing) * self.no_obj_ptr
         )  # (B, 256)
 
         return low_res_masks, iou_out, object_score_logits, obj_ptr
-
-
-def _evict_sam3_cache() -> None:
-    """Remove all sam3.* entries from sys.modules to force a clean re-import."""
-    to_del = [k for k in sys.modules if k == "sam3" or k.startswith("sam3.")]
-    for k in to_del:
-        del sys.modules[k]
 
 
 def _load_equiv_decode_head(
@@ -251,22 +258,11 @@ def _load_equiv_decode_head(
         FileNotFoundError: if either path is absent.
         RuntimeError:      if required tracker.* keys are not found.
     """
-    if not equiv_source_root.exists():
-        raise FileNotFoundError(f"Equiv source not found: {equiv_source_root}")
     if not checkpoint_path.exists():
         raise FileNotFoundError(f"Checkpoint not found: {checkpoint_path}")
 
-    equiv_root_str = str(equiv_source_root.resolve())
-    inserted = False
-    if equiv_root_str not in sys.path:
-        sys.path.insert(0, equiv_root_str)
-        inserted = True
-
-    _evict_sam3_cache()
-
-    try:
-        from sam3.model.sam3_tracker_base import Sam3TrackerBase  # type: ignore[import]
-        from sam3.model_builder import build_tracker               # type: ignore[import]
+    with equiv_sam3_on_path(equiv_source_root):
+        from sam3.model_builder import build_tracker  # type: ignore[import]
 
         log.info("Building SAM3 tracker (decode head) from equiv source ...")
         # Build a minimal tracker (no backbone) to get the decode head modules.
@@ -275,19 +271,14 @@ def _load_equiv_decode_head(
             with_backbone=False,
             use_rope_real=True,
         )
-    finally:
-        if inserted and equiv_root_str in sys.path:
-            sys.path.remove(equiv_root_str)
-        _evict_sam3_cache()
+    # Drop the freshly imported equiv sam3.* modules so later imports start clean.
+    evict_sam3_cache()
 
     tracker = tracker.cpu().float().eval()
 
     # --- Load weights from checkpoint ---
     log.info("Loading tracker decode head weights from %s ...", checkpoint_path)
-    with open(str(checkpoint_path), "rb") as f:
-        ckpt = torch.load(f, map_location="cpu", weights_only=True)
-    if "model" in ckpt and isinstance(ckpt["model"], dict):
-        ckpt = ckpt["model"]
+    ckpt = load_checkpoint(checkpoint_path)
 
     # Prefixes to load (map checkpoint prefix → module attribute on tracker).
     prefix_to_attr = {
@@ -297,22 +288,15 @@ def _load_equiv_decode_head(
     }
 
     for ckpt_prefix, attr_name in prefix_to_attr.items():
-        state = {
-            k[len(ckpt_prefix):]: v
-            for k, v in ckpt.items()
-            if k.startswith(ckpt_prefix)
-        }
+        state = {k[len(ckpt_prefix) :]: v for k, v in ckpt.items() if k.startswith(ckpt_prefix)}
         if not state:
             raise RuntimeError(
-                f"No '{ckpt_prefix}*' keys found in {checkpoint_path}. "
-                "Verify checkpoint format."
+                f"No '{ckpt_prefix}*' keys found in {checkpoint_path}. Verify checkpoint format."
             )
         module = getattr(tracker, attr_name)
         missing, unexpected = module.load_state_dict(state, strict=True)
         if missing:
-            raise RuntimeError(
-                f"Missing keys for {attr_name}: {missing[:10]}"
-            )
+            raise RuntimeError(f"Missing keys for {attr_name}: {missing[:10]}")
         if unexpected:
             log.warning("Unexpected keys for %s (ignored): %s", attr_name, unexpected[:5])
         log.info("Loaded %d keys for %s.", len(state), attr_name)
@@ -320,49 +304,23 @@ def _load_equiv_decode_head(
     # Load no_obj_ptr (it's a Parameter on the tracker itself).
     no_obj_ptr_key = "tracker.no_obj_ptr"
     if no_obj_ptr_key not in ckpt:
-        raise RuntimeError(
-            f"Key '{no_obj_ptr_key}' not found in {checkpoint_path}."
-        )
+        raise RuntimeError(f"Key '{no_obj_ptr_key}' not found in {checkpoint_path}.")
     no_obj_ptr = ckpt[no_obj_ptr_key].cpu().float()  # (1, 256)
     log.info("Loaded no_obj_ptr: shape=%s", no_obj_ptr.shape)
 
-    wrapper = DecodeHeadWrapper(
-        prompt_encoder=tracker.sam_prompt_encoder,
-        mask_decoder=tracker.sam_mask_decoder,
-        obj_ptr_proj=tracker.obj_ptr_proj,
-        no_obj_ptr=no_obj_ptr,
-    ).cpu().float().eval()
+    wrapper = (
+        DecodeHeadWrapper(
+            prompt_encoder=tracker.sam_prompt_encoder,
+            mask_decoder=tracker.sam_mask_decoder,
+            obj_ptr_proj=tracker.obj_ptr_proj,
+            no_obj_ptr=no_obj_ptr,
+        )
+        .cpu()
+        .float()
+        .eval()
+    )
 
     return wrapper
-
-
-def _patch_output_dims(model_proto: "onnx.ModelProto", output_path: Path) -> None:  # noqa: F821
-    """Replace symbolic dim_params in graph output ValueInfo with concrete values.
-
-    Args:
-        model_proto:  Loaded ONNX ModelProto (modified in-place).
-        output_path:  Path where the patched model is saved.
-    """
-    import onnx  # noqa: PLC0415
-
-    patched = 0
-    for out in model_proto.graph.output:
-        if out.name not in _KNOWN_SHAPES:
-            continue
-        shape = _KNOWN_SHAPES[out.name]
-        for i, d in enumerate(out.type.tensor_type.shape.dim):
-            if d.HasField("dim_param"):
-                d.ClearField("dim_param")
-                d.dim_value = shape[i]
-                patched += 1
-
-    if patched:
-        log.info("_patch_output_dims: patched %d symbolic dims → concrete values.", patched)
-        onnx.checker.check_model(model_proto)
-        onnx.save(model_proto, str(output_path))
-        log.info("Patched model saved to %s.", output_path)
-    else:
-        log.info("_patch_output_dims: all output dims already concrete — no patch needed.")
 
 
 def build_decode_head_module(
@@ -471,4 +429,4 @@ def export_decode_head(
             "Check multimask_output baking and dynamic_multimask_via_stability."
         )
 
-    _patch_output_dims(model_proto, output_path)
+    patch_output_dims(model_proto, output_path, _KNOWN_SHAPES)

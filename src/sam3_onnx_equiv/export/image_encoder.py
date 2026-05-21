@@ -40,20 +40,31 @@ from __future__ import annotations
 
 import logging
 import math
-import sys
 from pathlib import Path
-from typing import Tuple
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from jaxtyping import Float
+from torch import Tensor
 
+from sam3_onnx_equiv.export._equiv_loader import (
+    equiv_sam3_on_path,
+    evict_sam3_cache,
+    extract_prefixed_state,
+    load_checkpoint,
+    patch_output_dims,
+)
 from sam3_onnx_equiv.export.rope_freqs import replace_rope_freqs
+
+# Re-exported for backward compatibility (tests import _evict_sam3_cache via the
+# equiv loaders; keep the historical name available from this module too).
+_evict_sam3_cache = evict_sam3_cache
 
 log = logging.getLogger(__name__)
 
 # Fixed input shape for the image encoder (H=W=1008 resolution)
-INPUT_SHAPE: Tuple[int, int, int, int] = (1, 3, 1008, 1008)
+INPUT_SHAPE: tuple[int, int, int, int] = (1, 3, 1008, 1008)
 
 # Patch size used by the ViT backbone (1008 / 14 = 72, confirmed at runtime).
 # This is the spatial resolution at which the ViT trunk operates.
@@ -71,6 +82,17 @@ OUTPUT_NAMES = [
     "backbone_fpn_1",
     "backbone_fpn_2",
 ]
+
+# Static output shapes at 1008×1008 input (FPN level 0 = finest), used by
+# patch_output_dims to replace symbolic output dims with concrete values.
+_KNOWN_OUTPUT_SHAPES: dict[str, list[int]] = {
+    "vision_pos_enc_0": [1, 256, 288, 288],
+    "vision_pos_enc_1": [1, 256, 144, 144],
+    "vision_pos_enc_2": [1, 256, 72, 72],
+    "backbone_fpn_0": [1, 256, 288, 288],
+    "backbone_fpn_1": [1, 256, 144, 144],
+    "backbone_fpn_2": [1, 256, 72, 72],
+}
 
 OPSET_VERSION = 18
 
@@ -99,7 +121,7 @@ class ImageEncoderWrapper(nn.Module):
         # via backbone.forward_image(...)["sam2_backbone_out"].
         self.use_sam2_neck = use_sam2_neck
 
-    def forward(self, pixel_values: torch.Tensor) -> Tuple[torch.Tensor, ...]:
+    def forward(self, pixel_values: Float[Tensor, "1 3 1008 1008"]) -> tuple[Tensor, ...]:
         out = self.backbone._forward_image_no_act_ckpt(pixel_values)
         if self.use_sam2_neck:
             sam2 = out["sam2_backbone_out"]
@@ -138,22 +160,10 @@ def _load_equiv_sam3_model(
     Raises:
         FileNotFoundError: if equiv_source_root or checkpoint_path are absent.
     """
-    equiv_root_str = str(equiv_source_root.resolve())
-    if not equiv_source_root.exists():
-        raise FileNotFoundError(f"Equiv source not found: {equiv_source_root}")
     if not checkpoint_path.exists():
         raise FileNotFoundError(f"Checkpoint not found: {checkpoint_path}")
 
-    # Insert equiv source at front so sam3.* resolves to patched version.
-    inserted = False
-    if equiv_root_str not in sys.path:
-        sys.path.insert(0, equiv_root_str)
-        inserted = True
-
-    # Evict any cached sam3 sub-modules so the fresh import uses equiv source.
-    _evict_sam3_cache()
-
-    try:
+    with equiv_sam3_on_path(equiv_source_root):
         from sam3.model_builder import build_sam3_image_model  # type: ignore[import]
 
         log.info("Loading SAM3 image model from equiv source (use_rope_real=True) ...")
@@ -164,10 +174,6 @@ def _load_equiv_sam3_model(
             load_from_HF=False,
             use_rope_real=True,
         )
-    finally:
-        # Remove the injected path to avoid polluting subsequent imports.
-        if inserted and equiv_root_str in sys.path:
-            sys.path.remove(equiv_root_str)
 
     log.info("Model loaded.  Applying rope freqs replacement to backbone ...")
     replaced = replace_rope_freqs(model.backbone)
@@ -191,11 +197,44 @@ def _load_equiv_sam3_model(
     return model
 
 
-def _evict_sam3_cache() -> None:
-    """Remove all sam3.* entries from sys.modules to force a clean re-import."""
-    to_del = [k for k in sys.modules if k == "sam3" or k.startswith("sam3.")]
-    for k in to_del:
-        del sys.modules[k]
+def _resize_pos_embed_grid(
+    abs_pos: torch.Tensor, size: int, h: int, w: int, tiling: bool
+) -> torch.Tensor:
+    """Expand a (1, size², C) positional grid to (1, h*w, C) like get_abs_pos.
+
+    Args:
+        abs_pos: Spatial pos-embed tokens, (1, size², C).
+        size:    Source grid edge length.
+        h, w:    Target grid height / width.
+        tiling:  If True, tile-then-crop; otherwise bicubic interpolate.
+
+    Returns:
+        (1, h*w, C) token sequence.
+    """
+    grid = abs_pos.reshape(1, size, size, -1).permute(0, 3, 1, 2)  # (1, C, size, size)
+    if tiling:
+        grid = grid.tile([1, 1] + [x // y + 1 for x, y in zip((h, w), grid.shape[2:])])[
+            :, :, :h, :w
+        ]
+    else:
+        grid = F.interpolate(grid, size=(h, w), mode="bicubic", align_corners=False)
+    return grid.permute(0, 2, 3, 1).reshape(1, h * w, -1)  # (1, h*w, C)
+
+
+def _verify_pos_embed_size(
+    new_pos_embed: torch.Tensor, has_cls_token: bool, h: int, w: int
+) -> None:
+    """Raise if the precomputed pos-embed grid does not match the target (h, w).
+
+    Ensures get_abs_pos will take its trivial else-branch (no ONNX ``If`` node).
+    """
+    abs_pos_new = new_pos_embed[:, 1:] if has_cls_token else new_pos_embed
+    new_size = int(math.sqrt(abs_pos_new.shape[1]))
+    if new_size != h or new_size != w:
+        raise RuntimeError(
+            f"freeze_abs_pos_for_export: after precompute, new_size={new_size} "
+            f"still != target ({h}, {w}).  Check that h*w is a perfect square."
+        )
 
 
 def freeze_abs_pos_for_export(trunk: nn.Module, h: int = _VIT_H, w: int = _VIT_W) -> None:
@@ -236,8 +275,8 @@ def freeze_abs_pos_for_export(trunk: nn.Module, h: int = _VIT_H, w: int = _VIT_W
 
     abs_pos_full = trunk.pos_embed.data  # (1, N, C)
     if has_cls_token:
-        cls_pos = abs_pos_full[:, :1]   # (1, 1, C)
-        abs_pos = abs_pos_full[:, 1:]   # (1, size², C)
+        cls_pos = abs_pos_full[:, :1]  # (1, 1, C)
+        abs_pos = abs_pos_full[:, 1:]  # (1, size², C)
     else:
         cls_pos = None
         abs_pos = abs_pos_full
@@ -247,26 +286,22 @@ def freeze_abs_pos_for_export(trunk: nn.Module, h: int = _VIT_H, w: int = _VIT_W
     if size == h and size == w:
         log.info(
             "freeze_abs_pos_for_export: pos_embed already at target (%d×%d) — skipping.",
-            h, w,
+            h,
+            w,
         )
         return
 
     log.info(
         "freeze_abs_pos_for_export: resizing pos_embed from %d×%d to %d×%d (tiling=%s).",
-        size, size, h, w, tiling,
+        size,
+        size,
+        h,
+        w,
+        tiling,
     )
 
     # Expand pos_embed to (h, w) grid using the same logic as get_abs_pos.
-    grid = abs_pos.reshape(1, size, size, -1).permute(0, 3, 1, 2)  # (1, C, size, size)
-    if tiling:
-        grid = grid.tile(
-            [1, 1] + [x // y + 1 for x, y in zip((h, w), grid.shape[2:])]
-        )[:, :, :h, :w]
-    else:
-        grid = F.interpolate(grid, size=(h, w), mode="bicubic", align_corners=False)
-
-    # Flatten back to token sequence.
-    spatial_tokens = grid.permute(0, 2, 3, 1).reshape(1, h * w, -1)  # (1, h*w, C)
+    spatial_tokens = _resize_pos_embed_grid(abs_pos, size, h, w, tiling)  # (1, h*w, C)
 
     # Reassemble with optional cls_token prefix.
     if has_cls_token and cls_pos is not None and not retain_cls:
@@ -274,14 +309,7 @@ def freeze_abs_pos_for_export(trunk: nn.Module, h: int = _VIT_H, w: int = _VIT_W
     else:
         new_pos_embed = spatial_tokens
 
-    # Verify that the new size triggers the else-branch of get_abs_pos.
-    abs_pos_new = new_pos_embed[:, 1:] if has_cls_token else new_pos_embed
-    new_size = int(math.sqrt(abs_pos_new.shape[1]))
-    if new_size != h or new_size != w:
-        raise RuntimeError(
-            f"freeze_abs_pos_for_export: after precompute, new_size={new_size} "
-            f"still != target ({h}, {w}).  Check that h*w is a perfect square."
-        )
+    _verify_pos_embed_size(new_pos_embed, has_cls_token, h, w)
 
     # Replace the parameter data in-place (preserves requires_grad etc.).
     trunk.pos_embed = nn.Parameter(new_pos_embed.detach(), requires_grad=False)
@@ -341,8 +369,7 @@ def export_image_encoder(
         if_count = sum(1 for n in model_proto.graph.node if n.op_type == "If")
         if if_count == 0:
             log.info(
-                "ONNX file already exists with no `If` nodes (D5-3 fix applied) — "
-                "skipping export.",
+                "ONNX file already exists with no `If` nodes (D5-3 fix applied) — skipping export.",
             )
             return
         log.info(
@@ -381,61 +408,14 @@ def export_image_encoder(
     # already uses fixed shapes at 1008² resolution; only the ValueInfo
     # output descriptors still contain symbolic names from the exporter.
     # Patching them here avoids the cost of onnxsim on a ~1.8GB model.
-    _patch_output_dims(model_proto, output_path)
-
-
-def _patch_output_dims(model_proto: "onnx.ModelProto", output_path: Path) -> None:  # noqa: F821
-    """Replace symbolic dim_params in graph output ValueInfo with concrete values.
-
-    Concrete shapes (at 1008×1008 input) were verified by running ORT inference
-    with a random input immediately after export:
-        vision_pos_enc_0/1/2 and backbone_fpn_0/1/2 → (1, 256, H, W)
-        where (H, W) = (288, 288), (144, 144), (72, 72) per FPN level.
-
-    This is a metadata-only change: the ONNX computation nodes are unmodified.
-    onnx.checker is re-run on the patched proto to confirm validity.
-
-    Args:
-        model_proto: Loaded ONNX ModelProto (modified in-place).
-        output_path: Path where the patched model is saved.
-    """
-    import onnx  # noqa: PLC0415
-
-    # Known static shapes for 1008×1008 input (FPN level 0 = finest).
-    known_shapes: dict[str, list[int]] = {
-        "vision_pos_enc_0": [1, 256, 288, 288],
-        "vision_pos_enc_1": [1, 256, 144, 144],
-        "vision_pos_enc_2": [1, 256, 72, 72],
-        "backbone_fpn_0":   [1, 256, 288, 288],
-        "backbone_fpn_1":   [1, 256, 144, 144],
-        "backbone_fpn_2":   [1, 256, 72, 72],
-    }
-
-    patched = 0
-    for out in model_proto.graph.output:
-        if out.name not in known_shapes:
-            continue
-        shape = known_shapes[out.name]
-        for i, d in enumerate(out.type.tensor_type.shape.dim):
-            if d.HasField("dim_param"):
-                d.ClearField("dim_param")
-                d.dim_value = shape[i]
-                patched += 1
-
-    if patched:
-        log.info(
-            "_patch_output_dims: patched %d symbolic dims → concrete values.", patched
-        )
-        onnx.checker.check_model(model_proto)
-        onnx.save(model_proto, str(output_path))
-        log.info("Patched model saved to %s.", output_path)
-    else:
-        log.info("_patch_output_dims: all output dims already concrete — no patch needed.")
+    # Concrete shapes (at 1008×1008 input) verified by ORT inference after export.
+    patch_output_dims(model_proto, output_path, _KNOWN_OUTPUT_SHAPES)
 
 
 # ---------------------------------------------------------------------------
 # Tracker image encoder (SAM2 neck) — used by the video orchestrator (C-2)
 # ---------------------------------------------------------------------------
+
 
 def _load_equiv_tracker_backbone(
     equiv_source_root: Path,
@@ -459,19 +439,10 @@ def _load_equiv_tracker_backbone(
         SAM3VLBackbone (tracker.backbone) in eval mode, float32, CPU, with
         complex RoPE removed and pos_embed frozen for ONNX export.
     """
-    if not equiv_source_root.exists():
-        raise FileNotFoundError(f"Equiv source not found: {equiv_source_root}")
     if not checkpoint_path.exists():
         raise FileNotFoundError(f"Checkpoint not found: {checkpoint_path}")
 
-    equiv_root_str = str(equiv_source_root.resolve())
-    inserted = False
-    if equiv_root_str not in sys.path:
-        sys.path.insert(0, equiv_root_str)
-        inserted = True
-    _evict_sam3_cache()
-
-    try:
+    with equiv_sam3_on_path(equiv_source_root):
         from sam3.model_builder import build_tracker  # type: ignore[import]
 
         log.info("Building SAM3 tracker backbone from equiv source (use_rope_real=True) ...")
@@ -481,20 +452,13 @@ def _load_equiv_tracker_backbone(
             compile_mode=None,
             use_rope_real=True,
         )
-    finally:
-        if inserted and equiv_root_str in sys.path:
-            sys.path.remove(equiv_root_str)
 
-    ckpt = torch.load(str(checkpoint_path), map_location="cpu", weights_only=True)
-    if "model" in ckpt and isinstance(ckpt["model"], dict):
-        ckpt = ckpt["model"]
-    state: dict[str, torch.Tensor] = {
-        k[len("tracker."):]: v for k, v in ckpt.items() if k.startswith("tracker.")
-    }
-    state.update({
-        k[len("detector."):]: v for k, v in ckpt.items()
-        if k.startswith("detector.backbone.")
-    })
+    ckpt = load_checkpoint(checkpoint_path)
+    # tracker.* weights plus the shared backbone stored under detector.backbone.*.
+    state: dict[str, torch.Tensor] = extract_prefixed_state(ckpt, "tracker.")
+    state.update(
+        {k[len("detector.") :]: v for k, v in ckpt.items() if k.startswith("detector.backbone.")}
+    )
     missing, unexpected = tracker.load_state_dict(state, strict=False)
     backbone_missing = [k for k in missing if k.startswith("backbone.")]
     if backbone_missing:
@@ -584,4 +548,4 @@ def export_tracker_image_encoder(
     if found:
         raise RuntimeError(f"Complex ops found in tracker image encoder: {found}")
     log.info("Op types (%d): no complex ops. %s", len(op_types), sorted(op_types))
-    _patch_output_dims(model_proto, output_path)
+    patch_output_dims(model_proto, output_path, _KNOWN_OUTPUT_SHAPES)

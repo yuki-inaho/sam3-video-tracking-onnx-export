@@ -47,19 +47,26 @@ Fixed-shape I/O contract:
 from __future__ import annotations
 
 import logging
-import sys
 from pathlib import Path
-from typing import Tuple
 
 import torch
 import torch.nn as nn
+from jaxtyping import Float
+from torch import Tensor
+
+from sam3_onnx_equiv.export._equiv_loader import (
+    equiv_sam3_on_path,
+    extract_prefixed_state,
+    load_checkpoint,
+    patch_output_dims,
+)
 
 log = logging.getLogger(__name__)
 
 # Fixed spatial dimensions.
 B = 1
-IN_DIM = 256      # pix_feat channel count
-OUT_DIM = 64      # maskmem_features / pos_enc channel count
+IN_DIM = 256  # pix_feat channel count
+OUT_DIM = 64  # maskmem_features / pos_enc channel count
 FEAT_H = FEAT_W = 72
 MASK_H = MASK_W = 1008
 
@@ -71,6 +78,12 @@ _PIX_FEAT_NAME = "pix_feat"
 _MASK_NAME = "mask_for_mem"
 _FEATURES_NAME = "maskmem_features"
 _POS_ENC_NAME = "maskmem_pos_enc"
+
+# Static output shapes used by patch_output_dims.
+_KNOWN_OUTPUT_SHAPES: dict[str, list[int]] = {
+    _FEATURES_NAME: [B, OUT_DIM, FEAT_H, FEAT_W],
+    _POS_ENC_NAME: [B, OUT_DIM, FEAT_H, FEAT_W],
+}
 
 
 class MemoryEncoderWrapper(nn.Module):
@@ -91,9 +104,9 @@ class MemoryEncoderWrapper(nn.Module):
 
     def forward(
         self,
-        pix_feat: torch.Tensor,      # (B, IN_DIM, FEAT_H, FEAT_W)
-        mask_for_mem: torch.Tensor,  # (B, 1, MASK_H, MASK_W)
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        pix_feat: Float[Tensor, "1 256 72 72"],  # (B, IN_DIM, FEAT_H, FEAT_W)
+        mask_for_mem: Float[Tensor, "1 1 1008 1008"],  # (B, 1, MASK_H, MASK_W)
+    ) -> tuple[Float[Tensor, "1 64 72 72"], Float[Tensor, "1 64 72 72"]]:
         """Forward through SimpleMaskEncoder with skip_mask_sigmoid=True.
 
         Args:
@@ -107,16 +120,9 @@ class MemoryEncoderWrapper(nn.Module):
               maskmem_pos_enc  : float32 (1, 64, 72, 72)
         """
         out = self.memory_encoder(pix_feat, mask_for_mem, skip_mask_sigmoid=True)
-        features = out["vision_features"]          # (B, 64, 72, 72)
-        pos_enc = out["vision_pos_enc"][0]          # (B, 64, 72, 72)
+        features = out["vision_features"]  # (B, 64, 72, 72)
+        pos_enc = out["vision_pos_enc"][0]  # (B, 64, 72, 72)
         return features, pos_enc
-
-
-def _evict_sam3_cache() -> None:
-    """Remove all sam3.* entries from sys.modules to force a clean re-import."""
-    to_del = [k for k in sys.modules if k == "sam3" or k.startswith("sam3.")]
-    for k in to_del:
-        del sys.modules[k]
 
 
 def _load_equiv_memory_encoder(
@@ -143,41 +149,20 @@ def _load_equiv_memory_encoder(
         FileNotFoundError: if either path is absent.
         RuntimeError: if maskmem_backbone.* keys are not found in checkpoint.
     """
-    if not equiv_source_root.exists():
-        raise FileNotFoundError(f"Equiv source not found: {equiv_source_root}")
     if not checkpoint_path.exists():
         raise FileNotFoundError(f"Checkpoint not found: {checkpoint_path}")
 
-    equiv_root_str = str(equiv_source_root.resolve())
-    inserted = False
-    if equiv_root_str not in sys.path:
-        sys.path.insert(0, equiv_root_str)
-        inserted = True
-
-    _evict_sam3_cache()
-
-    try:
+    with equiv_sam3_on_path(equiv_source_root):
         from sam3.model_builder import _create_tracker_maskmem_backbone  # type: ignore[import]
 
         log.info("Building SAM3 memory encoder (SimpleMaskEncoder) from equiv source ...")
         memory_encoder = _create_tracker_maskmem_backbone()
-    finally:
-        if inserted and equiv_root_str in sys.path:
-            sys.path.remove(equiv_root_str)
 
     # Load maskmem_backbone weights from checkpoint (strip prefix).
     log.info("Loading maskmem_backbone weights from %s ...", checkpoint_path)
-    with open(str(checkpoint_path), "rb") as f:
-        ckpt = torch.load(f, map_location="cpu", weights_only=True)
-    if "model" in ckpt and isinstance(ckpt["model"], dict):
-        ckpt = ckpt["model"]
-
+    ckpt = load_checkpoint(checkpoint_path)
     prefix = "tracker.maskmem_backbone."
-    maskmem_state = {
-        k[len(prefix):]: v
-        for k, v in ckpt.items()
-        if k.startswith(prefix)
-    }
+    maskmem_state = extract_prefixed_state(ckpt, prefix)
     if not maskmem_state:
         raise RuntimeError(
             f"No '{prefix}*' keys found in {checkpoint_path}. "
@@ -185,14 +170,10 @@ def _load_equiv_memory_encoder(
         )
     missing, unexpected = memory_encoder.load_state_dict(maskmem_state, strict=True)
     if missing:
-        raise RuntimeError(
-            f"Missing keys when loading maskmem_backbone weights: {missing[:10]}"
-        )
+        raise RuntimeError(f"Missing keys when loading maskmem_backbone weights: {missing[:10]}")
     if unexpected:
         log.warning("Unexpected keys (ignored): %s", unexpected[:5])
-    log.info(
-        "maskmem_backbone weights loaded: %d parameters.", len(maskmem_state)
-    )
+    log.info("maskmem_backbone weights loaded: %d parameters.", len(maskmem_state))
 
     memory_encoder = memory_encoder.cpu().float().eval()
 
@@ -206,49 +187,12 @@ def _load_equiv_memory_encoder(
         _ = memory_encoder.position_encoding(dummy_feat)
     log.info(
         "PositionEmbeddingSine cache pre-populated for (%d, %d): %s",
-        FEAT_H, FEAT_W,
+        FEAT_H,
+        FEAT_W,
         (FEAT_H, FEAT_W) in memory_encoder.position_encoding.cache,
     )
 
     return memory_encoder
-
-
-def _patch_output_dims(model_proto: "onnx.ModelProto", output_path: Path) -> None:  # noqa: F821
-    """Replace symbolic dim_params in graph output ValueInfo with concrete values.
-
-    Args:
-        model_proto: Loaded ONNX ModelProto (modified in-place).
-        output_path: Path where the patched model is saved.
-    """
-    import onnx  # noqa: PLC0415
-
-    known_shapes: dict[str, list[int]] = {
-        _FEATURES_NAME: [B, OUT_DIM, FEAT_H, FEAT_W],
-        _POS_ENC_NAME:  [B, OUT_DIM, FEAT_H, FEAT_W],
-    }
-
-    patched = 0
-    for out in model_proto.graph.output:
-        if out.name not in known_shapes:
-            continue
-        shape = known_shapes[out.name]
-        for i, d in enumerate(out.type.tensor_type.shape.dim):
-            if d.HasField("dim_param"):
-                d.ClearField("dim_param")
-                d.dim_value = shape[i]
-                patched += 1
-
-    if patched:
-        log.info(
-            "_patch_output_dims: patched %d symbolic dims → concrete values.", patched
-        )
-        onnx.checker.check_model(model_proto)
-        onnx.save(model_proto, str(output_path))
-        log.info("Patched model saved to %s.", output_path)
-    else:
-        log.info(
-            "_patch_output_dims: all output dims already concrete — no patch needed."
-        )
 
 
 def build_memory_encoder_module(
@@ -301,7 +245,8 @@ def export_memory_encoder(
         except Exception as exc:
             log.warning(
                 "Existing ONNX at %s failed checker (%s); re-exporting.",
-                output_path, exc,
+                output_path,
+                exc,
             )
             output_path.unlink()
 
@@ -312,9 +257,7 @@ def export_memory_encoder(
     dummy_pix_feat = torch.zeros(B, IN_DIM, FEAT_H, FEAT_W, dtype=torch.float32)
     dummy_mask = torch.zeros(B, 1, MASK_H, MASK_W, dtype=torch.float32)
 
-    log.info(
-        "Exporting memory_encoder to %s (opset %d) ...", output_path, OPSET_VERSION
-    )
+    log.info("Exporting memory_encoder to %s (opset %d) ...", output_path, OPSET_VERSION)
     with torch.no_grad():
         torch.onnx.export(
             wrapper,
@@ -342,4 +285,4 @@ def export_memory_encoder(
             "Check antialias patch and PositionEmbeddingSine cache pre-population."
         )
 
-    _patch_output_dims(model_proto, output_path)
+    patch_output_dims(model_proto, output_path, _KNOWN_OUTPUT_SHAPES)

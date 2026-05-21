@@ -43,23 +43,31 @@ parity testing.
 from __future__ import annotations
 
 import logging
-import sys
 from pathlib import Path
 
 import torch
 import torch.nn as nn
+from jaxtyping import Float
+from torch import Tensor
+
+from sam3_onnx_equiv.export._equiv_loader import (
+    equiv_sam3_on_path,
+    extract_prefixed_state,
+    load_checkpoint,
+    patch_output_dims,
+)
 
 log = logging.getLogger(__name__)
 
 # Fixed spatial token count: 1008 / 14 = 72 → 72 × 72 = 5184.
-HW = 72 * 72   # 5184  spatial tokens per frame
+HW = 72 * 72  # 5184  spatial tokens per frame
 B = 1
 D_MODEL = 256
 MEM_DIM = 64
 
 # Canonical memory lengths for parity testing and full production:
 #   2-frame test (fast, ~10K tokens)
-TWO_FRAME_MEM_LEN: int = 2 * HW               # 10368
+TWO_FRAME_MEM_LEN: int = 2 * HW  # 10368
 #   Full production: 7 maskmem frames + 16 obj_ptrs × (D_MODEL // MEM_DIM) tokens
 FULL_MEM_LEN: int = 7 * HW + 16 * (D_MODEL // MEM_DIM)  # 36352
 
@@ -113,11 +121,11 @@ class MemoryAttentionWrapper(nn.Module):
 
     def forward(
         self,
-        src: torch.Tensor,         # (HW, B, D_MODEL) seq-first
-        src_pos: torch.Tensor,     # (HW, B, D_MODEL) seq-first
-        prompt: torch.Tensor,      # (mem_len, B, MEM_DIM) seq-first
-        prompt_pos: torch.Tensor,  # (mem_len, B, MEM_DIM) seq-first
-    ) -> torch.Tensor:
+        src: Float[Tensor, "5184 1 256"],  # (HW, B, D_MODEL) seq-first
+        src_pos: Float[Tensor, "5184 1 256"],  # (HW, B, D_MODEL) seq-first
+        prompt: Float[Tensor, "mem_len 1 64"],  # (mem_len, B, MEM_DIM) seq-first
+        prompt_pos: Float[Tensor, "mem_len 1 64"],  # (mem_len, B, MEM_DIM) seq-first
+    ) -> Float[Tensor, "5184 1 256"]:
         """Forward pass through the 4-layer cross-attention encoder.
 
         Args:
@@ -136,20 +144,13 @@ class MemoryAttentionWrapper(nn.Module):
             prompt=prompt,
             prompt_pos=prompt_pos,
             prompt_key_padding_mask=None,
-            feat_sizes=[[HW, 1]],   # dummy; not used by TransformerEncoderCrossAttention
+            feat_sizes=[[HW, 1]],  # dummy; not used by TransformerEncoderCrossAttention
             num_obj_ptr_tokens=self._num_k_exclude_rope,
         )
         # TransformerEncoderCrossAttention.forward with batch_first=True:
         # Internally transposes seq-first→batch-first, processes layers, then
         # transposes back.  The returned "memory" is seq-first (HW, B, D_MODEL).
         return out["memory"]  # (HW, B, D_MODEL)
-
-
-def _evict_sam3_cache() -> None:
-    """Remove all sam3.* entries from sys.modules to force a clean re-import."""
-    to_del = [k for k in sys.modules if k == "sam3" or k.startswith("sam3.")]
-    for k in to_del:
-        del sys.modules[k]
 
 
 def _load_equiv_tracker_encoder(
@@ -179,57 +180,31 @@ def _load_equiv_tracker_encoder(
         FileNotFoundError: if either path is absent.
         RuntimeError: if any RoPEAttention has use_rope_real=False after loading.
     """
-    if not equiv_source_root.exists():
-        raise FileNotFoundError(f"Equiv source not found: {equiv_source_root}")
     if not checkpoint_path.exists():
         raise FileNotFoundError(f"Checkpoint not found: {checkpoint_path}")
 
-    equiv_root_str = str(equiv_source_root.resolve())
-    inserted = False
-    if equiv_root_str not in sys.path:
-        sys.path.insert(0, equiv_root_str)
-        inserted = True
-
-    _evict_sam3_cache()
-
-    try:
+    with equiv_sam3_on_path(equiv_source_root):
         from sam3.model_builder import build_tracker  # type: ignore[import]
 
-        log.info(
-            "Building SAM3 tracker from equiv source (use_rope_real=True) ..."
-        )
+        log.info("Building SAM3 tracker from equiv source (use_rope_real=True) ...")
         tracker = build_tracker(
             apply_temporal_disambiguation=True,
             with_backbone=False,
             compile_mode=None,
             use_rope_real=True,
         )
-    finally:
-        if inserted and equiv_root_str in sys.path:
-            sys.path.remove(equiv_root_str)
 
     # Load tracker weights from checkpoint (tracker.* prefix → strip prefix).
     log.info("Loading tracker weights from %s ...", checkpoint_path)
-    with open(str(checkpoint_path), "rb") as f:
-        ckpt = torch.load(f, map_location="cpu", weights_only=True)
-    if "model" in ckpt and isinstance(ckpt["model"], dict):
-        ckpt = ckpt["model"]
-
-    tracker_state = {
-        k[len("tracker."):]: v
-        for k, v in ckpt.items()
-        if k.startswith("tracker.")
-    }
+    ckpt = load_checkpoint(checkpoint_path)
+    tracker_state = extract_prefixed_state(ckpt, "tracker.")
     if not tracker_state:
         raise RuntimeError(
-            f"No 'tracker.*' keys found in {checkpoint_path}. "
-            "Verify the checkpoint format."
+            f"No 'tracker.*' keys found in {checkpoint_path}. Verify the checkpoint format."
         )
     missing, unexpected = tracker.load_state_dict(tracker_state, strict=True)
     if missing:
-        raise RuntimeError(
-            f"Missing keys when loading tracker weights: {missing[:10]}"
-        )
+        raise RuntimeError(f"Missing keys when loading tracker weights: {missing[:10]}")
     if unexpected:
         log.warning("Unexpected keys (ignored): %s", unexpected[:5])
     log.info("Tracker weights loaded: %d parameters.", len(tracker_state))
@@ -279,9 +254,7 @@ def _verify_use_rope_real(module: nn.Module) -> None:
             "The equiv-source patcher did not wire use_rope_real=True for the tracker. "
             "Check sam3_source_patcher.py MODEL_BUILDER_REPLACEMENTS."
         )
-    log.info(
-        "_verify_use_rope_real: all RoPEAttention modules have use_rope_real=True ✓"
-    )
+    log.info("_verify_use_rope_real: all RoPEAttention modules have use_rope_real=True ✓")
 
 
 def _move_rope_attrs_to_cpu(encoder: nn.Module) -> None:
@@ -302,9 +275,7 @@ def _move_rope_attrs_to_cpu(encoder: nn.Module) -> None:
                 if val is not None and isinstance(val, torch.Tensor):
                     if val.device.type != "cpu":
                         setattr(mod, attr, val.cpu())
-                        log.info(
-                            "_move_rope_attrs_to_cpu: %s.%s moved to CPU.", name, attr
-                        )
+                        log.info("_move_rope_attrs_to_cpu: %s.%s moved to CPU.", name, attr)
 
 
 def _freeze_rope_for_export(encoder: nn.Module) -> None:
@@ -335,60 +306,25 @@ def _freeze_rope_for_export(encoder: nn.Module) -> None:
             if hasattr(mod, "freqs_cis"):
                 log.info(
                     "%s: freqs_cis.shape=%s (expected (%d, ...))",
-                    name, mod.freqs_cis.shape, HW,
+                    name,
+                    mod.freqs_cis.shape,
+                    HW,
                 )
                 if mod.freqs_cis.shape[0] != HW:
                     log.warning(
                         "%s: freqs_cis.shape[0]=%d != HW=%d. "
                         "The dynamic re-compute branch WILL be traced → complex ops risk.",
-                        name, mod.freqs_cis.shape[0], HW,
+                        name,
+                        mod.freqs_cis.shape[0],
+                        HW,
                     )
             if hasattr(mod, "freqs_cis_real"):
                 log.info(
                     "%s: freqs_cis_real.shape=%s, freqs_cis_imag.shape=%s",
-                    name, mod.freqs_cis_real.shape,
+                    name,
+                    mod.freqs_cis_real.shape,
                     mod.freqs_cis_imag.shape if hasattr(mod, "freqs_cis_imag") else "?",
                 )
-
-
-def _patch_output_dims(model_proto: "onnx.ModelProto", output_path: Path, hw: int, b: int, d_model: int) -> None:  # noqa: F821
-    """Replace symbolic dim_params in graph output ValueInfo with concrete values.
-
-    Args:
-        model_proto: Loaded ONNX ModelProto (modified in-place).
-        output_path: Path where the patched model is saved.
-        hw: Number of spatial tokens (5184).
-        b: Batch size (1).
-        d_model: Feature dimension (256).
-    """
-    import onnx  # noqa: PLC0415
-
-    known_shapes: dict[str, list[int]] = {
-        _MEMORY_NAME: [hw, b, d_model],
-    }
-
-    patched = 0
-    for out in model_proto.graph.output:
-        if out.name not in known_shapes:
-            continue
-        shape = known_shapes[out.name]
-        for i, d in enumerate(out.type.tensor_type.shape.dim):
-            if d.HasField("dim_param"):
-                d.ClearField("dim_param")
-                d.dim_value = shape[i]
-                patched += 1
-
-    if patched:
-        log.info(
-            "_patch_output_dims: patched %d symbolic dims → concrete values.", patched
-        )
-        onnx.checker.check_model(model_proto)
-        onnx.save(model_proto, str(output_path))
-        log.info("Patched model saved to %s.", output_path)
-    else:
-        log.info(
-            "_patch_output_dims: all output dims already concrete — no patch needed."
-        )
 
 
 def build_memory_attention_module(
@@ -448,9 +384,7 @@ def export_memory_attention(
             )
             return
         except Exception as exc:
-            log.warning(
-                "Existing ONNX at %s failed checker (%s); re-exporting.", output_path, exc
-            )
+            log.warning("Existing ONNX at %s failed checker (%s); re-exporting.", output_path, exc)
             output_path.unlink()
 
     wrapper = build_memory_attention_module(
@@ -464,9 +398,11 @@ def export_memory_attention(
     dummy_prompt_pos = torch.zeros(mem_len, B, MEM_DIM, dtype=torch.float32)
 
     log.info(
-        "Exporting memory_attention to %s (opset %d, mem_len=%d, "
-        "num_k_exclude_rope=%d) ...",
-        output_path, OPSET_VERSION, mem_len, num_k_exclude_rope,
+        "Exporting memory_attention to %s (opset %d, mem_len=%d, num_k_exclude_rope=%d) ...",
+        output_path,
+        OPSET_VERSION,
+        mem_len,
+        num_k_exclude_rope,
     )
     with torch.no_grad():
         torch.onnx.export(
@@ -488,4 +424,4 @@ def export_memory_attention(
     log.info("Op types in memory_attention graph: %s", sorted(op_types))
 
     # Patch symbolic output dims to concrete values.
-    _patch_output_dims(model_proto, output_path, hw=HW, b=B, d_model=D_MODEL)
+    patch_output_dims(model_proto, output_path, {_MEMORY_NAME: [HW, B, D_MODEL]})
