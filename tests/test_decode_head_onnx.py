@@ -58,13 +58,13 @@ ONNX_PATH = SANDBOX_ROOT / "outputs" / "onnx" / "decode_head.onnx"
 # Fixed shape constants (B-3 spec)
 # ---------------------------------------------------------------------------
 B = 1
-EMB_DIM = 256          # image_embeddings channel dim
-EMB_H = EMB_W = 72    # spatial resolution (1008 / 14)
-HRF0_C = 32            # high_res_feat0 channels (conv_s0: 256→32)
+EMB_DIM = 256  # image_embeddings channel dim
+EMB_H = EMB_W = 72  # spatial resolution (1008 / 14)
+HRF0_C = 32  # high_res_feat0 channels (conv_s0: 256→32)
 HRF0_H = HRF0_W = 288  # high_res_feat0 spatial (72 * 4)
-HRF1_C = 64            # high_res_feat1 channels (conv_s1: 256→64)
+HRF1_C = 64  # high_res_feat1 channels (conv_s1: 256→64)
 HRF1_H = HRF1_W = 144  # high_res_feat1 spatial (72 * 2)
-N_POINTS = 1           # number of points (fixed)
+N_POINTS = 1  # number of points (fixed)
 MASK_IN_H = MASK_IN_W = 288  # mask_input spatial (4 * 72)
 LOW_RES_H = LOW_RES_W = 288  # low_res_masks spatial (4 * 72)
 
@@ -201,12 +201,8 @@ def test_ort_parity() -> None:
         "object_score_logits",
         "obj_ptr",
     }
-    assert set(input_names) == expected_inputs, (
-        f"Unexpected input names: {input_names}"
-    )
-    assert set(output_names) == expected_outputs, (
-        f"Unexpected output names: {output_names}"
-    )
+    assert set(input_names) == expected_inputs, f"Unexpected input names: {input_names}"
+    assert set(output_names) == expected_outputs, f"Unexpected output names: {output_names}"
 
     for repeat_idx in range(N_REPEATS):
         seed = 42 + repeat_idx
@@ -275,7 +271,4 @@ def test_ort_parity() -> None:
             )
 
             max_diff = float(np.abs(pt_np - ort_np).max())
-            print(
-                f"[repeat {repeat_idx}, seed={seed}] {out_name} "
-                f"max_abs_diff={max_diff:.3e}"
-            )
+            print(f"[repeat {repeat_idx}, seed={seed}] {out_name} max_abs_diff={max_diff:.3e}")

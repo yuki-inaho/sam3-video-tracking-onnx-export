@@ -104,8 +104,7 @@ class TestOracleTracks:
             # masks shape: (N_obj, H, W) or variable
             if hasattr(masks, "shape") and masks.ndim == 3:
                 assert masks.any(), (
-                    f"Frame {frame_indices[frame_i]}: all masks are empty "
-                    f"(shape={masks.shape})"
+                    f"Frame {frame_indices[frame_i]}: all masks are empty (shape={masks.shape})"
                 )
             # object-array case — at least one element is non-zero
             elif hasattr(masks, "dtype") and masks.dtype == object:
@@ -119,15 +118,13 @@ class TestConstantsExtracted:
 
     def test_constants_dir_exists(self) -> None:
         assert CONSTANTS_DIR.exists(), (
-            f"{CONSTANTS_DIR} does not exist. "
-            "Run tools/run_pytorch_video.py first."
+            f"{CONSTANTS_DIR} does not exist. Run tools/run_pytorch_video.py first."
         )
 
     def test_manifest_exists(self) -> None:
         manifest = CONSTANTS_DIR / "manifest.json"
         assert manifest.exists(), (
-            f"manifest.json not found in {CONSTANTS_DIR}. "
-            "Run tools/run_pytorch_video.py first."
+            f"manifest.json not found in {CONSTANTS_DIR}. Run tools/run_pytorch_video.py first."
         )
 
     def test_required_constants_in_manifest(self) -> None:
@@ -137,9 +134,7 @@ class TestConstantsExtracted:
             info = json.load(f)
         recorded = {entry["name"] for entry in info}
         missing = set(REQUIRED_CONSTANTS) - recorded
-        assert not missing, (
-            f"Missing constants in manifest: {sorted(missing)}"
-        )
+        assert not missing, f"Missing constants in manifest: {sorted(missing)}"
 
     def test_constant_npy_files_loadable(self) -> None:
         manifest = CONSTANTS_DIR / "manifest.json"
@@ -173,6 +168,5 @@ class TestVisualization:
     def test_vis_pngs_exist(self) -> None:
         pngs = sorted(VIS_DIR.glob("*.png"))
         assert len(pngs) > 0, (
-            f"No PNG files found in {VIS_DIR}. "
-            "Run tools/run_pytorch_video.py first."
+            f"No PNG files found in {VIS_DIR}. Run tools/run_pytorch_video.py first."
         )

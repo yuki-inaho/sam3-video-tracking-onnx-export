@@ -8,7 +8,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
-import pytest
 
 _REFERENCE_DIR = Path(__file__).parent.parent / "outputs" / "reference"
 _NPZ_PATH = _REFERENCE_DIR / "baseline_detector.npz"

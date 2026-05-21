@@ -8,7 +8,7 @@ editable package) do not leak module state into each other.
 from __future__ import annotations
 
 import sys
-from typing import Generator
+from collections.abc import Generator
 
 import pytest
 
@@ -36,9 +36,7 @@ def _reset_sam3_module_cache() -> Generator[None, None, None]:
     Note: this does NOT prevent test_image_encoder_onnx.py from doing its own
     evict+reload inside the test body -- it restores the *snapshot* afterwards.
     """
-    snapshot_keys = frozenset(
-        k for k in sys.modules if k == "sam3" or k.startswith("sam3.")
-    )
+    snapshot_keys = frozenset(k for k in sys.modules if k == "sam3" or k.startswith("sam3."))
     snapshot = {k: sys.modules[k] for k in snapshot_keys}
 
     yield

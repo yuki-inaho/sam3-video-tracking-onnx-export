@@ -127,15 +127,12 @@ def equiv_detector_output() -> dict:
 class TestEquivDetectorMatchesBaseline:
     """Equiv-source (use_rope_real=True) detector must match D2 baseline output."""
 
-    def test_masks_iou_above_threshold(
-        self, baseline: dict, equiv_detector_output: dict
-    ) -> None:
+    def test_masks_iou_above_threshold(self, baseline: dict, equiv_detector_output: dict) -> None:
         baseline_mask = baseline["masks"][0, 0]
         equiv_mask = equiv_detector_output["masks"][0, 0]
         iou = _compute_iou(baseline_mask > 0.5, equiv_mask > 0.5)
         assert iou >= 0.99, (
-            f"Mask IoU {iou:.4f} < 0.99. "
-            "use_rope_real=True path may not produce equivalent output."
+            f"Mask IoU {iou:.4f} < 0.99. use_rope_real=True path may not produce equivalent output."
         )
 
     def test_scores_relative_diff_below_threshold(

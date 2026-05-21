@@ -50,12 +50,13 @@ SCORE_REL_DIFF_THRESHOLD = 5e-2
 # Oracle loading
 # ---------------------------------------------------------------------------
 
+
 def _load_oracle() -> dict:
     data = np.load(str(ORACLE_NPZ), allow_pickle=True)
     return {
         "frame_indices": data["frame_indices"],
         "obj_ids": data["obj_ids_per_frame"],
-        "masks": data["masks_per_frame"],   # (6,) object arrays; each (N_obj, H, W) bool
+        "masks": data["masks_per_frame"],  # (6,) object arrays; each (N_obj, H, W) bool
         "scores": data["probs_per_frame"],  # (6,) object arrays; each (N_obj,)
     }
 
@@ -63,6 +64,7 @@ def _load_oracle() -> dict:
 # ---------------------------------------------------------------------------
 # Setup logger
 # ---------------------------------------------------------------------------
+
 
 def _setup_logger() -> logging.Logger:
     LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -83,6 +85,7 @@ def _setup_logger() -> logging.Logger:
 # Helper: mask IoU
 # ---------------------------------------------------------------------------
 
+
 def _mask_iou(pred: np.ndarray, gt: np.ndarray) -> float:
     """Binary mask IoU.  pred and gt are boolean arrays of identical shape."""
     intersection = (pred & gt).sum()
@@ -96,10 +99,12 @@ def _mask_iou(pred: np.ndarray, gt: np.ndarray) -> float:
 # Orchestrator import guard
 # ---------------------------------------------------------------------------
 
+
 def _import_orchestrator():
     """Import VideoOrchestrator; fail with clear message if not yet implemented."""
     try:
         from sam3_onnx_equiv.video_orchestrator import VideoOrchestrator  # noqa: PLC0415
+
         return VideoOrchestrator
     except ImportError as exc:
         pytest.fail(
@@ -111,6 +116,7 @@ def _import_orchestrator():
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture(scope="module")
 def _orch():
@@ -126,8 +132,8 @@ def _orch():
 def _frame0_prompt():
     """Frame-0 point prompt (normalised), matching run_pytorch_video.py."""
     image_size = 128
-    cx = image_size // 6   # 21
-    cy = image_size // 2   # 64
+    cx = image_size // 6  # 21
+    cy = image_size // 2  # 64
     coords = np.array([[[cx / image_size, cy / image_size]]], dtype=np.float32)
     labels = np.array([[1]], dtype=np.int32)
     return coords, labels
@@ -156,8 +162,7 @@ class TestVideoE2E:
     @pytest.fixture(autouse=True)
     def _oracle(self):
         assert ORACLE_NPZ.exists(), (
-            f"Oracle not found: {ORACLE_NPZ}. "
-            "Run tools/run_pytorch_video.py first (C-1)."
+            f"Oracle not found: {ORACLE_NPZ}. Run tools/run_pytorch_video.py first (C-1)."
         )
         self.oracle = _load_oracle()
 
@@ -173,12 +178,13 @@ class TestVideoE2E:
         self.log.info("=== DoD-D-MUST: per-frame mask IoU ===")
         all_pass = True
         for i, fidx in enumerate(self.oracle["frame_indices"]):
-            oracle_mask = self.oracle["masks"][i][0].astype(bool)   # (H, W)
-            orch_mask_i = orch_masks[i].astype(bool)                # (H, W)
+            oracle_mask = self.oracle["masks"][i][0].astype(bool)  # (H, W)
+            orch_mask_i = orch_masks[i].astype(bool)  # (H, W)
 
             # Resize oracle mask to match orch if needed (oracle is 288x288)
             if oracle_mask.shape != orch_mask_i.shape:
                 from PIL import Image as PILImage  # noqa: PLC0415
+
                 oracle_pil = PILImage.fromarray(oracle_mask.astype(np.uint8) * 255, mode="L")
                 oracle_pil = oracle_pil.resize(
                     (orch_mask_i.shape[1], orch_mask_i.shape[0]), PILImage.NEAREST
@@ -188,10 +194,13 @@ class TestVideoE2E:
             iou = _mask_iou(orch_mask_i, oracle_mask)
             status = "PASS" if iou >= IOU_THRESHOLD else "FAIL"
             self.log.info(
-                "  frame %d: IoU=%.4f (threshold=%.2f) [%s]  "
-                "oracle_px=%d orch_px=%d",
-                fidx, iou, IOU_THRESHOLD, status,
-                oracle_mask.sum(), orch_mask_i.sum(),
+                "  frame %d: IoU=%.4f (threshold=%.2f) [%s]  oracle_px=%d orch_px=%d",
+                fidx,
+                iou,
+                IOU_THRESHOLD,
+                status,
+                oracle_mask.sum(),
+                orch_mask_i.sum(),
             )
             if iou < IOU_THRESHOLD:
                 all_pass = False
@@ -235,7 +244,12 @@ class TestVideoE2E:
             status = "PASS" if rel_diff <= SCORE_REL_DIFF_THRESHOLD else "FAIL"
             self.log.info(
                 "  frame %d: oracle=%.4f orch=%.4f rel_diff=%.4f (threshold=%.2f) [%s]",
-                fidx, oracle_score, orch_score, rel_diff, SCORE_REL_DIFF_THRESHOLD, status,
+                fidx,
+                oracle_score,
+                orch_score,
+                rel_diff,
+                SCORE_REL_DIFF_THRESHOLD,
+                status,
             )
             if rel_diff > SCORE_REL_DIFF_THRESHOLD:
                 all_pass = False
@@ -259,11 +273,11 @@ class TestVideoE2E:
         attn_count = result["memory_attention_invoke_count"]
         self.log.info(
             "DoD-D-MUST-a: memory_attention invocations=%d (expected=%d)",
-            attn_count, expected_invocations,
+            attn_count,
+            expected_invocations,
         )
         assert attn_count == expected_invocations, (
-            f"DoD-D-MUST-a FAILED: expected {expected_invocations} invocations, "
-            f"got {attn_count}."
+            f"DoD-D-MUST-a FAILED: expected {expected_invocations} invocations, got {attn_count}."
         )
         self.log.info("DoD-D-MUST-a: memory_attention invocation count PASSED.")
 
@@ -281,7 +295,7 @@ class TestVideoE2E:
         result_no_mem = _clip_results["no_mem"]
 
         # Compare low_res_mask logits at frame 1 (first non-conditioning frame)
-        logits_mem = result_with_mem["low_res_mask_logits"]   # list of (1, H, W) float32
+        logits_mem = result_with_mem["low_res_mask_logits"]  # list of (1, H, W) float32
         logits_no = result_no_mem["low_res_mask_logits"]
 
         self.log.info("=== DoD-D-MUST-b: memory ablation ===")
@@ -290,7 +304,8 @@ class TestVideoE2E:
             diff = np.abs(logits_mem[frame_i] - logits_no[frame_i]).mean()
             self.log.info(
                 "  frame %d: mean_abs_diff_logits=%.4f (threshold=0.5)",
-                frame_i, diff,
+                frame_i,
+                diff,
             )
             if diff > 0.5:
                 any_significant = True
@@ -314,7 +329,5 @@ class TestVideoE2E:
         self.log.info("Obj IDs across frames: %s", obj_ids)
         for i, (fidx, oid) in enumerate(zip(self.oracle["frame_indices"], obj_ids)):
             oracle_id = int(self.oracle["obj_ids"][i][0])
-            assert oid == oracle_id, (
-                f"frame {fidx}: expected obj_id={oracle_id}, got {oid}"
-            )
+            assert oid == oracle_id, f"frame {fidx}: expected obj_id={oracle_id}, got {oid}"
         self.log.info("Obj ID consistency PASSED for all frames.")

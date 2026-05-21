@@ -47,9 +47,7 @@ class _FakeAttention(nn.Module):
     def __init__(self, dim: int = 4) -> None:
         super().__init__()
         # Complex buffer: shape (T, dim//2), dtype complex64
-        t = torch.complex(
-            torch.ones(8, dim // 2), torch.zeros(8, dim // 2)
-        )
+        t = torch.complex(torch.ones(8, dim // 2), torch.zeros(8, dim // 2))
         self.register_buffer("freqs_cis", t)
 
 
@@ -81,9 +79,7 @@ def test_backbone_freqs_cis_removed_after_replace() -> None:
     attn = _FakeAttention()
     replace_rope_freqs(attn)
 
-    assert not hasattr(attn, "freqs_cis"), (
-        "freqs_cis should be deleted after replace_rope_freqs"
-    )
+    assert not hasattr(attn, "freqs_cis"), "freqs_cis should be deleted after replace_rope_freqs"
     assert hasattr(attn, "freqs_cos"), "freqs_cos must exist after replacement"
     assert hasattr(attn, "freqs_sin"), "freqs_sin must exist after replacement"
     assert attn.freqs_cos.dtype == torch.float32
@@ -135,12 +131,8 @@ def test_replace_scope_backbone_only_leaves_rope_attention_intact() -> None:
     assert count == 2
 
     # Backbone: no freqs_cis should remain.
-    remaining = sum(
-        1 for m in parent["backbone"].modules() if hasattr(m, "freqs_cis")
-    )
-    assert remaining == 0, (
-        f"freqs_cis still present in backbone after replace: {remaining}"
-    )
+    remaining = sum(1 for m in parent["backbone"].modules() if hasattr(m, "freqs_cis"))
+    assert remaining == 0, f"freqs_cis still present in backbone after replace: {remaining}"
 
     # Tracker: RoPEAttention modules must be untouched.
     for m in parent["tracker"].modules():
@@ -173,9 +165,7 @@ def test_image_encoder_replace_rope_freqs_scope_integration() -> None:
     model = _load_equiv_sam3_model(EQUIV_SOURCE_ROOT, CHECKPOINT_PATH)
 
     # No freqs_cis anywhere in the full model.
-    fc_remaining = [
-        n for n, _ in model.named_buffers() if "freqs_cis" in n
-    ]
+    fc_remaining = [n for n, _ in model.named_buffers() if "freqs_cis" in n]
     assert len(fc_remaining) == 0, (
         f"freqs_cis still present after replace_rope_freqs: {fc_remaining}"
     )
@@ -183,6 +173,5 @@ def test_image_encoder_replace_rope_freqs_scope_integration() -> None:
     # freqs_cos buffers must exist (replacement happened).
     fcos_count = sum(1 for n, _ in model.named_buffers() if "freqs_cos" in n)
     assert fcos_count > 0, (
-        "No freqs_cos buffers found after replace_rope_freqs -- "
-        "replacement may not have run"
+        "No freqs_cos buffers found after replace_rope_freqs -- replacement may not have run"
     )

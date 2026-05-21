@@ -115,15 +115,14 @@ def _ensure_static_shape() -> None:
         "vision_pos_enc_0": [1, 256, 288, 288],
         "vision_pos_enc_1": [1, 256, 144, 144],
         "vision_pos_enc_2": [1, 256, 72, 72],
-        "backbone_fpn_0":   [1, 256, 288, 288],
-        "backbone_fpn_1":   [1, 256, 144, 144],
-        "backbone_fpn_2":   [1, 256, 72, 72],
+        "backbone_fpn_0": [1, 256, 288, 288],
+        "backbone_fpn_1": [1, 256, 144, 144],
+        "backbone_fpn_2": [1, 256, 72, 72],
     }
     for out in m.graph.output:
         if out.name not in known_shapes:
             pytest.fail(
-                f"Unexpected output '{out.name}' not in known_shapes; "
-                "cannot guarantee static dims."
+                f"Unexpected output '{out.name}' not in known_shapes; cannot guarantee static dims."
             )
         shape = known_shapes[out.name]
         for i, d in enumerate(out.type.tensor_type.shape.dim):

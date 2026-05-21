@@ -17,7 +17,6 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-import pytest
 import torch
 
 # ---------------------------------------------------------------------------
@@ -47,14 +46,16 @@ HEADS = 4
 END_X = 8
 END_Y = 8
 SEQ_LEN = END_X * END_Y  # 64
-HEAD_DIM = 32             # must be divisible by 4 for axial RoPE
+HEAD_DIM = 32  # must be divisible by 4 for axial RoPE
 ATOL = 1e-4
 RTOL = 1e-4
 
 torch.manual_seed(42)
 
 
-def _make_qk(seq_len_q: int, seq_len_k: int, head_dim: int = HEAD_DIM) -> tuple[torch.Tensor, torch.Tensor]:
+def _make_qk(
+    seq_len_q: int, seq_len_k: int, head_dim: int = HEAD_DIM
+) -> tuple[torch.Tensor, torch.Tensor]:
     q = torch.randn(BATCH, HEADS, seq_len_q, head_dim)
     k = torch.randn(BATCH, HEADS, seq_len_k, head_dim)
     return q, k
@@ -88,7 +89,7 @@ def test_official_real_matches_complex_self_attn():
     )
 
     assert torch.allclose(q_complex, q_real_out, rtol=RTOL, atol=ATOL), (
-        f"Q mismatch: max_abs_err={( q_complex - q_real_out).abs().max().item():.6e}"
+        f"Q mismatch: max_abs_err={(q_complex - q_real_out).abs().max().item():.6e}"
     )
     assert torch.allclose(k_complex, k_real_out, rtol=RTOL, atol=ATOL), (
         f"K mismatch: max_abs_err={(k_complex - k_real_out).abs().max().item():.6e}"

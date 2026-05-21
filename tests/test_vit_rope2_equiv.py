@@ -18,7 +18,6 @@ will fail with ImportError or AttributeError (expected red state before D5-1 imp
 
 from __future__ import annotations
 
-import importlib.util
 import sys
 from pathlib import Path
 
@@ -80,6 +79,7 @@ def _load_equiv_vitdet():
             del sys.modules[key]
 
     import importlib
+
     mod = importlib.import_module("sam3.model.vitdet")
 
     if not hasattr(mod, "apply_rotary_enc2"):
@@ -98,7 +98,7 @@ HEADS = 4
 END_X = 8
 END_Y = 8
 SEQ_LEN = END_X * END_Y  # 64
-HEAD_DIM = 32             # divisible by 4 for axial RoPE
+HEAD_DIM = 32  # divisible by 4 for axial RoPE
 ATOL = 1e-4
 RTOL = 1e-4
 
@@ -163,9 +163,7 @@ def test_freqs_cos_sin_derived_from_freqs_cis():
 
     # Correct derivation
     q_ref, k_ref = apply_rotary_enc(q, k, freqs_cis, repeat_freqs_k=False)
-    q_cos, k_cos = apply_rotary_enc2(
-        q, k, freqs_cis.real, freqs_cis.imag, repeat_freqs_k=False
-    )
+    q_cos, k_cos = apply_rotary_enc2(q, k, freqs_cis.real, freqs_cis.imag, repeat_freqs_k=False)
 
     assert torch.allclose(q_ref, q_cos, rtol=RTOL, atol=ATOL), (
         "freqs_cos=.real / freqs_sin=.imag derivation is wrong for Q"
@@ -175,9 +173,7 @@ def test_freqs_cos_sin_derived_from_freqs_cis():
     )
 
     # Incorrect derivation (swapped) must differ -- ensures we are not testing a no-op
-    q_swapped, _ = apply_rotary_enc2(
-        q, k, freqs_cis.imag, freqs_cis.real, repeat_freqs_k=False
-    )
+    q_swapped, _ = apply_rotary_enc2(q, k, freqs_cis.imag, freqs_cis.real, repeat_freqs_k=False)
     assert not torch.allclose(q_ref, q_swapped, atol=1e-6), (
         "Swapped cos/sin should differ but matched -- test is degenerate"
     )
@@ -201,6 +197,7 @@ def test_apply_rotary_enc2_has_no_complex_ops():
     # Strip the docstring: keep only lines that are not inside triple-quoted strings.
     # Simple approach: remove the docstring block (text between first pair of triple quotes).
     import re
+
     # Remove docstring (first triple-quoted block after the def/signature)
     code_lines = re.sub(r'""".*?"""', "", src, count=1, flags=re.DOTALL)
 

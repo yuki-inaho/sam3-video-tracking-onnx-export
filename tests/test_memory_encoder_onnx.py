@@ -61,8 +61,8 @@ ONNX_PATH = SANDBOX_ROOT / "outputs" / "onnx" / "memory_encoder.onnx"
 # Fixed shape constants (B-2 spec)
 # ---------------------------------------------------------------------------
 B = 1
-IN_DIM = 256         # pix_feat channel dim
-OUT_DIM = 64         # maskmem_features / pos_enc channel dim
+IN_DIM = 256  # pix_feat channel dim
+OUT_DIM = 64  # maskmem_features / pos_enc channel dim
 FEAT_H = FEAT_W = 72  # spatial resolution (1008 / 14)
 MASK_H = MASK_W = 1008  # high-res mask input resolution
 

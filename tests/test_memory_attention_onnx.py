@@ -55,18 +55,18 @@ ONNX_PATH = SANDBOX_ROOT / "outputs" / "onnx" / "memory_attention.onnx"
 # ---------------------------------------------------------------------------
 # Fixed shape constants (B-1 spec)
 # ---------------------------------------------------------------------------
-HW = 72 * 72          # 5184 spatial tokens per frame
+HW = 72 * 72  # 5184 spatial tokens per frame
 B = 1
-D_MODEL = 256         # current-frame feature dim
-MEM_DIM = 64          # memory feature dim (kv_in_dim for cross-attn)
+D_MODEL = 256  # current-frame feature dim
+MEM_DIM = 64  # memory feature dim (kv_in_dim for cross-attn)
 
 # Number of frames for fast export/parity test (2 frames, no obj ptrs).
 # 2 * HW = 10368 memory tokens. Full config: 7 * HW + 16 = 36304.
-TWO_FRAME_MEM_LEN = 2 * HW   # 10368
+TWO_FRAME_MEM_LEN = 2 * HW  # 10368
 
 # Production memory length: 7 * HW frames + up to 16 obj_ptr tokens.
 # Each obj_ptr is expanded by C // mem_dim = 256 // 64 = 4 tokens → max 64.
-FULL_MEM_LEN = 7 * HW + 16 * (D_MODEL // MEM_DIM)   # 5184*7 + 64 = 36352
+FULL_MEM_LEN = 7 * HW + 16 * (D_MODEL // MEM_DIM)  # 5184*7 + 64 = 36352
 # NOTE: workdoc §9.9 says 36304 (obj_ptr≤16 tokens directly, not expanded).
 # The expanded form is 16 * 4 = 64. We use 36352 for full export test.
 
@@ -225,7 +225,6 @@ def test_ort_parity() -> None:
             rtol=RTOL,
             atol=ATOL,
             err_msg=(
-                f"[repeat {repeat_idx}, seed={seed}] memory output mismatch "
-                "between PyTorch and ORT"
+                f"[repeat {repeat_idx}, seed={seed}] memory output mismatch between PyTorch and ORT"
             ),
         )
