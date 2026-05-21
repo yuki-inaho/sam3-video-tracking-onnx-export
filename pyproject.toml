@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sam3-onnx-equiv"
+version = "0.1.0"
+description = "SAM3 video tracking ONNX equivalence layer"
+requires-python = ">=3.9,<3.13"
+dependencies = [
+    "torch==2.7.0",
+    "torchvision>=0.22.0",
+    "onnx>=1.19",
+    "onnxruntime>=1.20",
+    "onnxscript",
+    "jaxtyping",
+    "numpy",
+    "pillow",
+    "einops",
+    "timm",
+    "sam3",
+    "pycocotools>=2.0.11",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff",
+    "ty",
+    "radon",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu126" }
+torchvision = { index = "pytorch-cu126" }
+sam3 = { path = "/home/inaho-omen/Project/sam3", editable = true }
+
+[dependency-groups]
+dev = [
+    "onnxsim>=0.6.2",
+]
