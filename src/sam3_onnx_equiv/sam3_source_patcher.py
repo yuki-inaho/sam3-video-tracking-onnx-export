@@ -283,6 +283,29 @@ VITDET_REPLACEMENTS: tuple[TextReplacement, ...] = (
 )
 
 
+MEMORY_REPLACEMENTS: tuple[TextReplacement, ...] = (
+    # SimpleMaskDownSampler.forward uses F.interpolate(..., antialias=True) for the
+    # 1008->1152 bilinear upsample.  antialias=True emits aten::_upsample_bilinear2d_aa,
+    # which torch.onnx (opset 18, jit exporter) does not support.  The export tooling
+    # (export/memory_encoder.py docstring) documents that the equiv-source must use
+    # antialias=False so this op is not emitted; the numerical difference for this
+    # upsample is <5e-7 (verified by the memory_encoder ORT parity test).
+    TextReplacement(
+        old=(
+            "                align_corners=False,\n"
+            '                mode="bilinear",\n'
+            "                antialias=True,\n"
+        ),
+        new=(
+            "                align_corners=False,\n"
+            '                mode="bilinear",\n'
+            "                antialias=False,\n"
+        ),
+        label="memory: SimpleMaskDownSampler antialias=False for ONNX export",
+    ),
+)
+
+
 def _replace_once(text: str, replacement: TextReplacement) -> str:
     count = text.count(replacement.old)
     if count != 1:
@@ -302,6 +325,18 @@ def patch_model_builder_text(text: str) -> str:
 def patch_vitdet_text(text: str) -> str:
     """Patch ``sam3/model/vitdet.py`` to add cos/sin RoPE path (ONNX-safe)."""
     for replacement in VITDET_REPLACEMENTS:
+        text = _replace_once(text, replacement)
+    return text
+
+
+def patch_memory_text(text: str) -> str:
+    """Patch ``sam3/model/memory.py`` to use ONNX-exportable bilinear upsample.
+
+    Switches ``SimpleMaskDownSampler.forward`` from ``antialias=True`` to
+    ``antialias=False`` so that ``aten::_upsample_bilinear2d_aa`` (unsupported in
+    ONNX opset 18) is not emitted during ``export-memory-encoder``.
+    """
+    for replacement in MEMORY_REPLACEMENTS:
         text = _replace_once(text, replacement)
     return text
 
@@ -326,8 +361,10 @@ def create_equivalent_source_copy(source_root: PathLike, output_root: PathLike) 
     )
     copied_vitdet = output_root / "sam3" / "model" / "vitdet.py"
     copied_vitdet.write_text(patch_vitdet_text(copied_vitdet.read_text()), encoding="utf-8")
+    copied_memory = output_root / "sam3" / "model" / "memory.py"
+    copied_memory.write_text(patch_memory_text(copied_memory.read_text()), encoding="utf-8")
     return PatchResult(
         source_root=source_root,
         output_root=output_root,
-        modified_files=(copied_builder, copied_vitdet),
+        modified_files=(copied_builder, copied_vitdet, copied_memory),
     )
