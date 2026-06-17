@@ -54,9 +54,11 @@ MEM_DIM = 64
 OPSET_VERSION = 18
 
 # Valid obj_ptr token counts for a 6-frame clip: min(frame_idx, 6) frames × 4 tokens.
-# frame 1->4, 2->8, 3->12, 4->16, 5->20.  (0 = no obj_ptr; not used since frame>=1 always
-# has at least the conditioning frame's pointer.)
-DEFAULT_NUM_K = [4, 8, 12, 16, 20]
+# frame 1->4, 2->8, 3->12, 4->16, 5->20, 6->24.  (0 = no obj_ptr; not used since
+# frame>=1 always has at least the conditioning frame's pointer.)
+# Must cover every value in VideoOrchestrator.DYN_NUM_K_VALUES = (4,8,12,16,20,24);
+# the orchestrator loads one graph per k and the video E2E test needs k=24.
+DEFAULT_NUM_K = [4, 8, 12, 16, 20, 24]
 
 
 def _output_path(num_k: int) -> Path:

@@ -118,9 +118,14 @@ def equiv_detector_output() -> dict:
     state = processor.set_image(image)
     output = processor.set_text_prompt(prompt=TEXT_PROMPT, state=state)
 
-    masks = output["masks"].cpu().numpy().astype(np.float32)
-    scores = output["scores"].cpu().numpy().astype(np.float32)
-    boxes = output["boxes"].cpu().numpy().astype(np.float32)
+    # .float() before .numpy(): depending on test order the equiv model may emit
+    # bfloat16 tensors (numpy has no bf16 dtype, so a bare .numpy() raises
+    # "unsupported ScalarType BFloat16").  Upcasting to float32 on-device first is
+    # equivalent to the subsequent .astype(np.float32) and makes this fixture
+    # robust to the sam3 module-cache reload order (see conftest._reset_sam3_module_cache).
+    masks = output["masks"].float().cpu().numpy().astype(np.float32)
+    scores = output["scores"].float().cpu().numpy().astype(np.float32)
+    boxes = output["boxes"].float().cpu().numpy().astype(np.float32)
     return {"masks": masks, "scores": scores, "boxes": boxes}
 
 

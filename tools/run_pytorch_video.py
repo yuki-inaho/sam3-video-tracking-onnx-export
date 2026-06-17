@@ -472,6 +472,21 @@ def _extract_constants(tracker: Any, logger: logging.Logger) -> None:
         data = pt.data if isinstance(pt, torch.nn.Parameter) else pt
         _save(spec["name"], data, f"tracker.sam_mask_decoder.{spec['attr']}.{spec['param']}")
 
+    # obj_ptr temporal-position projection (nn.Linear(hidden_dim, mem_dim),
+    # sam3_tracker_base.py:216).  Required by VideoOrchestrator.Constants
+    # (video_orchestrator.py:164-165) to project obj_ptr temporal pos-enc.
+    obj_ptr_tpos_proj = tracker.obj_ptr_tpos_proj
+    _save(
+        "obj_ptr_tpos_proj_weight",
+        obj_ptr_tpos_proj.weight,
+        "tracker.obj_ptr_tpos_proj.weight (sam3_tracker_base.py:216)",
+    )
+    _save(
+        "obj_ptr_tpos_proj_bias",
+        obj_ptr_tpos_proj.bias,
+        "tracker.obj_ptr_tpos_proj.bias (sam3_tracker_base.py:216)",
+    )
+
     # Scalar constants
     for name, val, source in [
         ("NO_OBJ_SCORE", NO_OBJ_SCORE, "sam3_tracker_base.py:24 (= -1024.0)"),
