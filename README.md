@@ -69,3 +69,21 @@ The notebook ONNX inference example is:
 It uses the exported ONNX modules under `outputs/onnx/` and constants under
 `outputs/reference/constants/`, then compares the ONNX video-tracking path with
 the PyTorch oracle.
+
+## Gradio Web UI
+
+Launch the bbox-prompted ONNX tracking UI:
+
+```bash
+just image-encoder-tracker-fp16
+just webgui
+```
+
+The UI requires ONNX Runtime `CUDAExecutionProvider` and does not use TensorRT.
+It keeps `CUDAExecutionProvider` first and permits `CPUExecutionProvider` fallback
+for ORT-required ops. The `image-encoder-tracker-fp16` step creates
+`outputs/onnx/image_encoder_tracker_fp16.onnx`, which is preferred automatically
+when present and is intended for GTX 1070 / 8GB VRAM runs. The UI accepts
+sequential image uploads, lets you select a base frame, draw one bounding box,
+then generates per-frame masks and overlay visualizations under
+`outputs/gradio_sessions/`.

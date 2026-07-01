@@ -136,6 +136,14 @@ run-video:
         {{ if MAX_FRAMES != "" { "--max-frames " + MAX_FRAMES } else { "" } }} \
         {{ if EMULATE_BF16 == "true" { "--emulate-bf16" } else { "" } }}
 
+# Convert the tracker image encoder to fp16 for GTX 1070 / 8GB VRAM runs.
+image-encoder-tracker-fp16:
+    uv run --extra webgui python tools/convert_image_encoder_tracker_fp16.py
+
+# Launch the Gradio UI for bbox-prompted ONNX video tracking.
+webgui:
+    uv run --extra webgui python tools/webgui.py
+
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------

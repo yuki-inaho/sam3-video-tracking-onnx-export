@@ -13,7 +13,7 @@ dependencies = [
     "torch==2.7.0",
     "torchvision>=0.22.0",
     "onnx>=1.19",
-    "onnxruntime>=1.20",
+    "onnxruntime==1.18.0",
     "onnxscript",
     "jaxtyping",
     "numpy",
@@ -31,6 +31,15 @@ dev = [
     "ruff",
     "ty",
     "radon",
+]
+webgui = [
+    "gradio>=5.49",
+    "gradio-image-annotation>=0.3.1",
+    "onnxruntime-gpu==1.18.0",
+    "nvidia-cublas-cu11==11.11.3.6",
+    "nvidia-cuda-runtime-cu11==11.8.89",
+    "nvidia-cufft-cu11==10.9.0.58",
+    "nvidia-curand-cu11==10.3.0.86",
 ]
 
 [tool.setuptools.packages.find]

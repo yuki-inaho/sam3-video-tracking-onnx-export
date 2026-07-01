@@ -42,7 +42,8 @@ Key semantics replicated from the official code (no implicit fallback):
     decode_head.onnx already applies this internally (B-3).
   * no_obj_embed_spatial added after memory_encoder (_encode_new_memory:845-848).
 
-Device:  CPUExecutionProvider (explicit; no auto-detect).
+Device:  explicit ORT providers; no auto-detect. Tests use CPUExecutionProvider,
+         while the Gradio UI uses CUDAExecutionProvider.
 Dtype:   float32 throughout (oracle is bf16; the bf16/fp32 gap is accepted but the
          DoD thresholds are NOT silently relaxed).
 """
@@ -51,7 +52,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import TypedDict
+from typing import Any, TypedDict
 
 import numpy as np
 from jaxtyping import Bool, Float, Int
@@ -540,6 +541,8 @@ class VideoOrchestrator:
         onnx_dir:      Directory containing the *.onnx files.
         constants_dir: Directory containing constant *.npy files.
         providers:     ORT execution providers (explicit; no auto-detect).
+        session_options: Optional ORT SessionOptions shared by all sessions.
+        image_encoder_name: Tracker image encoder ONNX filename.
     """
 
     def __init__(
@@ -547,6 +550,8 @@ class VideoOrchestrator:
         onnx_dir: Path,
         constants_dir: Path,
         providers: list[str],
+        session_options: Any | None = None,
+        image_encoder_name: str = "image_encoder_tracker.onnx",
     ) -> None:
         import onnxruntime as ort  # noqa: PLC0415
 
@@ -564,14 +569,24 @@ class VideoOrchestrator:
             path = onnx_dir / name
             if not path.exists():
                 raise FileNotFoundError(f"ONNX file not found: {path}")
-            sess = ort.InferenceSession(str(path), providers=providers)
+            sess = ort.InferenceSession(
+                str(path),
+                sess_options=session_options,
+                providers=providers,
+            )
             log.info("  Loaded %s", name)
             return sess
 
         # NOTE: the tracker consumes the SAM2 neck features (sam2_backbone_out),
         # NOT the detector image_encoder.onnx (sam3 FPN).  image_encoder_tracker.onnx
         # is exported from build_tracker's backbone (add_sam2_neck=True).
-        self._image_enc = _load("image_encoder_tracker.onnx")
+        self._image_enc = _load(image_encoder_name)
+        self._image_encoder_outputs = [
+            "vision_pos_enc_2",
+            "backbone_fpn_0",
+            "backbone_fpn_1",
+            "backbone_fpn_2",
+        ]
         # One memory_attention graph per obj_ptr token count (num_k_exclude_rope).
         # Selected at runtime by the real obj_ptr count (no zero padding).
         self._mem_attn: dict[int, ort.InferenceSession] = {
@@ -731,12 +746,14 @@ class VideoOrchestrator:
 
             # --- Step 1: image encoder ------------------------------------ #
             pixel_values = _preprocess_frame(pil_frame)
-            enc_outs = self._image_enc.run(None, {"pixel_values": pixel_values})
-            # order: vision_pos_enc_0,_1,_2, backbone_fpn_0,_1,_2
-            vision_pos_enc_2 = enc_outs[2]  # (1,256,72,72)
-            backbone_fpn_0 = enc_outs[3]  # (1,256,288,288)
-            backbone_fpn_1 = enc_outs[4]  # (1,256,144,144)
-            backbone_fpn_2 = enc_outs[5]  # (1,256,72,72)
+            enc_outs = self._image_enc.run(
+                self._image_encoder_outputs,
+                {"pixel_values": pixel_values},
+            )
+            vision_pos_enc_2 = enc_outs[0]  # (1,256,72,72)
+            backbone_fpn_0 = enc_outs[1]  # (1,256,288,288)
+            backbone_fpn_1 = enc_outs[2]  # (1,256,144,144)
+            backbone_fpn_2 = enc_outs[3]  # (1,256,72,72)
 
             # --- Step 2: conv_s0 / conv_s1 (forward_image:450-453) -------- #
             # high_res_feat0 -> (1,32,288,288); high_res_feat1 -> (1,64,144,144)
