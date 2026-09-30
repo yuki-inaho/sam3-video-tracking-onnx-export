@@ -30,12 +30,13 @@ Install dependencies:
 uv sync --extra dev --group dev
 ```
 
-Place the SAM3 checkpoint:
+After accepting the model terms on Hugging Face, authenticate once with
+`uv run hf auth login` or provide `HF_TOKEN` in your environment. Download the
+official SAM 3 checkpoint:
 
 ```bash
 mkdir -p models
-# put the official checkpoint at:
-# models/sam3.pt
+uv run hf download facebook/sam3 sam3.pt --local-dir models
 ```
 
 Generate the equivalent source tree and export all ONNX modules:
@@ -81,6 +82,7 @@ on Hugging Face, then place its `sam3.1_multiplex.pt` checkpoint at
 ```bash
 git submodule update --init --recursive
 uv sync --extra dev --group dev
+uv run hf download facebook/sam3.1 sam3.1_multiplex.pt --local-dir models
 CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 just build-sam31
 CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 just sam31-e2e
 ```

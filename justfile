@@ -122,6 +122,9 @@ build-all: equiv-source export-all
 
 # Export SAM 3.1 Object Multiplex tensor modules after sam31-source.
 export-sam31-all:
+    SAM31_CPU_SOURCE="{{ SAM31_CPU_SOURCE }}" \
+    SAM31_CHECKPOINT="{{ SAM31_CHECKPOINT }}" \
+    SAM31_ONNX_DIR="{{ SAM31_ONNX_DIR }}" \
     uv run python tools/export_sam31.py
 
 # Generate the CPU source copy and export all SAM 3.1 ONNX modules.
@@ -169,6 +172,10 @@ e2e:
 
 # Run the two-object, six-frame SAM 3.1 ORT vs official PyTorch comparison.
 sam31-e2e:
+    SAM31_SRC="{{ SAM31_SRC }}" \
+    SAM31_CPU_SOURCE="{{ SAM31_CPU_SOURCE }}" \
+    SAM31_CHECKPOINT="{{ SAM31_CHECKPOINT }}" \
+    SAM31_ONNX_DIR="{{ SAM31_ONNX_DIR }}" \
     uv run python -m pytest tests/test_sam31_video_e2e.py -q -s
 
 # ---------------------------------------------------------------------------
