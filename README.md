@@ -42,7 +42,8 @@ uv run hf download facebook/sam3 sam3.pt --local-dir models
 Generate the equivalent source tree and export all ONNX modules:
 
 ```bash
-just build-all
+CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 just build-all
+CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 just e2e
 ```
 
 ## Minimum Commands
@@ -52,7 +53,8 @@ For a fresh checkout with `models/sam3.pt` already present:
 ```bash
 git submodule update --init --recursive
 uv sync --extra dev --group dev
-just build-all
+CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 just build-all
+CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 just e2e
 ```
 
 `just build-all` runs:
@@ -91,6 +93,8 @@ CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 just sam3
 `outputs/sam31_cpu_source/`, then exports the TriHead image encoder, multiplex
 mask decoder, multiplex memory encoder, and four bounded shapes of decoupled
 memory attention to `outputs/onnx_sam31/`. It does not edit either Git submodule.
+To run the source preparation and ONNX export separately, use `just sam31-source`
+followed by `just export-sam31-all` with the same CPU environment variables.
 The SAM 3.1 E2E test compares a two-object, six-frame clip against the same official PyTorch
 model, checks every frame's object IDs and mask IoU, and verifies ONNX session
 calls. All inference uses the CPU.
