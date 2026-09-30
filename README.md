@@ -1,5 +1,8 @@
 # SAM3 Video Tracking ONNX Export
 
+Contributor and agent setup guidance is available in
+[`docs/ONBOARDING.md`](docs/ONBOARDING.md).
+
 ## Prerequisites
 
 - Python `>=3.10,<3.13`
@@ -43,6 +46,7 @@ Generate the equivalent source tree and export all ONNX modules:
 
 ```bash
 CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 just build-all
+CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 just oracle
 CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 just e2e
 ```
 
@@ -54,6 +58,7 @@ For a fresh checkout with `models/sam3.pt` already present:
 git submodule update --init --recursive
 uv sync --extra dev --group dev
 CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 just build-all
+CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 just oracle
 CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 just e2e
 ```
 
