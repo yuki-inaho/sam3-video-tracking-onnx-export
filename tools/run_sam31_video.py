@@ -74,6 +74,7 @@ def main() -> None:
                 torch.tensor([1], dtype=torch.int32),
                 clear_old_points=True,
             )
+        model.propagate_in_video_preflight(state, run_mem_encoder=True)
         frame_limit = min(args.max_frames or state["num_frames"], state["num_frames"])
         frames = []
         masks = []

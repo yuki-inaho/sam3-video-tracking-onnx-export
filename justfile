@@ -10,6 +10,8 @@
 #   just export-all     # run all ONNX export steps in dependency order
 #   just oracle         # generate PyTorch oracle artefacts (slow, GPU recommended)
 #   just run-video      # run ONNX video orchestrator and compare with oracle
+#   just annotate       # start the local SAM 3.1 image/video annotator
+#   just test-annotation # run annotation unit and HTTP tests
 #   just test           # run full test suite
 #   just e2e            # run MUST test (mask IoU >= 0.90)
 #   just quality        # run all quality gates (format-check + lint + typecheck + complexity)
@@ -158,6 +160,10 @@ run-video:
         {{ if MAX_FRAMES != "" { "--max-frames " + MAX_FRAMES } else { "" } }} \
         {{ if EMULATE_BF16 == "true" { "--emulate-bf16" } else { "" } }}
 
+# Start the local SAM 3.1 image/video annotation UI.
+annotate:
+    uv run python tools/run_sam31_annotation.py serve
+
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
@@ -165,6 +171,12 @@ run-video:
 # Run the full test suite.
 test:
     uv run python -m pytest -q
+
+# Run model-free annotation data and HTTP boundary tests.
+test-annotation:
+    uv run python -m pytest \
+        tests/test_sam31_annotation.py \
+        tests/test_sam31_annotation_server.py -q
 
 # Run the MUST e2e test (memory-bank video tracking, mask IoU >= 0.90).
 e2e:
