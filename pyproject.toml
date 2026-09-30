@@ -49,7 +49,7 @@ target-version = "py310"
 # code) that conflict with library-grade lint (E402 etc.); exclude them from
 # ruff format/lint. Library code under src/tools/tests stays strict.
 # sam3/ is a read-only Git submodule; upstream code is not reformatted here.
-extend-exclude = ["notebooks", "sam3"]
+extend-exclude = ["notebooks", "sam3", "sam31"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]

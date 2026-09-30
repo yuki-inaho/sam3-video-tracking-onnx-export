@@ -31,6 +31,12 @@ CHECKPOINT := env_var_or_default("CHECKPOINT", "models/sam3.pt")
 # ONNX output directory (relative to repo root).
 ONNX_DIR := env_var_or_default("ONNX_DIR", "outputs/onnx")
 
+# Pinned SAM 3.1 Object Multiplex source and separate generated artifacts.
+SAM31_SRC := env_var_or_default("SAM31_SRC", "sam31")
+SAM31_CPU_SOURCE := env_var_or_default("SAM31_CPU_SOURCE", "outputs/sam31_cpu_source")
+SAM31_CHECKPOINT := env_var_or_default("SAM31_CHECKPOINT", "models/sam3.1_multiplex.pt")
+SAM31_ONNX_DIR := env_var_or_default("SAM31_ONNX_DIR", "outputs/onnx_sam31")
+
 # ---------------------------------------------------------------------------
 # Default: list all targets
 # ---------------------------------------------------------------------------
@@ -58,6 +64,12 @@ equiv-source:
     uv run python tools/create_equivalent_sam3_source.py \
         --source-root "{{ SAM3_SRC }}" \
         --output-root "{{ EQUIV_SOURCE }}"
+
+# Generate a separate CPU/ONNX source copy from the official SAM 3.1 submodule.
+sam31-source:
+    uv run python tools/create_sam31_cpu_source.py \
+        --source-root "{{ SAM31_SRC }}" \
+        --output-root "{{ SAM31_CPU_SOURCE }}"
 
 # ---------------------------------------------------------------------------
 # ONNX export — individual targets
@@ -108,6 +120,16 @@ export-all: export-image-encoder export-image-encoder-tracker export-memory-atte
 # equiv-source + export-all as a single convenience target.
 build-all: equiv-source export-all
 
+# Export SAM 3.1 Object Multiplex tensor modules after sam31-source.
+export-sam31-all:
+    SAM31_CPU_SOURCE="{{ SAM31_CPU_SOURCE }}" \
+    SAM31_CHECKPOINT="{{ SAM31_CHECKPOINT }}" \
+    SAM31_ONNX_DIR="{{ SAM31_ONNX_DIR }}" \
+    uv run python tools/export_sam31.py
+
+# Generate the CPU source copy and export all SAM 3.1 ONNX modules.
+build-sam31: sam31-source export-sam31-all
+
 # ---------------------------------------------------------------------------
 # Oracle generation (PyTorch reference; slow — GPU strongly recommended)
 # ---------------------------------------------------------------------------
@@ -147,6 +169,14 @@ test:
 # Run the MUST e2e test (memory-bank video tracking, mask IoU >= 0.90).
 e2e:
     uv run python -m pytest tests/test_video_e2e.py -q
+
+# Run the two-object, six-frame SAM 3.1 ORT vs official PyTorch comparison.
+sam31-e2e:
+    SAM31_SRC="{{ SAM31_SRC }}" \
+    SAM31_CPU_SOURCE="{{ SAM31_CPU_SOURCE }}" \
+    SAM31_CHECKPOINT="{{ SAM31_CHECKPOINT }}" \
+    SAM31_ONNX_DIR="{{ SAM31_ONNX_DIR }}" \
+    uv run python -m pytest tests/test_sam31_video_e2e.py -q -s
 
 # ---------------------------------------------------------------------------
 # Quality gates
