@@ -106,6 +106,31 @@ calls. All inference uses the CPU.
 First-frame interactive prompt handling and bucket bookkeeping use the official
 PyTorch/Python code; the exported ONNX modules run image features and propagation.
 
+### 画像・動画アノテーション
+
+SAM 3.1 Object Multiplex のポイント指定アノテーションを、ローカルのブラウザまたは
+headless CLI で実行できます。事前に上記の `just build-sam31` を完了してください。操作、
+正規化座標、COCO 非圧縮 RLE、成果物、制限の詳細は
+[`docs/ANNOTATION.md`](docs/ANNOTATION.md) を参照してください。
+
+```bash
+# ローカル Web UI
+CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 \
+  uv run python tools/run_sam31_annotation.py serve
+
+# 画像（末尾の :0 は負例点）
+CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 \
+  uv run python tools/run_sam31_annotation.py image \
+  --input path/to/input.jpg --point 1:0.48:0.52 --point 1:0.68:0.52:0 \
+  --label 1:target --output outputs/annotations/example-image
+
+# 動画（先頭フレームの点を読み込んだ全フレームへ伝播）
+CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 \
+  uv run python tools/run_sam31_annotation.py video \
+  --input path/to/input.mp4 --point 1:0.28:0.44 --label 1:target \
+  --max-frames 60 --output outputs/annotations/example-video
+```
+
 To run point-prompted tracking on a folder of numbered image frames:
 
 ```bash

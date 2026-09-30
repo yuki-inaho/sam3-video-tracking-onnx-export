@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="data:,">
+  <title>SAM 3.1 Video Annotator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand" aria-label="SAM 3.1 Video Annotator">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <strong>SAM 3.1</strong>
+      <span>Video Annotator</span>
+    </div>
+    <div id="mediaSummary" class="media-summary" data-testid="media-summary">メディア未読み込み</div>
+    <div class="service-state">
+      <span id="healthDot" class="health-dot" aria-hidden="true"></span>
+      <span id="healthText" data-testid="health-status">接続確認中</span>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="sidebar" aria-label="アノテーション設定">
+      <section class="panel-section upload-section">
+        <div class="section-heading">
+          <h2>メディア</h2>
+          <button id="resetButton" data-testid="reset" class="text-button danger" type="button" disabled>リセット</button>
+        </div>
+
+        <label for="mediaInput" class="file-picker" data-testid="upload-picker">
+          <span class="file-picker-icon" aria-hidden="true">＋</span>
+          <span>
+            <strong>画像・動画を選択</strong>
+            <small>JPEG, PNG, WebP, MP4 など</small>
+          </span>
+          <input id="mediaInput" data-testid="file-input" type="file" accept="image/*,video/*">
+        </label>
+
+        <label class="field compact" for="maxFrames">
+          <span>最大フレーム数</span>
+          <input id="maxFrames" data-testid="max-frames" type="number" min="1" max="60" step="1" value="6" inputmode="numeric">
+        </label>
+      </section>
+
+      <section class="panel-section prompt-section">
+        <div class="section-heading">
+          <h2>ポイントプロンプト</h2>
+          <span id="pointCount" data-testid="point-count" class="badge">0</span>
+        </div>
+
+        <div class="prompt-key" aria-label="ポイント操作の説明">
+          <span><i class="dot positive" aria-hidden="true"></i>クリック: 対象</span>
+          <span><i class="dot negative" aria-hidden="true"></i><kbd>Shift</kbd> / 右クリック: 除外</span>
+        </div>
+
+        <div class="two-columns">
+          <label class="field" for="objectId">
+            <span>オブジェクト ID</span>
+            <input id="objectId" data-testid="object-id" type="number" min="1" max="16" step="1" value="1" inputmode="numeric">
+          </label>
+          <label class="field" for="objectLabel">
+            <span>ラベル</span>
+            <input id="objectLabel" data-testid="object-label" type="text" value="object" maxlength="120" autocomplete="off">
+          </label>
+        </div>
+
+        <button id="newObjectButton" data-testid="new-object" class="secondary full" type="button" disabled>新しいオブジェクト</button>
+
+        <div class="button-row">
+          <button id="undoButton" data-testid="undo-prompt" class="secondary" type="button" disabled>1 点戻す <kbd>Ctrl Z</kbd></button>
+          <button id="clearButton" data-testid="clear-prompts" class="secondary" type="button" disabled>点を消去 <kbd>Esc</kbd></button>
+        </div>
+
+        <button id="segmentButton" data-testid="segment" class="primary full" type="button" disabled>
+          <span>このフレームをセグメント</span>
+          <kbd>Space</kbd>
+        </button>
+
+        <button id="propagateButton" data-testid="propagate" class="accent full" type="button" disabled>
+          動画全体へ伝播
+        </button>
+      </section>
+
+      <section class="panel-section object-section">
+        <div class="section-heading">
+          <h2>オブジェクト</h2>
+          <span id="objectCount" data-testid="object-count" class="badge">0</span>
+        </div>
+        <p id="objectEmpty" class="empty-copy">セグメントすると、ここにオブジェクトが表示されます。</p>
+        <ul id="objectList" data-testid="object-list" class="object-list" aria-label="オブジェクト一覧"></ul>
+      </section>
+
+      <section class="panel-section export-section">
+        <button id="exportButton" data-testid="export-coco" class="primary full" type="button" disabled>COCO JSON を書き出す</button>
+      </section>
+    </aside>
+
+    <section class="viewer" aria-label="アノテーションビューアー">
+      <div class="viewer-toolbar" aria-label="表示操作">
+        <div class="tool-group" role="group" aria-label="キャンバス操作">
+          <button id="promptToolButton" data-testid="prompt-tool" class="tool-button active" type="button" aria-pressed="true" title="ポイントを追加">ポイント</button>
+          <button id="panToolButton" data-testid="pan-tool" class="tool-button" type="button" aria-pressed="false" title="ドラッグで移動">移動</button>
+        </div>
+        <div class="tool-group zoom-tools" role="group" aria-label="拡大縮小">
+          <button id="zoomOutButton" data-testid="zoom-out" class="icon-button" type="button" disabled aria-label="縮小">−</button>
+          <output id="zoomLevel" data-testid="zoom-level" aria-live="polite">100%</output>
+          <button id="zoomInButton" data-testid="zoom-in" class="icon-button" type="button" disabled aria-label="拡大">＋</button>
+          <button id="fitButton" data-testid="fit-view" class="tool-button" type="button" disabled>全体表示</button>
+        </div>
+      </div>
+
+      <div id="canvasWrap" class="canvas-wrap">
+        <canvas id="annotationCanvas" data-testid="annotation-canvas" tabindex="0" role="img" aria-label="メディアのアノテーションキャンバス。クリックで対象点、Shift キーを押しながらクリックすると除外点を追加します。"></canvas>
+        <div id="emptyState" data-testid="empty-state" class="empty-state">
+          <div class="empty-state-mark" aria-hidden="true">◎</div>
+          <strong>画像または動画を読み込んでください</strong>
+          <span>左の「画像・動画を選択」から開始できます</span>
+        </div>
+        <div id="busyOverlay" data-testid="busy-overlay" class="busy-overlay" hidden aria-hidden="true">
+          <span class="spinner" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <div id="timeline" data-testid="timeline" class="timeline" aria-label="動画コントロール" hidden>
+        <button id="previousButton" data-testid="previous-frame" class="icon-button transport" type="button" aria-label="前のフレーム">‹</button>
+        <button id="playButton" data-testid="play-pause" class="icon-button transport play" type="button" aria-label="再生">▶</button>
+        <button id="nextButton" data-testid="next-frame" class="icon-button transport" type="button" aria-label="次のフレーム">›</button>
+        <span id="frameReadout" data-testid="frame-readout" class="frame-readout">1 / 1</span>
+        <input id="frameSlider" data-testid="frame-slider" type="range" min="0" max="0" value="0" step="1" aria-label="表示フレーム">
+        <span id="timeReadout" data-testid="time-readout" class="time-readout">00:00.00</span>
+      </div>
+
+      <footer class="statusbar">
+        <div id="statusMessage" data-testid="status" class="status-message" role="status" aria-live="polite">サーバーへの接続を確認しています…</div>
+        <div id="errorMessage" data-testid="error" class="error-message" role="alert" hidden></div>
+        <button id="clearMessageButton" data-testid="clear-message" class="clear-message" type="button" hidden aria-label="メッセージを消去">×</button>
+      </footer>
+    </section>
+  </main>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

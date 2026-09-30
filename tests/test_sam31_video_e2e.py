@@ -44,6 +44,7 @@ def _initial_masks_from_points(model: torch.nn.Module, path: Path) -> torch.Tens
                 torch.tensor([1], dtype=torch.int32),
                 clear_old_points=True,
             )
+        model.propagate_in_video_preflight(state, run_mem_encoder=True)
         _, ids, _, masks, _ = next(model.propagate_in_video(state, 0, 0, False, tqdm_disable=True))
         assert list(ids) == [1, 2]
         return (masks[:, 0] > 0).float().cpu()
@@ -55,6 +56,7 @@ def _track(
     with torch.inference_mode():
         state = _init_state(model, path)
         model.add_new_masks(state, 0, [1, 2], prompt_masks)
+        model.propagate_in_video_preflight(state, run_mem_encoder=True)
         multiplex_state = state["multiplex_state"]
         assert multiplex_state.num_buckets == 1
         assert multiplex_state.assignments == [[0, 1] + [-1] * 14]

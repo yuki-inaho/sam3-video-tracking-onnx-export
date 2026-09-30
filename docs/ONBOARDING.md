@@ -58,8 +58,12 @@ SAM 3.1 の初回対話プロンプトと bucket / slot / 時間状態は、公�
 | `sam3/` | 固定された公式SAM 3 source。直接編集しない |
 | `sam31/` | 固定された公式SAM 3.1 source。直接編集しない |
 | `src/sam3_onnx_equiv/` | source変換、モデル読込、ONNX wrapper、動画orchestrator |
+| `src/sam3_onnx_equiv/annotation.py` | ポイント推論、COCO RLE、overlay、画像・動画伝播 |
+| `src/sam3_onnx_equiv/annotation_server.py` | ローカルアノテーション API と成果物保存 |
 | `src/sam3_onnx_equiv/export/` | ONNX境界とexport実装 |
 | `tools/` | source生成、export、oracle、推論CLI |
+| `web/annotation/` | 画像・動画アノテーション UI |
+| `docs/ANNOTATION.md` | アノテーションの操作、出力形式、制限 |
 | `tests/` | 契約、checker、数値比較、動画E2E |
 | `notebooks/` | SAM 3 ONNX動画デモ |
 | `models/` | 公式checkpoint。Git管理外 |
@@ -201,6 +205,22 @@ CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 \
 ```
 
 `--point` は `object_id:x:y` で、座標は画像幅・高さに対する `[0, 1]` の比率です。`--max-frames` で短いsmoke runにできます。
+
+### 7.4 SAM 3.1 画像・動画アノテーション
+
+`just build-sam31` 完了後、ローカル Web UI は次で起動できます。
+
+```bash
+CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 just annotate
+```
+
+既定の `http://127.0.0.1:8765` を開き、ポイントからマスクを作成します。動画では先頭フレームのオブジェクト ID を保ったまま全フレームへ伝播します。ブラウザを閉じてもサーバーが動いていれば、再度開いたときに現在のセッションを復元します。
+
+画面を使わない画像・動画 CLI、負例点、COCO JSON、mask PNG、overlay、preview MP4 の詳細は [`docs/ANNOTATION.md`](ANNOTATION.md) を参照してください。軽量テストは次で実行します。
+
+```bash
+just test-annotation
+```
 
 ## 8. 検証の進め方
 
