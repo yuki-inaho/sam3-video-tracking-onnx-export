@@ -7,7 +7,18 @@ paths belong in a local ``.env`` file loaded by direnv.
 from __future__ import annotations
 
 import os
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
+
+
+@dataclass(frozen=True)
+class ModelPaths:
+    """Source, checkpoint, and ONNX artifacts for one SAM release."""
+
+    source_root: Path
+    checkpoint_path: Path
+    onnx_dir: Path
 
 
 def _resolve(raw_path: str | os.PathLike[str], *, base: Path | None = None) -> Path:
@@ -75,3 +86,21 @@ def constants_dir() -> Path:
 def reference_dir() -> Path:
     """Return the reference output directory."""
     return _repo_relative_env(("SAM3_REFERENCE_DIR", "REFERENCE_DIR"), "outputs/reference")
+
+
+def model_paths(version: Literal["sam3", "sam31"] = "sam3") -> ModelPaths:
+    """Select an explicit model release without changing SAM 3 defaults."""
+    if version == "sam3":
+        return ModelPaths(sam3_source_root(), checkpoint_path(), onnx_dir())
+    if version == "sam31":
+        return ModelPaths(
+            _repo_relative_env(("SAM31_SRC",), "sam31"),
+            _repo_relative_env(("SAM31_CHECKPOINT",), "models/sam3.1_multiplex.pt"),
+            _repo_relative_env(("SAM31_ONNX_DIR",), "outputs/onnx_sam31"),
+        )
+    raise ValueError(f"Unknown SAM model version: {version}")
+
+
+def sam31_cpu_source_root() -> Path:
+    """Return the generated SAM 3.1 CPU source location."""
+    return _repo_relative_env(("SAM31_CPU_SOURCE",), "outputs/sam31_cpu_source")
