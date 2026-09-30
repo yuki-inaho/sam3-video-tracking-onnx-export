@@ -40,6 +40,47 @@ class TextReplacement:
 
 MODEL_BUILDER_REPLACEMENTS: tuple[TextReplacement, ...] = (
     TextReplacement(
+        old=(
+            "def _create_position_encoding(precompute_resolution=None):\n"
+            '    """Create position encoding for visual backbone."""\n'
+        ),
+        new=(
+            "def _create_position_encoding(precompute_resolution=None):\n"
+            '    """Create position encoding for visual backbone."""\n'
+            "    # The official precompute allocates its cache on CUDA; on CPU,\n"
+            "    # compute the same encoding lazily on the input device.\n"
+            "    if not torch.cuda.is_available():\n"
+            "        precompute_resolution = None\n"
+        ),
+        label="position encoding: skip CUDA precompute on CPU",
+    ),
+    TextReplacement(
+        old="        resolution=1008,\n        stride=14,\n",
+        new=(
+            "        # The decoder precomputes coordinates on CUDA when resolution is set.\n"
+            "        resolution=1008 if torch.cuda.is_available() else None,\n"
+            "        stride=14,\n"
+        ),
+        label="decoder: compute coordinates lazily on CPU",
+    ),
+    TextReplacement(
+        old=(
+            "        num_pos_feats=64,\n"
+            "        normalize=True,\n"
+            "        scale=None,\n"
+            "        temperature=10000,\n"
+            "        precompute_resolution=1008,\n"
+        ),
+        new=(
+            "        num_pos_feats=64,\n"
+            "        normalize=True,\n"
+            "        scale=None,\n"
+            "        temperature=10000,\n"
+            "        precompute_resolution=1008 if torch.cuda.is_available() else None,\n"
+        ),
+        label="tracker memory position encoding: skip CUDA precompute on CPU",
+    ),
+    TextReplacement(
         old="def _create_tracker_transformer():\n",
         new="def _create_tracker_transformer(use_rope_real: bool = True):\n",
         label="_create_tracker_transformer signature",
@@ -306,6 +347,89 @@ MEMORY_REPLACEMENTS: tuple[TextReplacement, ...] = (
 )
 
 
+# The official interactive tracker assumes CUDA in a few device transfers.  Keep
+# its source read-only and make the generated copy follow the model's device so
+# the PyTorch oracle can run on CPU alongside ORT CPUExecutionProvider.
+CPU_PREDICTOR_REPLACEMENTS: tuple[TextReplacement, ...] = (
+    TextReplacement(
+        old=(
+            '        self.bf16_context = torch.autocast(device_type="cuda", dtype=torch.bfloat16)\n'
+        ),
+        new=(
+            "        self.bf16_context = torch.autocast(\n"
+            "            device_type=self.device.type, dtype=torch.bfloat16,\n"
+            '            enabled=self.device.type == "cuda",\n'
+            "        )\n"
+        ),
+        label="predictor: autocast only on CUDA",
+    ),
+    TextReplacement(
+        old='            inference_state["storage_device"] = torch.device("cuda")\n',
+        new='            inference_state["storage_device"] = self.device\n',
+        label="predictor: storage device follows model",
+    ),
+    TextReplacement(
+        old=(
+            '                prev_sam_mask_logits = prev_out["pred_masks"].cuda('
+            "non_blocking=True)\n"
+        ),
+        new=(
+            '                prev_sam_mask_logits = prev_out["pred_masks"].to(\n'
+            "                    self.device, non_blocking=True\n"
+            "                )\n"
+        ),
+        label="predictor: previous mask follows model device",
+    ),
+    TextReplacement(
+        old=(
+            '                image = inference_state["images"][frame_idx].cuda().float()'
+            ".unsqueeze(0)\n"
+        ),
+        new=(
+            '                image = inference_state["images"][frame_idx].to(self.device).float()'
+            ".unsqueeze(0)\n"
+        ),
+        label="predictor: image follows model device",
+    ),
+)
+
+CPU_TRACKER_BASE_REPLACEMENTS: tuple[TextReplacement, ...] = (
+    TextReplacement(
+        old=(
+            "            torch.tensor(rel_pos_list).pin_memory().to("
+            "device=device, non_blocking=True)\n"
+        ),
+        new="            torch.tensor(rel_pos_list).to(device=device, non_blocking=True)\n",
+        label="tracker: temporal position encoding works without CUDA pinning",
+    ),
+    TextReplacement(
+        old='                feats = prev["maskmem_features"].cuda(non_blocking=True)\n',
+        new='                feats = prev["maskmem_features"].to(device, non_blocking=True)\n',
+        label="tracker: memory features follow current feature device",
+    ),
+    TextReplacement(
+        old='                maskmem_enc = prev["maskmem_pos_enc"][-1].cuda()\n',
+        new='                maskmem_enc = prev["maskmem_pos_enc"][-1].to(device)\n',
+        label="tracker: memory position follows current feature device",
+    ),
+)
+
+CPU_GEOMETRY_REPLACEMENTS: tuple[TextReplacement, ...] = (
+    TextReplacement(
+        old=(
+            "            scale = scale.pin_memory().to("
+            "device=boxes_xyxy.device, non_blocking=True)\n"
+        ),
+        new=(
+            '            if boxes_xyxy.device.type == "cuda":\n'
+            "                scale = scale.pin_memory()\n"
+            "            scale = scale.to(device=boxes_xyxy.device, non_blocking=True)\n"
+        ),
+        label="geometry: pin host scale only for CUDA transfer",
+    ),
+)
+
+
 def _replace_once(text: str, replacement: TextReplacement) -> str:
     count = text.count(replacement.old)
     if count != 1:
@@ -341,8 +465,15 @@ def patch_memory_text(text: str) -> str:
     return text
 
 
+def patch_cpu_text(text: str, replacements: tuple[TextReplacement, ...]) -> str:
+    """Replace official CUDA assumptions with transfers to the tracker device."""
+    for replacement in replacements:
+        text = _replace_once(text, replacement)
+    return text
+
+
 def create_equivalent_source_copy(source_root: PathLike, output_root: PathLike) -> PatchResult:
-    """Copy a SAM3 source tree and patch model_builder.py and vitdet.py in that copy."""
+    """Copy a SAM3 tree and patch ONNX and CPU oracle paths in the copy."""
     source_root = Path(source_root).resolve()
     output_root = Path(output_root).resolve()
     builder = source_root / "sam3" / "model_builder.py"
@@ -363,8 +494,30 @@ def create_equivalent_source_copy(source_root: PathLike, output_root: PathLike) 
     copied_vitdet.write_text(patch_vitdet_text(copied_vitdet.read_text()), encoding="utf-8")
     copied_memory = output_root / "sam3" / "model" / "memory.py"
     copied_memory.write_text(patch_memory_text(copied_memory.read_text()), encoding="utf-8")
+    copied_predictor = output_root / "sam3" / "model" / "sam3_tracking_predictor.py"
+    copied_predictor.write_text(
+        patch_cpu_text(copied_predictor.read_text(), CPU_PREDICTOR_REPLACEMENTS),
+        encoding="utf-8",
+    )
+    copied_tracker_base = output_root / "sam3" / "model" / "sam3_tracker_base.py"
+    copied_tracker_base.write_text(
+        patch_cpu_text(copied_tracker_base.read_text(), CPU_TRACKER_BASE_REPLACEMENTS),
+        encoding="utf-8",
+    )
+    copied_geometry = output_root / "sam3" / "model" / "geometry_encoders.py"
+    copied_geometry.write_text(
+        patch_cpu_text(copied_geometry.read_text(), CPU_GEOMETRY_REPLACEMENTS),
+        encoding="utf-8",
+    )
     return PatchResult(
         source_root=source_root,
         output_root=output_root,
-        modified_files=(copied_builder, copied_vitdet, copied_memory),
+        modified_files=(
+            copied_builder,
+            copied_vitdet,
+            copied_memory,
+            copied_predictor,
+            copied_tracker_base,
+            copied_geometry,
+        ),
     )

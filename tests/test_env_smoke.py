@@ -40,4 +40,4 @@ def test_relative_env_paths_resolve_from_repo_root(monkeypatch) -> None:
 
     assert sam3_source_root() == root / "sam3"
     assert onnx_dir() == root / "outputs" / "onnx"
-    assert checkpoint_path() == root / "models" / "sam3.pt"
+    assert checkpoint_path() == (root / "models" / "sam3.pt").resolve()

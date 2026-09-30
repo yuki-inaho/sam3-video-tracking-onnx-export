@@ -21,6 +21,7 @@ from __future__ import annotations
 import logging
 import sys
 import time
+from contextlib import nullcontext
 from pathlib import Path
 
 import numpy as np
@@ -150,15 +151,27 @@ def run_detector() -> dict:
     # --- Load model (offline, no HuggingFace download) ---
     logger.info("Loading model from checkpoint (load_from_HF=False)...")
     t0 = time.time()
-    from sam3.model.sam3_image_processor import Sam3Processor
-    from sam3.model_builder import build_sam3_image_model
+    if device == "cpu":
+        from sam3_onnx_equiv.export._equiv_loader import equiv_sam3_on_path
+        from sam3_onnx_equiv.path_config import equiv_source_root
 
-    model = build_sam3_image_model(
-        checkpoint_path=str(CHECKPOINT_PATH),
-        device=device,
-        eval_mode=True,
-        load_from_HF=False,
-    )
+        logger.info("Using CPU-capable SAM3 source copy: %s", equiv_source_root())
+        source_context = equiv_sam3_on_path(equiv_source_root())
+    else:
+        source_context = nullcontext()
+
+    with source_context:
+        from sam3.model.sam3_image_processor import Sam3Processor
+        from sam3.model_builder import build_sam3_image_model
+
+        model_kwargs = {"use_rope_real": False} if device == "cpu" else {}
+        model = build_sam3_image_model(
+            checkpoint_path=str(CHECKPOINT_PATH),
+            device=device,
+            eval_mode=True,
+            load_from_HF=False,
+            **model_kwargs,
+        )
     logger.info("Model loaded in %.1f s", time.time() - t0)
 
     processor = Sam3Processor(

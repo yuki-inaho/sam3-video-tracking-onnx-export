@@ -40,6 +40,7 @@ import logging
 import sys
 import tempfile
 import time
+from contextlib import nullcontext
 from pathlib import Path
 from typing import Any
 
@@ -158,12 +159,26 @@ def _load_tracker(checkpoint_path: Path, logger: logging.Logger) -> Any:
 
     logger.info("Building Sam3TrackerPredictor with ViT backbone ...")
     t0 = time.time()
-    from sam3.model_builder import build_tracker  # type: ignore[import]
+    if torch.cuda.is_available():
+        source_context = nullcontext()
+        logger.info("Using official SAM3 source for CUDA oracle")
+    else:
+        from sam3_onnx_equiv.export._equiv_loader import equiv_sam3_on_path
+        from sam3_onnx_equiv.path_config import equiv_source_root
 
-    tracker = build_tracker(
-        apply_temporal_disambiguation=False,  # simple tracking, no heuristics
-        with_backbone=True,  # include ViT backbone for image encoding
-    )
+        source_root = equiv_source_root()
+        logger.info("Using CPU-capable SAM3 source copy: %s", source_root)
+        source_context = equiv_sam3_on_path(source_root)
+
+    with source_context:
+        from sam3.model_builder import build_tracker  # type: ignore[import]
+
+        tracker_kwargs = {"use_rope_real": False} if not torch.cuda.is_available() else {}
+        tracker = build_tracker(
+            apply_temporal_disambiguation=False,  # simple tracking, no heuristics
+            with_backbone=True,  # include ViT backbone for image encoding
+            **tracker_kwargs,
+        )
     logger.info("Tracker structure built in %.1f s", time.time() - t0)
 
     # Load checkpoint: extract 'tracker.*' keys → strip 'tracker.' prefix.
