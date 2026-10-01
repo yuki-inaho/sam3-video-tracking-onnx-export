@@ -133,38 +133,38 @@ docs/ONBOARDING.md と機能 guide を更新、公開情報検査、zstd 梱包�
 - [x] 🛠 **エラー時対処**: 意図的な BN fusion 等は式と数値比較を記録、黙って tensor を除外しない。
 
 ### 手順 12: C++ 学生 encoder と loader の実装（E3）
-- [ ] 🖐 **操作**: `sam3.cpp`/`sam3.h` に EfficientSAM3 のロードと段階別 ggml graph を追加する。
-- [ ] 🔎 **確認**: vision/text/PCS 必須重みを検証してから compute する。Python/ORT 推論への委譲がない。
-- [ ] 🧪 **テスト**: operator/stage 参照比較と malformed GGUF 拒否、既存 build を確認する。
-- [ ] 🛠 **エラー時対処**: shape/layout の小さい oracle から切り分け、graph ごとに CPU buffer を受け渡す。
+- [x] 🖐 **操作**: `sam3.cpp`/`sam3.h` に EfficientSAM3 のロードと段階別 ggml graph を追加する。
+- [x] 🔎 **確認**: vision/text/PCS 必須重みを検証してから compute する。Python/ORT 推論への委譲がない。
+- [x] 🧪 **テスト**: operator/stage 参照比較と malformed GGUF 拒否、既存 build を確認する。
+- [x] 🛠 **エラー時対処**: shape/layout の小さい oracle から切り分け、graph ごとに CPU buffer を受け渡す。
 
 ### 手順 13: C++ 実モデル image/sequence E2E（E3/E4）
-- [ ] 🖐 **操作**: headless CLI を使い同じ実画像/6フレームで native output を保存する。
-- [ ] 🔎 **確認**: PyTorch/ORT と mask IoU >=0.90、finite、入力依存、再現性を満たす。
-- [ ] 🧪 **テスト**: 外部プログラムを起動できない PATH で native 推論を実行して証明する。
-- [ ] 🛠 **エラー時対処**: 共有 PCS stage と学生 stage を別々に比較して修正する。
+- [x] 🖐 **操作**: headless CLI を使い同じ実画像/6フレームで native output を保存する。
+- [x] 🔎 **確認**: PyTorch/ORT と mask IoU >=0.90、finite、入力依存、再現性を満たす。
+- [x] 🧪 **テスト**: 外部プログラムを起動できない PATH で native 推論を実行して証明する。
+- [x] 🛠 **エラー時対処**: 共有 PCS stage と学生 stage を別々に比較して修正する。
 
 ### フェーズ4：検証
 
 ### 手順 14: 性能計測（E4）
-- [ ] 🖐 **操作**: 同一入力/スレッド数で stage時間/全体時間/モデル容量を計測する。
-- [ ] 🔎 **確認**: 実測値が report にあり、最適化した場合は同一結果と前後時間がある。
-- [ ] 🧪 **テスト**: 修正後の数値/マスク比較を再実行する。
-- [ ] 🛠 **エラー時対処**: ボトルネックを特定してから変更する。近似を無断追加しない。
+- [x] 🖐 **操作**: 同一入力/スレッド数で stage時間/全体時間/モデル容量を計測する。
+- [x] 🔎 **確認**: 実測値が report にあり、最適化した場合は同一結果と前後時間がある。
+- [x] 🧪 **テスト**: 修正後の数値/マスク比較を再実行する。
+- [x] 🛠 **エラー時対処**: ボトルネックを特定してから変更する。近似を無断追加しない。
 
 ### 手順 15: 回帰・品質ゲート（E4）
-- [ ] 🖐 **操作**: 各 repo の既存 model-free tests、新規 tests、CMake build、対象 lint/format を実行する。
-- [ ] 🔎 **確認**: SAM31 CTest `-LE real` と ONNX 新規 tests が成功し、既存 API の互換を確認する。
-- [ ] 🧪 **テスト**: 実行 command と exit code を保存する。
-- [ ] 🛠 **エラー時対処**: 既存環境の不足と今回の回帰を分離して記録する。
+- [x] 🖐 **操作**: 各 repo の既存 model-free tests、新規 tests、CMake build、対象 lint/format を実行する。
+- [x] 🔎 **確認**: SAM31 CTest `-LE real` と ONNX 新規 tests が成功し、既存 API の互換を確認する。
+- [x] 🧪 **テスト**: 実行 command と exit code を保存する。
+- [x] 🛠 **エラー時対処**: 既存環境の不足と今回の回帰を分離して記録する。
 
 ### フェーズ5：公開
 
 ### 手順 16: 導入手順の更新（E5）
-- [ ] 🖐 **操作**: 両 repo の `docs/ONBOARDING.md` と EfficientSAM3 guide に download→convert/export→image/sequence→test を記載する。
-- [ ] 🔎 **確認**: パス/モデル/variant が一貫し、空環境で必要な source/deps が分かる。
-- [ ] 🧪 **テスト**: docs のコマンドを clean output directory で実行確認する。
-- [ ] 🛠 **エラー時対処**: 固定 revision と public URL を用い、token や利用者の絶対パスを保存しない。
+- [x] 🖐 **操作**: 両 repo の `docs/ONBOARDING.md` と EfficientSAM3 guide に download→convert/export→image/sequence→test を記載する。
+- [x] 🔎 **確認**: パス/モデル/variant が一貫し、空環境で必要な source/deps が分かる。
+- [x] 🧪 **テスト**: docs のコマンドを clean output directory で実行確認する。
+- [x] 🛠 **エラー時対処**: 固定 revision と public URL を用い、token や利用者の絶対パスを保存しない。
 
 ### 手順 17: zstd 成果物の復元検査（E5）
 - [ ] 🖐 **操作**: source/artifacts を追跡対象と明示 evidence から梱包し復元検査する。
@@ -229,6 +229,15 @@ git diff --check
 | --- | --- | --- | --- | --- |
 | 2026-10-01 | 09:53 JST+0900 | Codex | 前作業完了後、手順1開始 | SAM31 PR#2 merged、両 feature branch を準備、固定 source/HF metadata を取得。開始時刻は前の date 記録を参照した分単位の記録。 |
 | 2026-10-01 | 09:56:50 JST+0900 | Codex | 手順1完了 | EV-M Stage3 実重み SHA 一致。README と source を調査、b1 確定。text と tracker は次に実重みで検査する。 |
+| 2026-10-01 | 10:02:52 JST+0900 | Codex | 手順2/3完了、手順4開始 | CPU torch 2.7.0+cpu/ORT/ONNX import成功。実重み799 tensors/97455649 elements、MobileCLIP-S0 context16、trackerなし。private trainer metadataは保存しない。参照 import は動画backend未配置で失敗したため必要依存opencvを明示追加。 |
+| 2026-10-01 | 10:05:51 JST+0900 | Codex | 手順4完了・手順5設計記入 | strict load799/799成功、97435030params。S0/context16とtrackerなしを確定。upstreamの部分ロードhelperは利用しない。 |
+| 2026-10-01 | 10:06:29 JST+0900 | Codex | 手順5完了・手順6開始 | 入出力・必須799keys・S0ctx16・tracker無しframe sequence・GGUF mapを確定。再レビューPASS。新規contractの不足/shape/extra/checksum拒否を先に追加する。 |
+| 2026-10-01 | 10:14:25 JST+0900 | Codex | 手順6–8完了・手順9実行中 | 未実装contract importでred、境界7 tests green。vision/text/groundingの実exportとchecker成功。runtime正常/異常/torch非importを含む15 tests green。公開dog画像の実検出1 maskをPNG出力、ORT約1547ms。6frame比較の最初2frame IoU1.0。 |
+| 2026-10-01 | 10:26:21 JST+0900 | Codex | 手順9–11完了・手順12開始 | ONNX6frames全mask IoU1.0。GGUF799payload/389822768 bytes完全一致。変換境界5 tests green。学生vision/text・strictGGUFloaderを実装しC++ library build成功。既存PCS接続を実モデルCLIで検証する。 |
+| 2026-10-01 | 10:41:28 JST+0900 | Codex | 手順12完了・手順13追加検証/14計測中 | native実画像IoU0.999993、6個別frame最小IoU0.999962。GGUF799契約、native loader拒否/CLI境界12tests成功。DWは固定ggmlのF32 direct kernelを使用。S0にはrbr_scale branchが無いことをspecに合わせ修正。連続CLIのstate再利用を追加検証し、grouped1×1をbatchedGEMMへ集約して計測する。 |
+| 2026-10-01 | 10:53:18 JST+0900 | Codex | 手順13完了・手順14/15実行 | native実モデルpytest1 passed、6frame最小IoU0.999962、外部実行不可PATH。一般preprocessed APIのdispatch、visual tracker拒否と解放順を修正。CTest5groupsと境界12tests成功。速度改善案は16threadsで明確な改善なし、stage profileを続ける。ONNX既存model-free36 passed/19 skipped、実checkpoint必須の別4件は未配置で失敗したため回帰成功に数えない。 |
+
+| 2026-10-01 | 10:56:06 JST+0900 | Codex | 手順14–16完了・手順17開始 | profile16threads10949.7ms、4threads9751.2ms、PNG byte一致。grouped batched案は遅く採用せず。1×1はim2colを省く等価行列積。6frameはdistinct output、frame0再実行PNG一致。最終CTest5/5、境界12 passed/1 skip、ruff成功。ONNXmodel-free36 passed/19 skip。両ONBOARDING/guide整備、native default fetchと通常画像CLI実行成功。公開reportをdocsへ保存しzstd梱包復元へ進む。 |
 
 ## 8. 設計ゲート
 
@@ -250,13 +259,3 @@ git diff --check
 ### テスト設計（E4）
 
 `test_contract.py`: checksum/不足キー/誤shape/余分キー/非tensor拒否。`test_real_e2e.py`:固定実重みでvision/text/groundingの数値差分、最終選択マスクIoU>=0.90、6frameで同等検査。nativeは各stageのraw dumpを比較し最初の差分を診断する。画像には公開参照assetか人工形状を用い、非空検出が得られる入力を固定する。必要な場合ユーザーのprivate画像は使わない。
-
-| 2026-10-01 | 10:02:52 JST+0900 | Codex | 手順2/3完了、手順4開始 | CPU torch 2.7.0+cpu/ORT/ONNX import成功。実重み799 tensors/97455649 elements、MobileCLIP-S0 context16、trackerなし。private trainer metadataは保存しない。参照 import は動画backend未配置で失敗したため必要依存opencvを明示追加。 |
-
-| 2026-10-01 | 10:05:51 JST+0900 | Codex | 手順4完了・手順5設計記入 | strict load799/799成功、97435030params。S0/context16とtrackerなしを確定。upstreamの部分ロードhelperは利用しない。 |
-
-| 2026-10-01 | 10:06:29 JST+0900 | Codex | 手順5完了・手順6開始 | 入出力・必須799keys・S0ctx16・tracker無しframe sequence・GGUF mapを確定。再レビューPASS。新規contractの不足/shape/extra/checksum拒否を先に追加する。 |
-
-| 2026-10-01 | 10:14:25 JST+0900 | Codex | 手順6–8完了・手順9実行中 | 未実装contract importでred、境界7 tests green。vision/text/groundingの実exportとchecker成功。runtime正常/異常/torch非importを含む15 tests green。公開dog画像の実検出1 maskをPNG出力、ORT約1547ms。6frame比較の最初2frame IoU1.0。 |
-
-| 2026-10-01 | 10:26:21 JST+0900 | Codex | 手順9–11完了・手順12開始 | ONNX6frames全mask IoU1.0。GGUF799payload/389822768 bytes完全一致。変換境界5 tests green。学生vision/text・strictGGUFloaderを実装しC++ library build成功。既存PCS接続を実モデルCLIで検証する。 |

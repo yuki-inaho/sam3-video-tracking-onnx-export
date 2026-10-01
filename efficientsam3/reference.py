@@ -17,6 +17,8 @@ def build_reference(source, checkpoint):
     ).strip()
     if actual != SOURCE_REVISION:
         raise ValueError("Reference source revision mismatch")
+    if subprocess.check_output(["git", "-C", str(source), "status", "--porcelain"]):
+        raise ValueError("Reference source checkout has local modifications")
     verify_file(checkpoint)
     sys.path.insert(0, str(source / "sam3"))
     from sam3.model_builder import build_efficientsam3_image_model
