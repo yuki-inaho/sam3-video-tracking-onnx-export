@@ -179,16 +179,16 @@ docs/ONBOARDING.md と機能 guide を更新、公開情報検査、zstd 梱包�
 - [x] 🛠 **エラー時対処**: conflict は変更単位で解決、force push しない。
 
 ### 手順 19: PR と merge（E5）
-- [ ] 🖐 **操作**: C++ develop / ONNX main への PR を作成しレビューと必須 CI 通過後 merge する。
-- [ ] 🔎 **確認**: 両 PR の merged 状態と merge SHA を記録する。
-- [ ] 🧪 **テスト**: `gh pr view` と fetch した base の SHA を確認する。
-- [ ] 🛠 **エラー時対処**: CI 失敗を修正して再 push、完成していない機能を完了として説明しない。
+- [x] 🖐 **操作**: C++ develop / ONNX main への PR を作成しレビューと必須 CI 通過後 merge する。
+- [x] 🔎 **確認**: 両 PR の merged 状態と merge SHA を記録する。
+- [x] 🧪 **テスト**: `gh pr view` と fetch した base の SHA を確認する。
+- [x] 🛠 **エラー時対処**: CI 失敗を修正して再 push、完成していない機能を完了として説明しない。
 
 ### 手順 20: 一時ファイル整理（E5）
-- [ ] 🖐 **操作**: 今回作成した検証用 staging directory を削除し `uv cache prune` を実行する。
-- [ ] 🔎 **確認**: source repo、実重み原本、提出済み成果物を保持した状態で不要 staging のみ整理できた。
-- [ ] 🧪 **テスト**: git status と提出物 SHA が成功する。
-- [ ] 🛠 **エラー時対処**: 削除対象の所有/用途が不明なら調査して今回作成分に限定する。
+- [x] 🖐 **操作**: 今回作成した検証用 staging directory を削除し `uv cache prune` を実行する。
+- [x] 🔎 **確認**: source repo、実重み原本、提出済み成果物を保持した状態で不要 staging のみ整理できた。
+- [x] 🧪 **テスト**: git status と提出物 SHA が成功する。
+- [x] 🛠 **エラー時対処**: 削除対象の所有/用途が不明なら調査して今回作成分に限定する。
 
 ## 4. 作業に使用するコマンド参考情報
 
@@ -211,7 +211,7 @@ git diff --check
 - [x] D2/E2：ONNX の画像/6フレームで参照 mask IoU >=0.90、finite、実行証跡がある。
 - [x] D3/E3：GGUF 変換照合、C++/ggml の画像/6フレームで同等基準、外部推論を使わない証跡がある。
 - [x] D4/E4：境界/回帰テスト成功、時間を実測し report を公開情報だけで保存した。
-- [ ] D5/E5：導入 guide、zstd 復元検査、両 repo push/PR/merge、整理まで記録した。
+- [x] D5/E5：導入 guide、zstd 復元検査、両 repo push/PR/merge、整理まで記録した。
 
 ## 7. 作業記録
 
@@ -243,6 +243,8 @@ git diff --check
 
 | 2026-10-01 | 11:05:04 JST+0900 | Codex | 手順18完了・手順19開始 | C++f146d92/ONNX4a565b6のlocalとremote SHA一致、差分なし。public identity/inventory/strict loadを保存、公開対象のprivate/token検査で一致なし。ONNX実モデルpytest再実行1 passed/40.09s。必須CI contextsは両branchとも空。両PRを作成し検証根拠を記載する。 |
 
+| 2026-10-01 | 11:10:25 JST+0900 | Codex | 手順19/20完了・完了記録を公開 | C++PR#3 merged develop15d3433、ONNXPR#5 merged main64ca8a5。作成したrestore/upstream/SAM31レビューstagingを削除、uv cache prune成功。実重み原本をDownloadsに保持、全archive/guide/report/実annotationを提出ディレクトリへ保存。完了記録のdocs PRを作り、最終再梱包の後にユーザー指定の作業checkoutを削除する。削除の実行結果は提出先cleanup.jsonへ記録する。 |
+
 ## 8. 設計ゲート
 
 ### 確定した仕様（E1）
@@ -263,3 +265,13 @@ git diff --check
 ### テスト設計（E4）
 
 `test_contract.py`: checksum/不足キー/誤shape/余分キー/非tensor拒否。`test_real_e2e.py`:固定実重みでvision/text/groundingの数値差分、最終選択マスクIoU>=0.90、6frameで同等検査。nativeは各stageのraw dumpを比較し最初の差分を診断する。画像には公開参照assetか人工形状を用い、非空検出が得られる入力を固定する。必要な場合ユーザーのprivate画像は使わない。
+
+## 9. 完了確認
+
+- D1–D5: 全項目達成。検証は公開EV-M実重みと公開dog画像の人工移動で行った。
+- C++機能PR: https://github.com/yuki-inaho/sam3.cpp/pull/3 、merge `15d3433dbc4fd4d6d902e87d21ea1c84adbadf28`。
+- ONNX機能PR: https://github.com/yuki-inaho/sam3-video-tracking-onnx-export/pull/5 、merge `64ca8a5899f908807f29c8960bdceedbd9700f95`。
+- 提出物: Downloads内の `efficientsam3-delivery/`。source2本とGGUFをzstd圧縮、SHA256一覧、guide、検証JSON、画像/6frameの実annotationを保存。
+- frame sequenceは独立検出。公開EV-Mにmemory tracker重みは無く、SAM31の追跡APIをこのvariantで利用することはできない。
+- 必須CI contextは両branchとも未設定。実行したローカルの実モデル/E2E/復元ゲートを根拠とする。既存checkpoint必須の回帰検査が未配置で失敗した点は手順15の記録に残している。
+- ユーザー指定のclone削除は、完了記録のpush/mergeと最終再梱包後の終了処理として実施する。公開リポジトリに未実行の削除を成功として書き込まない。実行済みの最終結果は提出先 `cleanup.json` で確認できる。
