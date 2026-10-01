@@ -381,3 +381,7 @@ SAM 3 は `just build-all`、SAM 3.1 は `just build-sam31` を先に実行し�
 - [ ] 対象版の動画E2Eが成功した
 - [ ] `just quality` と `git diff --check` が成功した
 - [ ] checkpoint、生成物、ログ、秘密情報をstageしていない
+# EfficientSAM3 EV-M の追加経路
+
+CPU専用uv環境で、固定公開モデルの取得→ONNX変換→画像/画像列annotationを実行できる。
+入口は [EfficientSAM3 guide](EFFICIENTSAM3.md)。`just efficient-sync`、`just efficient-fetch`、`just efficient-export`、`just efficient-test` を順に利用する。
