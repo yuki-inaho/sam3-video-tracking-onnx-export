@@ -230,3 +230,22 @@ lint-notebooks:
 
 # Run all quality gates (Python + notebook format/lint + typecheck + complexity).
 quality: format-check lint format-notebooks-check lint-notebooks typecheck complexity
+
+# EfficientSAM3 EV-M: isolated CPU environment and pinned public source/model.
+efficient-sync:
+    uv sync --project efficientsam3 --locked
+
+efficient-fetch:
+    uv run --project efficientsam3 python efficientsam3/fetch.py
+
+efficient-export:
+    uv run --project efficientsam3 python efficientsam3/export.py
+
+efficient-test:
+    uv run --project efficientsam3 pytest efficientsam3/tests -q
+
+efficient-e2e:
+    EFFICIENTSAM3_REAL=1 uv run --project efficientsam3 pytest efficientsam3/tests/test_real_e2e.py -q -s
+
+efficient-run *args:
+    uv run --project efficientsam3 python efficientsam3/runtime.py {{args}}

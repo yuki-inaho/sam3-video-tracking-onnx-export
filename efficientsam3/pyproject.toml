@@ -19,6 +19,7 @@ dependencies = [
   "pycocotools",
   "psutil",
   "opencv-python-headless",
+  "omegaconf",
   "pytest",
   "ruff",
 ]
