@@ -1,15 +1,15 @@
 # 開発オンボーディング
 
-この文書は、新しい開発者や自動化エージェントが、このリポジトリを安全にセットアップし、SAM 3 / SAM 3.1 の CPU ONNX 経路を再現するための入口です。コマンドは、特記がない限りリポジトリルートで実行してください。
+更新: 2026-10-01。対象は `main`。この文書は、新しい開発者や自動化エージェントが、SAM 3 / SAM 3.1 / EfficientSAM3 EV-M の CPU 経路を再現するための入口です。コマンドは、特記がない限りリポジトリルートで実行してください。
 
 ## 1. 最初に行うこと
 
 1. `README.md` と本書を読む。
 2. `git status --short --branch` で既存変更を確認する。
-3. `git submodule update --init --recursive` で公式ソースを取得する。
-4. `just sync` で依存関係を同期する。
-5. Hugging Face で使用するモデルの利用条件を承認し、公式重みを取得する。
-6. 下記の CPU 環境変数を付け、軽い契約テストから実行する。
+3. 下のモデル表で経路を選ぶ。SAM 3 / SAM3.1 は公式 submodule、EV-M は固定 source cache を使用する。
+4. 選んだ環境を同期する。EV-M は `just efficient-sync`、SAM 3 / SAM3.1 は `just sync`。
+5. 使用するモデルの利用条件を確認し、重みを取得する。公式 gated model はアクセス承認が必要。
+6. 軽い契約テストから実行する。SAM 3 / SAM3.1 は下記の CPU 固定変数を付ける。
 7. ONNX を生成してから、数値比較、動画 E2E、品質ゲートへ進む。
 8. commit 前に、生成物と秘密情報が staged diff に含まれていないことを確認する。
 
@@ -22,6 +22,16 @@ just --list
 ## 2. プロジェクト概要
 
 このリポジトリは、公式 SAM 3 と SAM 3.1 Object Multiplex の動画追跡を、ONNX Runtime の CPUExecutionProvider で実行・検証するための実装です。
+
+| モデル | 環境・取得経路 | 画像列の意味 | 詳細 |
+| --- | --- | --- | --- |
+| SAM 3 | root uv project / `sam3/` submodule / `models/sam3.pt` | memory-bank tracking | 本書7.1 |
+| SAM3.1 | root uv project / `sam31/` submodule / `models/sam3.1_multiplex.pt` | Object Multiplex tracking | [ANNOTATION](ANNOTATION.md) |
+| EfficientSAM3 EV-M | CPU `efficientsam3/.venv` / pinned cache / `models/efficientsam3_ev_m.pt` | フレームごとの独立検出 | [EFFICIENTSAM3](EFFICIENTSAM3.md) |
+
+EV-M は EfficientViT **b1** + MobileCLIP **S0**、context **16**、入力 **1008×1008**。
+公開 checkpoint は detector のみで、memory tracker を持ちません。query ID は追跡 ID ではありません。
+native C++/GGUF 版は [sam3.cpp の ONBOARDING](https://github.com/yuki-inaho/sam3.cpp/blob/develop/docs/ONBOARDING.md) を参照します。
 
 ### SAM 3
 
@@ -65,6 +75,8 @@ SAM 3.1 の初回対話プロンプトと bucket / slot / 時間状態は、公�
 | `web/annotation/` | 画像・動画アノテーション UI |
 | `docs/ANNOTATION.md` | アノテーションの操作、出力形式、制限 |
 | `tests/` | 契約、checker、数値比較、動画E2E |
+| `efficientsam3/` | EV-M の CPU uv project、固定取得、strict load、export、torch非依存runtime、tests |
+| `docs/efficientsam3-validation/` | 公開checkpointのinventory、ロード検査、ORT/PyTorch E2E証跡 |
 | `notebooks/` | SAM 3 ONNX動画デモ |
 | `models/` | 公式checkpoint。Git管理外 |
 | `outputs/` | 生成source、ONNX、oracle、推論結果。Git管理外 |
@@ -76,6 +88,7 @@ SAM 3.1 の初回対話プロンプトと bucket / slot / 時間状態は、公�
 ## 4. 前提条件
 
 - Python `>=3.10,<3.13`
+- EV-M の独立 project は Python 3.11 または3.12
 - `git`
 - `uv`
 - `just`
@@ -102,6 +115,9 @@ git submodule status
 ```
 
 ### 5.2 Python環境
+
+以下は SAM 3 / SAM3.1 用です。root の lock は CUDA 対応torch wheelを含みます。
+CPU専用 EV-M を使う場合は、このroot環境を同期せず、7.5の独立projectを使います。
 
 ```bash
 just sync
@@ -222,6 +238,37 @@ CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 ROCR_VISIBLE_DEVICES=-1 just anno
 just test-annotation
 ```
 
+### 7.5 EfficientSAM3 EV-M：取得 → ONNX → annotation
+
+公式 submodule の初期化はこの経路には不要です。`fetch` が公開 source / checkpoint を固定取得します。
+
+```sh
+just efficient-sync
+just efficient-test
+just efficient-fetch
+just efficient-export
+just efficient-run --images outputs/efficientsam3/source/sam3/assets/dog_person.jpeg \
+  --text dog --threads 4 --output outputs/efficientsam3/annotation
+```
+
+画像列は `--images frame0.png frame1.png frame2.png` の明示順で処理します。
+出力は `annotations.json` と `frame_000000/mask_*.png` 等。frame index、元画像寸法、score、pixel box、時間を保存します。
+実取得checkpointは799 tensors、実測97,435,030 parameters。上流README表の89.2Mとは異なります。
+不足・余分なキー、shape、dtype、非有限値を拒否し、strictロード後に vision / text / grounding の3 graphをexportします。
+
+`runtime.py` はtorchをimportせず、ORT CPUのみで推論します。同じpromptのtext出力はcacheします。
+画像はRGB → Pillow bilinear → CHW float32 → `pixel/127.5-1`。参照比較にも同じ前処理を渡します。
+manifest はvariant、context、解像度、checkpoint SHA、sequence modeを照合します。
+
+モデルなし検査は `just efficient-test`、source・重み・ONNX配置後の実モデル6frame比較は次です。
+
+```sh
+just efficient-e2e
+```
+
+2026-10-01 の [実モデルreport](efficientsam3-validation/onnx-e2e.json) は全6frame mask IoU **1.0**。
+finite、同じ選択query、非空mask、IoU >=0.90 を要求します。通常testのskipを実モデル成功として数えません。
+
 ## 8. 検証の進め方
 
 高負荷テストを繰り返す前に、軽い検査から進めます。
@@ -266,6 +313,18 @@ git diff --check
 ```
 
 `just test` と動画E2EはCPUでは時間がかかります。実装変更に応じた対象テストを先に通し、最終確認で全体を実行してください。
+
+EV-Mだけの変更は `just efficient-test` と対象ファイルのruff検査を入口にし、export/runtime変更時に `just efficient-e2e` を実行します。
+新しい環境で全体testを実行すると、checkpointや生成source未配置のテストがskip・失敗する場合があります。必要物を配置して再実行し、結果を分けて記録してください。
+
+### 8.5 性能計測とブラウザ確認
+
+model SHA、入力順・寸法、前処理、provider、thread数、反復回数を揃えて比較します。
+`annotations.json` のstage時間と、load・I/Oを含むプロセス全体時間は別に記録します。
+公開EV-MのORT約1.35〜1.51秒/frameはCPU16threadsの過去の観測で、環境をまたぐ速度保証ではありません。
+
+SAM3.1 UI変更時はサーバーを起動し、headless Playwrightで画像/画像列upload、点追加、伝播、フレーム移動、reload、COCO downloadを確認します。
+console/network errorとmaskの見た目も確認し、browser結果とmodel-free HTTP testsを区別します。
 
 ## 9. SAM 3.1 の実装契約と制約
 
@@ -331,11 +390,13 @@ git diff --cached
 
 ```bash
 git diff --cached --no-ext-diff --unified=0 | \
-  grep '^+' | grep -v '^+++' | \
-  grep -E '(/home/|/Users/|BEGIN [A-Z ]*PRIVATE KEY|HF_TOKEN=|hf_[A-Za-z0-9]{20,})'
+  rg '^\+' | rg -v '^\+\+\+' | \
+  rg -q '(/home/|/Users/|BEGIN [A-Z ]*PRIVATE KEY|HF_TOKEN=|hf_[A-Za-z0-9]{20,})'
 ```
 
-ヒットした場合は内容を表示・共有せず、該当ファイルをunstageして安全な相対パスやプレースホルダへ置き換えてください。
+最後の `rg` が終了コード0ならヒットがあります。内容を表示・共有せず、該当ファイルをunstageして安全な相対パスやプレースホルダへ置き換えてください。
+source archiveとモデルは別に梱包し、tar owner名・環境cacheを除外します。展開後のファイル数、SHA、PNGとJSONの対応も確認します。
+作業終了時の `uv cache prune` は `uv run` の子として起動せず、端末から直接実行します。
 
 ## 12. トラブルシューティング
 
@@ -359,6 +420,11 @@ git submodule status
 ### ONNXが見つからない
 
 SAM 3 は `just build-all`、SAM 3.1 は `just build-sam31` を先に実行します。SAM 3 E2Eでは `just oracle` も必要です。
+EV-M は `just efficient-fetch` → `just efficient-export`。別ディレクトリのgraphは `just efficient-run --models <directory>` で指定します。
+
+### EV-MのSHA / manifest / strict loadが失敗する
+
+固定revisionのEV-M Stage3 checkpointとsourceを使っているか確認します。variant・context・shapeの検査を緩めて別モデルを通さないでください。
 
 ### CPU実行でプロセスが終了する
 
@@ -371,17 +437,25 @@ SAM 3 は `just build-all`、SAM 3.1 は `just build-sam31` を先に実行し�
 ## 13. オンボーディング完了チェックリスト
 
 - [ ] `README.md` と本書を読んだ
-- [ ] 作業ツリーとsubmoduleの状態を確認した
-- [ ] `just sync` が成功した
-- [ ] CPU固定環境でCUDAが無効であることを確認した
-- [ ] 必要な公式modelの利用条件を承認した
+- [ ] モデル・対応範囲・画像列の意味を選んだ
+- [ ] 作業ツリーと対象sourceの状態を確認した
+- [ ] 選んだ環境の `just sync` または `just efficient-sync` が成功した
+- [ ] CPU経路を確認した
+- [ ] モデルの利用条件と必要なアクセス承認を確認した
 - [ ] checkpointを規定パスへ取得した
 - [ ] 対象版のsource生成とONNX exportが成功した
 - [ ] checker / parity testが成功した
-- [ ] 対象版の動画E2Eが成功した
-- [ ] `just quality` と `git diff --check` が成功した
+- [ ] 対象版の追跡または独立検出6frame E2Eが成功した
+- [ ] 対象品質ゲートと `git diff --check` が成功した
 - [ ] checkpoint、生成物、ログ、秘密情報をstageしていない
-# EfficientSAM3 EV-M の追加経路
 
-CPU専用uv環境で、固定公開モデルの取得→ONNX変換→画像/画像列annotationを実行できる。
-入口は [EfficientSAM3 guide](EFFICIENTSAM3.md)。`just efficient-sync`、`just efficient-fetch`、`just efficient-export`、`just efficient-test` を順に利用する。
+## 14. 参照と更新履歴
+
+関連リポジトリ FlashVSR / ZipMap のONBOARDINGを参考に、入口・責務・環境・実行・検証・トラブル対応の構成を採用しました。
+内容は本repoの `justfile`、CLI、uv lock、検証JSONに照合しています。
+
+- [公式SAM3](https://github.com/facebookresearch/sam3): model演算とObject Multiplexの参照
+- [EfficientSAM3固定source](https://github.com/SimonZeng7108/efficientsam3/tree/bd0936c788fed8d51fa799437f05abd97b401b06): EV-M builder
+- [native C++/GGUF版](https://github.com/yuki-inaho/sam3.cpp/blob/develop/docs/ONBOARDING.md): 同じ公開EV-Mの別backend
+
+2026-10-01: EV-Mを最初のモデル選択へ統合し、CPU独立環境、strict load、入力順、実モデルE2E、公開・性能の契約を整理。

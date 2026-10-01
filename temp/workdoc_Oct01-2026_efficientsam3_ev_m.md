@@ -275,3 +275,76 @@ git diff --check
 - frame sequenceは独立検出。公開EV-Mにmemory tracker重みは無く、SAM31の追跡APIをこのvariantで利用することはできない。
 - 必須CI contextは両branchとも未設定。実行したローカルの実モデル/E2E/復元ゲートを根拠とする。既存checkpoint必須の回帰検査が未配置で失敗した点は手順15の記録に残している。
 - ユーザー指定のclone削除は、完了記録のpush/mergeと最終再梱包後の終了処理として実施する。公開リポジトリに未実行の削除を成功として書き込まない。実行済みの最終結果は提出先 `cleanup.json` で確認できる。
+
+
+## 10. 完了照合・調査分析サマリ
+
+### 10.1 調査メタ情報
+
+| 項目 | 内容 |
+| --- | --- |
+| 調査日時 | 2026-10-01 11:54:59 JST+0900（date実測） |
+| 調査者 | Codex |
+| 対象作業書 | `temp/workdoc_Oct01-2026_efficientsam3_ev_m.md` |
+| 対象 | `yuki-inaho/sam3.cpp` develop / `yuki-inaho/sam3-video-tracking-onnx-export` main |
+| 主な証跡 | GitHubのmerged PR、model guide、検証JSON、実行ログ、`docs/efficientsam3-validation/completion-audit.json` |
+
+### 10.2 現況サマリ
+
+EV-M実装はnative PR#3とONNX PR#5、完了記録はそれぞれPR#4/#6でマージ済み。推論コードを変更せず、実重み・数値・性能証跡とコードの対応を照合した。
+手順8の入力順・空入力・寸法の境界検査が不足していたため、model-freeテストを追加し23 passed / 1 skippedを確認した。
+両ONBOARDINGをFlashVSR / ZipMapの資料構成と現実のCLIに合わせて更新し、SAM3.1のtar所有者情報を除去した。
+提出済みファイルは削除前にSHA照合済み。その後依頼者がローカル提出物と入力を削除し、今後は提供済みURL・入力を使い、commit/pushを中心に引き継ぐ方針を確認した。恒久保存・再提出は今回の追加作業から除外する。
+この章の作成時点では追加差分をpushしnative PR#5 / ONNX PR#7を作成済み。追加PRのmergeと一時checkout整理は最後の終了処理として実施する。
+
+### 10.3 ゴール要求分析との照合
+
+| Goal/Trace ID | 要求 | 判定 | 実態・根拠 | 不足・次アクション |
+| --- | --- | --- | --- | --- |
+| SG1/E1 | 固定EV-Mの構成・重み | 達成 | 両repoのinventory/loading JSON。799 strict keys、b1/S0/context16、固定SHA | 不要 |
+| SG2/E2 | ONNX画像・画像列 | 達成 | ONNXの`onnx-e2e.json`:6frame全mask IoU1.0。runtimeのtorch非importと入力順/PNG対応テスト | 推論変更時のみ再E2E |
+| SG3/E3 | 全payload GGUF・native推論 | 達成 | nativeのconversion/native-e2e/stage-comparison JSON。799payload一致、6frame最小IoU0.999962、外部実行不可PATH | 推論変更時のみ再E2E |
+| SG4/E4 | 境界・回帰・性能 | 達成 | ONNX23 pass、annotation36 pass、native12 pass、CTest5/5。performance JSONに採用・棄却案を区別 | 速度保証として一般化しない |
+| SG4/E5 | 案内・梱包・公開 | 本体達成、追加公開処理中 | 既存機能/完了PRはmerged。両ONBOARDING更新済み、tar2146files全SHA一致・ownerなし | 追加PR#5/#7 merge、監査用checkout整理 |
+
+### 10.4 完了の定義との照合
+
+| DoD | 判定 | 確認方法 | 根拠・備考 |
+| --- | --- | --- | --- |
+| D1 | 達成 | inventory/loadingと固定取得元を確認 | 799/799、全shape/dtype、公開checkpoint SHAを保存 |
+| D2 | 達成 | ONNXの実モデル6frame reportとexport/runtime sourceを照合 | 全IoU1.0、finite、同じ選択query。今回のmodel-free skipを実モデル成功には数えない |
+| D3 | 達成 | native converter/loader/graphと実モデルreportを照合 | 全payload一致、min IoU0.999962、native実行。再変換した両GGUFも以前のSHAに完全一致 |
+| D4 | 達成 | pytest、CTest、ruff、JS構文、性能JSON | 23/36/12件と5groups成功。19 source依存skipと1 opt-in skipを別記 |
+| D5 | 本体達成、追加公開処理中 | GitHub PR状態、docs、zstd/tar実検査 | 本体PR merged。新しい補足PRは作成・push済み。過去提出物の再生成は依頼変更により対象外 |
+
+### 10.5 実行した調査コマンドと結果
+
+| コマンド | 目的 | 結果 | 判定への使い方 |
+| --- | --- | --- | --- |
+| `gh pr list --state all`（両repo） | 本体公開確認 | native#1〜4、ONNX#2〜6 merged | D5本体の公開履歴 |
+| `just efficient-test` | ONNX境界 | 最終23 passed / 1 skipped、1.66秒 | 手順8不足を補完 |
+| `PYTHONPATH=src uv run --project efficientsam3 --with jaxtyping pytest tests/test_sam31_annotation.py tests/test_sam31_annotation_server.py tests/test_source_patcher.py -q` | HTTP/annotation/source回帰 | 36 passed / 19 skipped、3.69秒 | checkpoint不要範囲の回帰 |
+| `uv run --project efficientsam3 ruff check efficientsam3/tests/test_runtime.py` と `ruff format --check` | 変更testの品質 | 成功 | D4 |
+| `node --check web/annotation/app.js` | JS構文 | 成功 | UI sourceの軽量確認 |
+| `cmake --build build --target sam31_quant --parallel 8` 後 `OPENBLAS_NUM_THREADS=1 ctest --test-dir build -LE real --output-on-failure` | native回帰 | 最終5/5成功、3.29秒 | 初回は共有libraryのbuild漏れで1group失敗。必要targetをbuildし解消 |
+| `uv run --project efficientsam3 pytest tests/test_efficientsam3_conversion.py tests/test_efficient_cli.py -q` | native境界 | 12 passed、1.32秒 | D4 |
+| `uv run --project sam31 python scripts/package_sam31.py`、`zstd -t`、stream tar/SHA検査 | owner名・payload | 2146files SHA一致、所有者名/uid/gid/mtimeクリア | 個人情報を含まない梱包 |
+| guide記載の両converter、全ファイルSHA照合 | 再現性 | SAM3.1 GGUF e59728d…、EV-M f78a2dec…で過去検証と完全一致 | 変換sourceの一致 |
+| 相対Markdownリンク・追加差分のprivate-value検査、`git diff --check` | 案内・公開 | 成功 | E5 |
+
+### 10.6 未達・未確認項目とリスク
+
+| 区分 | 項目 | 現況・対応 |
+| --- | --- | --- |
+| 終了処理待ち | 追加PRのmerge、監査checkout削除、uv cache prune | 本章をpush後に行う。未実行の終了処理を成功と記録しない |
+| 今回未実行 | 実モデルE2E・live browserの再実行 | 推論とUIを変えていない。既存実モデルreportとannotation PR#4のheadless Playwright記録を照合。新しい実行として数えない |
+| 対象外 | SAM3.1全面公式数値parity・EV-M memory追跡 | 前者は人工入力smokeの範囲外、後者は公開重みにtracker無し |
+| 対象外 | 削除済みローカル提出物の恒久保存・再生成 | 依頼者の削除・方針変更による。公開取得URL・SHA・再現手順を保持 |
+
+### 10.7 最終判定
+
+**判定:** 実装・検証完了。追加監査差分の公開・終了処理は継続中。
+
+**理由:** E1〜E4は実重みの既存証跡と今回の境界・回帰で確認できる。E5の本体は公開済みで、追加ONBOARDINGと梱包修正のPRをpush済み。提出物の削除は未達と取り違えず、依頼変更と検証履歴を分けて記録した。
+
+**次アクション:** native PR#5 / ONNX PR#7の最終差分を確認してmergeし、監査用checkoutと再取得した一時重みを削除、端末から`uv cache prune`を実行。最終状態は該当PRと終了報告で確認する。

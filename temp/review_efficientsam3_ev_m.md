@@ -48,3 +48,8 @@
 - source archiveのtar uid/gid/利用者名を消去し、tokens/cache/元checkpoint trainer metadataを含めていない。
 
 **Residual Findings:** mandatory CI contextsは両対象branchに無い。ローカルの実モデルゲートを使用する。PR#3/#5のmerged状態とstaging整理・pruneを確認し、手順19/20とD5を更新した。checkoutの終了処理は提出先cleanup.jsonへ記録する。
+
+
+## 2026-10-01 追加完了監査・ONBOARDINGレビュー
+
+model選択→isolated uv→固定取得→変換/export→画像/画像列→境界/実モデルtestの導線を照合。相対リンク、CLI引数、b1/S0/context16、tracker無し、実測と保証の区別、private値不在を確認。ONNXの順序/空入力/寸法境界を追加して23件成功。native CTestは共有libraryのbuild漏れを補い5/5成功。梱包tarのowner名を削除して2146file SHAを実検査。作業書第10章に追加公開と終了処理待ちを明記し、削除済みローカル提出物の再生成は依頼変更により除外。安全な追記を両repoへ反映済み。
