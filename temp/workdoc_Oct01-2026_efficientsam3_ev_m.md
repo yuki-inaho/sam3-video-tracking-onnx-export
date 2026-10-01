@@ -167,10 +167,10 @@ docs/ONBOARDING.md と機能 guide を更新、公開情報検査、zstd 梱包�
 - [x] 🛠 **エラー時対処**: 固定 revision と public URL を用い、token や利用者の絶対パスを保存しない。
 
 ### 手順 17: zstd 成果物の復元検査（E5）
-- [ ] 🖐 **操作**: source/artifacts を追跡対象と明示 evidence から梱包し復元検査する。
-- [ ] 🔎 **確認**: zstd test/SHA256 が成功し秘密/環境/キャッシュが含まれない。
-- [ ] 🧪 **テスト**: 復元後の build/CLI と manifest の照合を行う。
-- [ ] 🛠 **エラー時対処**: private metadata を whitelist で除外して再梱包する。
+- [x] 🖐 **操作**: source/artifacts を追跡対象と明示 evidence から梱包し復元検査する。
+- [x] 🔎 **確認**: zstd test/SHA256 が成功し秘密/環境/キャッシュが含まれない。
+- [x] 🧪 **テスト**: 復元後の build/CLI と manifest の照合を行う。
+- [x] 🛠 **エラー時対処**: private metadata を whitelist で除外して再梱包する。
 
 ### 手順 18: commit と push（E5）
 - [ ] 🖐 **操作**: 両 feature branch の review済み差分を commit して origin へ push する。
@@ -207,10 +207,10 @@ git diff --check
 
 ## 6. 完了の定義
 
-- [ ] D1/E1：EV-M 固定実重み、モデル構成、必須キー/shape の検査結果が保存されている。
-- [ ] D2/E2：ONNX の画像/6フレームで参照 mask IoU >=0.90、finite、実行証跡がある。
-- [ ] D3/E3：GGUF 変換照合、C++/ggml の画像/6フレームで同等基準、外部推論を使わない証跡がある。
-- [ ] D4/E4：境界/回帰テスト成功、時間を実測し report を公開情報だけで保存した。
+- [x] D1/E1：EV-M 固定実重み、モデル構成、必須キー/shape の検査結果が保存されている。
+- [x] D2/E2：ONNX の画像/6フレームで参照 mask IoU >=0.90、finite、実行証跡がある。
+- [x] D3/E3：GGUF 変換照合、C++/ggml の画像/6フレームで同等基準、外部推論を使わない証跡がある。
+- [x] D4/E4：境界/回帰テスト成功、時間を実測し report を公開情報だけで保存した。
 - [ ] D5/E5：導入 guide、zstd 復元検査、両 repo push/PR/merge、整理まで記録した。
 
 ## 7. 作業記録
@@ -238,6 +238,8 @@ git diff --check
 | 2026-10-01 | 10:53:18 JST+0900 | Codex | 手順13完了・手順14/15実行 | native実モデルpytest1 passed、6frame最小IoU0.999962、外部実行不可PATH。一般preprocessed APIのdispatch、visual tracker拒否と解放順を修正。CTest5groupsと境界12tests成功。速度改善案は16threadsで明確な改善なし、stage profileを続ける。ONNX既存model-free36 passed/19 skipped、実checkpoint必須の別4件は未配置で失敗したため回帰成功に数えない。 |
 
 | 2026-10-01 | 10:56:06 JST+0900 | Codex | 手順14–16完了・手順17開始 | profile16threads10949.7ms、4threads9751.2ms、PNG byte一致。grouped batched案は遅く採用せず。1×1はim2colを省く等価行列積。6frameはdistinct output、frame0再実行PNG一致。最終CTest5/5、境界12 passed/1 skip、ruff成功。ONNXmodel-free36 passed/19 skip。両ONBOARDING/guide整備、native default fetchと通常画像CLI実行成功。公開reportをdocsへ保存しzstd梱包復元へ進む。 |
+
+| 2026-10-01 | 11:03:15 JST+0900 | Codex | 手順17完了・手順18開始 | zstd3archive test成功。C++2143/ONNX87files SHA照合、tar owner名なし、GGUF復元byte一致。復元sourceをGGML_NATIVE=OFF/SAM31=OFFでbuild、実モデル1maskが元のmaskとIoU1.0。復元ONNX tests15 passed/1 skip。default sourceの再変換GGUFもbyte一致。C++実装9721449/docs85ba22b、ONNX5a7d41bを既にpush。最終evidence commitへ進む。 |
 
 ## 8. 設計ゲート
 

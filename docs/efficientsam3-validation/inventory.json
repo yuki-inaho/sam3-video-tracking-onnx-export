@@ -1,0 +1,6087 @@
+{
+  "source_revision": "bd0936c788fed8d51fa799437f05abd97b401b06",
+  "hf_revision": "85b05896928f974e308f889d7ccb2eefc069de98",
+  "sha256": "086b04b2e7da7cc98aa4621b70c7291608aa9d187357b98d03bd4d6533ed5a17",
+  "bytes": 468394477,
+  "tensor_count": 799,
+  "numel": 97455649,
+  "groups": {
+    "backbone.vision_backbone.trunk.model": 14358755,
+    "backbone.vision_backbone.convs.0": 3278080,
+    "backbone.vision_backbone.convs.1": 2819072,
+    "backbone.vision_backbone.convs.2": 852480,
+    "backbone.vision_backbone.convs.3": 852480,
+    "backbone.language_backbone.encoder.projection_layer": 262144,
+    "backbone.language_backbone.encoder.embedding_layer": 25296896,
+    "backbone.language_backbone.encoder.positional_embedding": 8192,
+    "backbone.language_backbone.encoder.transformer": 16849928,
+    "backbone.language_backbone.encoder.final_layer_norm": 1024,
+    "backbone.language_backbone.projector.weight": 131072,
+    "backbone.language_backbone.projector.bias": 256,
+    "transformer.encoder.layers.0": 1578752,
+    "transformer.encoder.layers.1": 1578752,
+    "transformer.encoder.layers.2": 1578752,
+    "transformer.encoder.layers.3": 1578752,
+    "transformer.encoder.layers.4": 1578752,
+    "transformer.encoder.layers.5": 1578752,
+    "transformer.decoder.layers.0": 1842432,
+    "transformer.decoder.layers.1": 1842432,
+    "transformer.decoder.layers.2": 1842432,
+    "transformer.decoder.layers.3": 1842432,
+    "transformer.decoder.layers.4": 1842432,
+    "transformer.decoder.layers.5": 1842432,
+    "transformer.decoder.norm.weight": 256,
+    "transformer.decoder.norm.bias": 256,
+    "transformer.decoder.bbox_embed.layers": 132612,
+    "transformer.decoder.query_embed.weight": 51200,
+    "transformer.decoder.reference_points.weight": 800,
+    "transformer.decoder.boxRPB_embed_x.layers": 2824,
+    "transformer.decoder.boxRPB_embed_y.layers": 2824,
+    "transformer.decoder.presence_token.weight": 256,
+    "transformer.decoder.presence_token_head.layers": 131841,
+    "transformer.decoder.presence_token_out_norm.weight": 256,
+    "transformer.decoder.presence_token_out_norm.bias": 256,
+    "transformer.decoder.ref_point_head.layers": 197120,
+    "segmentation_head.pixel_decoder.conv_layers.0": 590080,
+    "segmentation_head.pixel_decoder.conv_layers.1": 590080,
+    "segmentation_head.pixel_decoder.conv_layers.2": 590080,
+    "segmentation_head.pixel_decoder.norms.0": 512,
+    "segmentation_head.pixel_decoder.norms.1": 512,
+    "segmentation_head.pixel_decoder.norms.2": 512,
+    "segmentation_head.mask_predictor.mask_embed.layers": 197376,
+    "segmentation_head.cross_attend_prompt.in_proj_weight": 196608,
+    "segmentation_head.cross_attend_prompt.in_proj_bias": 768,
+    "segmentation_head.cross_attend_prompt.out_proj.weight": 65536,
+    "segmentation_head.cross_attend_prompt.out_proj.bias": 256,
+    "segmentation_head.cross_attn_norm.weight": 256,
+    "segmentation_head.cross_attn_norm.bias": 256,
+    "segmentation_head.semantic_seg_head.weight": 256,
+    "segmentation_head.semantic_seg_head.bias": 1,
+    "segmentation_head.instance_seg_head.weight": 65536,
+    "segmentation_head.instance_seg_head.bias": 256,
+    "dot_prod_scoring.prompt_mlp.layers.0": 526336,
+    "dot_prod_scoring.prompt_mlp.layers.1": 524544,
+    "dot_prod_scoring.prompt_mlp.out_norm.weight": 256,
+    "dot_prod_scoring.prompt_mlp.out_norm.bias": 256,
+    "dot_prod_scoring.prompt_proj.weight": 65536,
+    "dot_prod_scoring.prompt_proj.bias": 256,
+    "dot_prod_scoring.hs_proj.weight": 65536,
+    "dot_prod_scoring.hs_proj.bias": 256,
+    "geometry_encoder.label_embed.weight": 512,
+    "geometry_encoder.cls_embed.weight": 256,
+    "geometry_encoder.points_direct_project.weight": 512,
+    "geometry_encoder.points_direct_project.bias": 256,
+    "geometry_encoder.points_pool_project.weight": 65536,
+    "geometry_encoder.points_pool_project.bias": 256,
+    "geometry_encoder.points_pos_enc_project.weight": 65536,
+    "geometry_encoder.points_pos_enc_project.bias": 256,
+    "geometry_encoder.boxes_direct_project.weight": 1024,
+    "geometry_encoder.boxes_direct_project.bias": 256,
+    "geometry_encoder.boxes_pool_project.weight": 3211264,
+    "geometry_encoder.boxes_pool_project.bias": 256,
+    "geometry_encoder.boxes_pos_enc_project.weight": 66048,
+    "geometry_encoder.boxes_pos_enc_project.bias": 256,
+    "geometry_encoder.final_proj.weight": 65536,
+    "geometry_encoder.final_proj.bias": 256,
+    "geometry_encoder.norm.weight": 256,
+    "geometry_encoder.norm.bias": 256,
+    "geometry_encoder.img_pre_norm.weight": 256,
+    "geometry_encoder.img_pre_norm.bias": 256,
+    "geometry_encoder.encode.0.self_attn": 263168,
+    "geometry_encoder.encode.0.cross_attn_image": 263168,
+    "geometry_encoder.encode.0.linear1": 526336,
+    "geometry_encoder.encode.0.linear2": 524544,
+    "geometry_encoder.encode.0.norm1": 512,
+    "geometry_encoder.encode.0.norm2": 512,
+    "geometry_encoder.encode.0.norm3": 512,
+    "geometry_encoder.encode.1.self_attn": 263168,
+    "geometry_encoder.encode.1.cross_attn_image": 263168,
+    "geometry_encoder.encode.1.linear1": 526336,
+    "geometry_encoder.encode.1.linear2": 524544,
+    "geometry_encoder.encode.1.norm1": 512,
+    "geometry_encoder.encode.1.norm2": 512,
+    "geometry_encoder.encode.1.norm3": 512,
+    "geometry_encoder.encode.2.self_attn": 263168,
+    "geometry_encoder.encode.2.cross_attn_image": 263168,
+    "geometry_encoder.encode.2.linear1": 526336,
+    "geometry_encoder.encode.2.linear2": 524544,
+    "geometry_encoder.encode.2.norm1": 512,
+    "geometry_encoder.encode.2.norm2": 512,
+    "geometry_encoder.encode.2.norm3": 512,
+    "geometry_encoder.encode_norm.weight": 256,
+    "geometry_encoder.encode_norm.bias": 256
+  },
+  "tensors": {
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.0.conv.weight": {
+      "shape": [
+        16,
+        3,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 432
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.0.norm.weight": {
+      "shape": [
+        16
+      ],
+      "dtype": "torch.float32",
+      "numel": 16
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.0.norm.bias": {
+      "shape": [
+        16
+      ],
+      "dtype": "torch.float32",
+      "numel": 16
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.0.norm.running_mean": {
+      "shape": [
+        16
+      ],
+      "dtype": "torch.float32",
+      "numel": 16
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.0.norm.running_var": {
+      "shape": [
+        16
+      ],
+      "dtype": "torch.float32",
+      "numel": 16
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.0.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.1.main.depth_conv.conv.weight": {
+      "shape": [
+        16,
+        1,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 144
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.1.main.depth_conv.norm.weight": {
+      "shape": [
+        16
+      ],
+      "dtype": "torch.float32",
+      "numel": 16
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.1.main.depth_conv.norm.bias": {
+      "shape": [
+        16
+      ],
+      "dtype": "torch.float32",
+      "numel": 16
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.1.main.depth_conv.norm.running_mean": {
+      "shape": [
+        16
+      ],
+      "dtype": "torch.float32",
+      "numel": 16
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.1.main.depth_conv.norm.running_var": {
+      "shape": [
+        16
+      ],
+      "dtype": "torch.float32",
+      "numel": 16
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.1.main.depth_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.1.main.point_conv.conv.weight": {
+      "shape": [
+        16,
+        16,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.1.main.point_conv.norm.weight": {
+      "shape": [
+        16
+      ],
+      "dtype": "torch.float32",
+      "numel": 16
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.1.main.point_conv.norm.bias": {
+      "shape": [
+        16
+      ],
+      "dtype": "torch.float32",
+      "numel": 16
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.1.main.point_conv.norm.running_mean": {
+      "shape": [
+        16
+      ],
+      "dtype": "torch.float32",
+      "numel": 16
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.1.main.point_conv.norm.running_var": {
+      "shape": [
+        16
+      ],
+      "dtype": "torch.float32",
+      "numel": 16
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.input_stem.op_list.1.main.point_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.inverted_conv.conv.weight": {
+      "shape": [
+        64,
+        16,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 1024
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.inverted_conv.norm.weight": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.inverted_conv.norm.bias": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.inverted_conv.norm.running_mean": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.inverted_conv.norm.running_var": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.inverted_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.depth_conv.conv.weight": {
+      "shape": [
+        64,
+        1,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 576
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.depth_conv.norm.weight": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.depth_conv.norm.bias": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.depth_conv.norm.running_mean": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.depth_conv.norm.running_var": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.depth_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.point_conv.conv.weight": {
+      "shape": [
+        32,
+        64,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.point_conv.norm.weight": {
+      "shape": [
+        32
+      ],
+      "dtype": "torch.float32",
+      "numel": 32
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.point_conv.norm.bias": {
+      "shape": [
+        32
+      ],
+      "dtype": "torch.float32",
+      "numel": 32
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.point_conv.norm.running_mean": {
+      "shape": [
+        32
+      ],
+      "dtype": "torch.float32",
+      "numel": 32
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.point_conv.norm.running_var": {
+      "shape": [
+        32
+      ],
+      "dtype": "torch.float32",
+      "numel": 32
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.0.main.point_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.inverted_conv.conv.weight": {
+      "shape": [
+        128,
+        32,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 4096
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.inverted_conv.norm.weight": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.inverted_conv.norm.bias": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.inverted_conv.norm.running_mean": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.inverted_conv.norm.running_var": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.inverted_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.depth_conv.conv.weight": {
+      "shape": [
+        128,
+        1,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 1152
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.depth_conv.norm.weight": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.depth_conv.norm.bias": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.depth_conv.norm.running_mean": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.depth_conv.norm.running_var": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.depth_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.point_conv.conv.weight": {
+      "shape": [
+        32,
+        128,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 4096
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.point_conv.norm.weight": {
+      "shape": [
+        32
+      ],
+      "dtype": "torch.float32",
+      "numel": 32
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.point_conv.norm.bias": {
+      "shape": [
+        32
+      ],
+      "dtype": "torch.float32",
+      "numel": 32
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.point_conv.norm.running_mean": {
+      "shape": [
+        32
+      ],
+      "dtype": "torch.float32",
+      "numel": 32
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.point_conv.norm.running_var": {
+      "shape": [
+        32
+      ],
+      "dtype": "torch.float32",
+      "numel": 32
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.0.op_list.1.main.point_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.inverted_conv.conv.weight": {
+      "shape": [
+        128,
+        32,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 4096
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.inverted_conv.norm.weight": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.inverted_conv.norm.bias": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.inverted_conv.norm.running_mean": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.inverted_conv.norm.running_var": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.inverted_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.depth_conv.conv.weight": {
+      "shape": [
+        128,
+        1,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 1152
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.depth_conv.norm.weight": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.depth_conv.norm.bias": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.depth_conv.norm.running_mean": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.depth_conv.norm.running_var": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.depth_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.point_conv.conv.weight": {
+      "shape": [
+        64,
+        128,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 8192
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.point_conv.norm.weight": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.point_conv.norm.bias": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.point_conv.norm.running_mean": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.point_conv.norm.running_var": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.0.main.point_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.inverted_conv.conv.weight": {
+      "shape": [
+        256,
+        64,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 16384
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.inverted_conv.norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.inverted_conv.norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.inverted_conv.norm.running_mean": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.inverted_conv.norm.running_var": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.inverted_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.depth_conv.conv.weight": {
+      "shape": [
+        256,
+        1,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 2304
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.depth_conv.norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.depth_conv.norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.depth_conv.norm.running_mean": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.depth_conv.norm.running_var": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.depth_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.point_conv.conv.weight": {
+      "shape": [
+        64,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 16384
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.point_conv.norm.weight": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.point_conv.norm.bias": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.point_conv.norm.running_mean": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.point_conv.norm.running_var": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.1.main.point_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.inverted_conv.conv.weight": {
+      "shape": [
+        256,
+        64,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 16384
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.inverted_conv.norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.inverted_conv.norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.inverted_conv.norm.running_mean": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.inverted_conv.norm.running_var": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.inverted_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.depth_conv.conv.weight": {
+      "shape": [
+        256,
+        1,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 2304
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.depth_conv.norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.depth_conv.norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.depth_conv.norm.running_mean": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.depth_conv.norm.running_var": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.depth_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.point_conv.conv.weight": {
+      "shape": [
+        64,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 16384
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.point_conv.norm.weight": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.point_conv.norm.bias": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.point_conv.norm.running_mean": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.point_conv.norm.running_var": {
+      "shape": [
+        64
+      ],
+      "dtype": "torch.float32",
+      "numel": 64
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.1.op_list.2.main.point_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.0.main.inverted_conv.conv.weight": {
+      "shape": [
+        256,
+        64,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 16384
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.0.main.inverted_conv.conv.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.0.main.depth_conv.conv.weight": {
+      "shape": [
+        256,
+        1,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 2304
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.0.main.depth_conv.conv.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.0.main.point_conv.conv.weight": {
+      "shape": [
+        128,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 32768
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.0.main.point_conv.norm.weight": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.0.main.point_conv.norm.bias": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.0.main.point_conv.norm.running_mean": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.0.main.point_conv.norm.running_var": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.0.main.point_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.context_module.main.qkv.conv.weight": {
+      "shape": [
+        384,
+        128,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 49152
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.context_module.main.aggreg.0.0.weight": {
+      "shape": [
+        384,
+        1,
+        5,
+        5
+      ],
+      "dtype": "torch.float32",
+      "numel": 9600
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.context_module.main.aggreg.0.1.weight": {
+      "shape": [
+        384,
+        16,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 6144
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.context_module.main.proj.conv.weight": {
+      "shape": [
+        128,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 32768
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.context_module.main.proj.norm.weight": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.context_module.main.proj.norm.bias": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.context_module.main.proj.norm.running_mean": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.context_module.main.proj.norm.running_var": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.context_module.main.proj.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.local_module.main.inverted_conv.conv.weight": {
+      "shape": [
+        512,
+        128,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.local_module.main.inverted_conv.conv.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.local_module.main.depth_conv.conv.weight": {
+      "shape": [
+        512,
+        1,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 4608
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.local_module.main.depth_conv.conv.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.local_module.main.point_conv.conv.weight": {
+      "shape": [
+        128,
+        512,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.local_module.main.point_conv.norm.weight": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.local_module.main.point_conv.norm.bias": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.local_module.main.point_conv.norm.running_mean": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.local_module.main.point_conv.norm.running_var": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.1.local_module.main.point_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.context_module.main.qkv.conv.weight": {
+      "shape": [
+        384,
+        128,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 49152
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.context_module.main.aggreg.0.0.weight": {
+      "shape": [
+        384,
+        1,
+        5,
+        5
+      ],
+      "dtype": "torch.float32",
+      "numel": 9600
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.context_module.main.aggreg.0.1.weight": {
+      "shape": [
+        384,
+        16,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 6144
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.context_module.main.proj.conv.weight": {
+      "shape": [
+        128,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 32768
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.context_module.main.proj.norm.weight": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.context_module.main.proj.norm.bias": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.context_module.main.proj.norm.running_mean": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.context_module.main.proj.norm.running_var": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.context_module.main.proj.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.local_module.main.inverted_conv.conv.weight": {
+      "shape": [
+        512,
+        128,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.local_module.main.inverted_conv.conv.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.local_module.main.depth_conv.conv.weight": {
+      "shape": [
+        512,
+        1,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 4608
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.local_module.main.depth_conv.conv.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.local_module.main.point_conv.conv.weight": {
+      "shape": [
+        128,
+        512,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.local_module.main.point_conv.norm.weight": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.local_module.main.point_conv.norm.bias": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.local_module.main.point_conv.norm.running_mean": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.local_module.main.point_conv.norm.running_var": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.2.local_module.main.point_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.context_module.main.qkv.conv.weight": {
+      "shape": [
+        384,
+        128,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 49152
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.context_module.main.aggreg.0.0.weight": {
+      "shape": [
+        384,
+        1,
+        5,
+        5
+      ],
+      "dtype": "torch.float32",
+      "numel": 9600
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.context_module.main.aggreg.0.1.weight": {
+      "shape": [
+        384,
+        16,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 6144
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.context_module.main.proj.conv.weight": {
+      "shape": [
+        128,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 32768
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.context_module.main.proj.norm.weight": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.context_module.main.proj.norm.bias": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.context_module.main.proj.norm.running_mean": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.context_module.main.proj.norm.running_var": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.context_module.main.proj.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.local_module.main.inverted_conv.conv.weight": {
+      "shape": [
+        512,
+        128,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.local_module.main.inverted_conv.conv.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.local_module.main.depth_conv.conv.weight": {
+      "shape": [
+        512,
+        1,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 4608
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.local_module.main.depth_conv.conv.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.local_module.main.point_conv.conv.weight": {
+      "shape": [
+        128,
+        512,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.local_module.main.point_conv.norm.weight": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.local_module.main.point_conv.norm.bias": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.local_module.main.point_conv.norm.running_mean": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.local_module.main.point_conv.norm.running_var": {
+      "shape": [
+        128
+      ],
+      "dtype": "torch.float32",
+      "numel": 128
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.2.op_list.3.local_module.main.point_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.0.main.inverted_conv.conv.weight": {
+      "shape": [
+        512,
+        128,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.0.main.inverted_conv.conv.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.0.main.depth_conv.conv.weight": {
+      "shape": [
+        512,
+        1,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 4608
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.0.main.depth_conv.conv.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.0.main.point_conv.conv.weight": {
+      "shape": [
+        256,
+        512,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 131072
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.0.main.point_conv.norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.0.main.point_conv.norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.0.main.point_conv.norm.running_mean": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.0.main.point_conv.norm.running_var": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.0.main.point_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.context_module.main.qkv.conv.weight": {
+      "shape": [
+        768,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.context_module.main.aggreg.0.0.weight": {
+      "shape": [
+        768,
+        1,
+        5,
+        5
+      ],
+      "dtype": "torch.float32",
+      "numel": 19200
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.context_module.main.aggreg.0.1.weight": {
+      "shape": [
+        768,
+        16,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 12288
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.context_module.main.proj.conv.weight": {
+      "shape": [
+        256,
+        512,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 131072
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.context_module.main.proj.norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.context_module.main.proj.norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.context_module.main.proj.norm.running_mean": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.context_module.main.proj.norm.running_var": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.context_module.main.proj.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.local_module.main.inverted_conv.conv.weight": {
+      "shape": [
+        1024,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 262144
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.local_module.main.inverted_conv.conv.bias": {
+      "shape": [
+        1024
+      ],
+      "dtype": "torch.float32",
+      "numel": 1024
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.local_module.main.depth_conv.conv.weight": {
+      "shape": [
+        1024,
+        1,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 9216
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.local_module.main.depth_conv.conv.bias": {
+      "shape": [
+        1024
+      ],
+      "dtype": "torch.float32",
+      "numel": 1024
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.local_module.main.point_conv.conv.weight": {
+      "shape": [
+        256,
+        1024,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 262144
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.local_module.main.point_conv.norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.local_module.main.point_conv.norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.local_module.main.point_conv.norm.running_mean": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.local_module.main.point_conv.norm.running_var": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.1.local_module.main.point_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.context_module.main.qkv.conv.weight": {
+      "shape": [
+        768,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.context_module.main.aggreg.0.0.weight": {
+      "shape": [
+        768,
+        1,
+        5,
+        5
+      ],
+      "dtype": "torch.float32",
+      "numel": 19200
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.context_module.main.aggreg.0.1.weight": {
+      "shape": [
+        768,
+        16,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 12288
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.context_module.main.proj.conv.weight": {
+      "shape": [
+        256,
+        512,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 131072
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.context_module.main.proj.norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.context_module.main.proj.norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.context_module.main.proj.norm.running_mean": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.context_module.main.proj.norm.running_var": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.context_module.main.proj.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.local_module.main.inverted_conv.conv.weight": {
+      "shape": [
+        1024,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 262144
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.local_module.main.inverted_conv.conv.bias": {
+      "shape": [
+        1024
+      ],
+      "dtype": "torch.float32",
+      "numel": 1024
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.local_module.main.depth_conv.conv.weight": {
+      "shape": [
+        1024,
+        1,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 9216
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.local_module.main.depth_conv.conv.bias": {
+      "shape": [
+        1024
+      ],
+      "dtype": "torch.float32",
+      "numel": 1024
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.local_module.main.point_conv.conv.weight": {
+      "shape": [
+        256,
+        1024,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 262144
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.local_module.main.point_conv.norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.local_module.main.point_conv.norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.local_module.main.point_conv.norm.running_mean": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.local_module.main.point_conv.norm.running_var": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.2.local_module.main.point_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.context_module.main.qkv.conv.weight": {
+      "shape": [
+        768,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.context_module.main.aggreg.0.0.weight": {
+      "shape": [
+        768,
+        1,
+        5,
+        5
+      ],
+      "dtype": "torch.float32",
+      "numel": 19200
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.context_module.main.aggreg.0.1.weight": {
+      "shape": [
+        768,
+        16,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 12288
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.context_module.main.proj.conv.weight": {
+      "shape": [
+        256,
+        512,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 131072
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.context_module.main.proj.norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.context_module.main.proj.norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.context_module.main.proj.norm.running_mean": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.context_module.main.proj.norm.running_var": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.context_module.main.proj.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.local_module.main.inverted_conv.conv.weight": {
+      "shape": [
+        1024,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 262144
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.local_module.main.inverted_conv.conv.bias": {
+      "shape": [
+        1024
+      ],
+      "dtype": "torch.float32",
+      "numel": 1024
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.local_module.main.depth_conv.conv.weight": {
+      "shape": [
+        1024,
+        1,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 9216
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.local_module.main.depth_conv.conv.bias": {
+      "shape": [
+        1024
+      ],
+      "dtype": "torch.float32",
+      "numel": 1024
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.local_module.main.point_conv.conv.weight": {
+      "shape": [
+        256,
+        1024,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 262144
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.local_module.main.point_conv.norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.local_module.main.point_conv.norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.local_module.main.point_conv.norm.running_mean": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.local_module.main.point_conv.norm.running_var": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.3.local_module.main.point_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.context_module.main.qkv.conv.weight": {
+      "shape": [
+        768,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.context_module.main.aggreg.0.0.weight": {
+      "shape": [
+        768,
+        1,
+        5,
+        5
+      ],
+      "dtype": "torch.float32",
+      "numel": 19200
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.context_module.main.aggreg.0.1.weight": {
+      "shape": [
+        768,
+        16,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 12288
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.context_module.main.proj.conv.weight": {
+      "shape": [
+        256,
+        512,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 131072
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.context_module.main.proj.norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.context_module.main.proj.norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.context_module.main.proj.norm.running_mean": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.context_module.main.proj.norm.running_var": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.context_module.main.proj.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.local_module.main.inverted_conv.conv.weight": {
+      "shape": [
+        1024,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 262144
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.local_module.main.inverted_conv.conv.bias": {
+      "shape": [
+        1024
+      ],
+      "dtype": "torch.float32",
+      "numel": 1024
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.local_module.main.depth_conv.conv.weight": {
+      "shape": [
+        1024,
+        1,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 9216
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.local_module.main.depth_conv.conv.bias": {
+      "shape": [
+        1024
+      ],
+      "dtype": "torch.float32",
+      "numel": 1024
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.local_module.main.point_conv.conv.weight": {
+      "shape": [
+        256,
+        1024,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 262144
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.local_module.main.point_conv.norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.local_module.main.point_conv.norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.local_module.main.point_conv.norm.running_mean": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.local_module.main.point_conv.norm.running_var": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.trunk.model.backbone.model.stages.3.op_list.4.local_module.main.point_conv.norm.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.head.0.weight": {
+      "shape": [
+        1024,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 262144
+    },
+    "backbone.vision_backbone.trunk.model.head.1.weight": {
+      "shape": [
+        1024
+      ],
+      "dtype": "torch.float32",
+      "numel": 1024
+    },
+    "backbone.vision_backbone.trunk.model.head.1.bias": {
+      "shape": [
+        1024
+      ],
+      "dtype": "torch.float32",
+      "numel": 1024
+    },
+    "backbone.vision_backbone.trunk.model.head.1.running_mean": {
+      "shape": [
+        1024
+      ],
+      "dtype": "torch.float32",
+      "numel": 1024
+    },
+    "backbone.vision_backbone.trunk.model.head.1.running_var": {
+      "shape": [
+        1024
+      ],
+      "dtype": "torch.float32",
+      "numel": 1024
+    },
+    "backbone.vision_backbone.trunk.model.head.1.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.vision_backbone.trunk.model.head.3.weight": {
+      "shape": [
+        1024,
+        1024,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 9437184
+    },
+    "backbone.vision_backbone.trunk.model.head.3.bias": {
+      "shape": [
+        1024
+      ],
+      "dtype": "torch.float32",
+      "numel": 1024
+    },
+    "backbone.vision_backbone.convs.0.dconv_2x2_0.weight": {
+      "shape": [
+        1024,
+        512,
+        2,
+        2
+      ],
+      "dtype": "torch.float32",
+      "numel": 2097152
+    },
+    "backbone.vision_backbone.convs.0.dconv_2x2_0.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.vision_backbone.convs.0.dconv_2x2_1.weight": {
+      "shape": [
+        512,
+        256,
+        2,
+        2
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "backbone.vision_backbone.convs.0.dconv_2x2_1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.convs.0.conv_1x1.weight": {
+      "shape": [
+        256,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "backbone.vision_backbone.convs.0.conv_1x1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.convs.0.conv_3x3.weight": {
+      "shape": [
+        256,
+        256,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 589824
+    },
+    "backbone.vision_backbone.convs.0.conv_3x3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.convs.1.dconv_2x2.weight": {
+      "shape": [
+        1024,
+        512,
+        2,
+        2
+      ],
+      "dtype": "torch.float32",
+      "numel": 2097152
+    },
+    "backbone.vision_backbone.convs.1.dconv_2x2.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.vision_backbone.convs.1.conv_1x1.weight": {
+      "shape": [
+        256,
+        512,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 131072
+    },
+    "backbone.vision_backbone.convs.1.conv_1x1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.convs.1.conv_3x3.weight": {
+      "shape": [
+        256,
+        256,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 589824
+    },
+    "backbone.vision_backbone.convs.1.conv_3x3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.convs.2.conv_1x1.weight": {
+      "shape": [
+        256,
+        1024,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 262144
+    },
+    "backbone.vision_backbone.convs.2.conv_1x1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.convs.2.conv_3x3.weight": {
+      "shape": [
+        256,
+        256,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 589824
+    },
+    "backbone.vision_backbone.convs.2.conv_3x3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.convs.3.conv_1x1.weight": {
+      "shape": [
+        256,
+        1024,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 262144
+    },
+    "backbone.vision_backbone.convs.3.conv_1x1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.vision_backbone.convs.3.conv_3x3.weight": {
+      "shape": [
+        256,
+        256,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 589824
+    },
+    "backbone.vision_backbone.convs.3.conv_3x3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "backbone.language_backbone.encoder.projection_layer": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 262144
+    },
+    "backbone.language_backbone.encoder.embedding_layer.weight": {
+      "shape": [
+        49408,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 25296896
+    },
+    "backbone.language_backbone.encoder.positional_embedding.pos_embed.pos_embed": {
+      "shape": [
+        1,
+        1,
+        16,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 8192
+    },
+    "backbone.language_backbone.encoder.transformer.0.layer_scale": {
+      "shape": [
+        512,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.layer_scale": {
+      "shape": [
+        512,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.norm.rbr_skip.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.norm.rbr_skip.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.norm.rbr_skip.running_mean": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.norm.rbr_skip.running_var": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.norm.rbr_skip.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.mixer.rbr_skip.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.mixer.rbr_skip.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.mixer.rbr_skip.running_mean": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.mixer.rbr_skip.running_var": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.mixer.rbr_skip.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.mixer.rbr_conv.0.conv.weight": {
+      "shape": [
+        512,
+        1,
+        1,
+        11
+      ],
+      "dtype": "torch.float32",
+      "numel": 5632
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.mixer.rbr_conv.0.bn.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.mixer.rbr_conv.0.bn.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.mixer.rbr_conv.0.bn.running_mean": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.mixer.rbr_conv.0.bn.running_var": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.token_mixer.mixer.rbr_conv.0.bn.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.language_backbone.encoder.transformer.0.convffn.conv.conv.weight": {
+      "shape": [
+        512,
+        1,
+        1,
+        11
+      ],
+      "dtype": "torch.float32",
+      "numel": 5632
+    },
+    "backbone.language_backbone.encoder.transformer.0.convffn.conv.bn.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.convffn.conv.bn.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.convffn.conv.bn.running_mean": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.convffn.conv.bn.running_var": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.0.convffn.conv.bn.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.language_backbone.encoder.transformer.0.convffn.fc1.weight": {
+      "shape": [
+        2048,
+        512,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 1048576
+    },
+    "backbone.language_backbone.encoder.transformer.0.convffn.fc1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "backbone.language_backbone.encoder.transformer.0.convffn.fc2.weight": {
+      "shape": [
+        512,
+        2048,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 1048576
+    },
+    "backbone.language_backbone.encoder.transformer.0.convffn.fc2.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.1.pre_norm_mha.0.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.1.pre_norm_mha.0.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.1.pre_norm_mha.1.qkv_proj.weight": {
+      "shape": [
+        1536,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 786432
+    },
+    "backbone.language_backbone.encoder.transformer.1.pre_norm_mha.1.qkv_proj.bias": {
+      "shape": [
+        1536
+      ],
+      "dtype": "torch.float32",
+      "numel": 1536
+    },
+    "backbone.language_backbone.encoder.transformer.1.pre_norm_mha.1.out_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 262144
+    },
+    "backbone.language_backbone.encoder.transformer.1.pre_norm_mha.1.out_proj.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.1.pre_norm_ffn.0.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.1.pre_norm_ffn.0.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.1.pre_norm_ffn.1.weight": {
+      "shape": [
+        2048,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 1048576
+    },
+    "backbone.language_backbone.encoder.transformer.1.pre_norm_ffn.1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "backbone.language_backbone.encoder.transformer.1.pre_norm_ffn.4.weight": {
+      "shape": [
+        512,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 1048576
+    },
+    "backbone.language_backbone.encoder.transformer.1.pre_norm_ffn.4.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.2.pre_norm_mha.0.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.2.pre_norm_mha.0.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.2.pre_norm_mha.1.qkv_proj.weight": {
+      "shape": [
+        1536,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 786432
+    },
+    "backbone.language_backbone.encoder.transformer.2.pre_norm_mha.1.qkv_proj.bias": {
+      "shape": [
+        1536
+      ],
+      "dtype": "torch.float32",
+      "numel": 1536
+    },
+    "backbone.language_backbone.encoder.transformer.2.pre_norm_mha.1.out_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 262144
+    },
+    "backbone.language_backbone.encoder.transformer.2.pre_norm_mha.1.out_proj.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.2.pre_norm_ffn.0.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.2.pre_norm_ffn.0.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.2.pre_norm_ffn.1.weight": {
+      "shape": [
+        2048,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 1048576
+    },
+    "backbone.language_backbone.encoder.transformer.2.pre_norm_ffn.1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "backbone.language_backbone.encoder.transformer.2.pre_norm_ffn.4.weight": {
+      "shape": [
+        512,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 1048576
+    },
+    "backbone.language_backbone.encoder.transformer.2.pre_norm_ffn.4.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.3.pre_norm_mha.0.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.3.pre_norm_mha.0.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.3.pre_norm_mha.1.qkv_proj.weight": {
+      "shape": [
+        1536,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 786432
+    },
+    "backbone.language_backbone.encoder.transformer.3.pre_norm_mha.1.qkv_proj.bias": {
+      "shape": [
+        1536
+      ],
+      "dtype": "torch.float32",
+      "numel": 1536
+    },
+    "backbone.language_backbone.encoder.transformer.3.pre_norm_mha.1.out_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 262144
+    },
+    "backbone.language_backbone.encoder.transformer.3.pre_norm_mha.1.out_proj.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.3.pre_norm_ffn.0.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.3.pre_norm_ffn.0.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.3.pre_norm_ffn.1.weight": {
+      "shape": [
+        2048,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 1048576
+    },
+    "backbone.language_backbone.encoder.transformer.3.pre_norm_ffn.1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "backbone.language_backbone.encoder.transformer.3.pre_norm_ffn.4.weight": {
+      "shape": [
+        512,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 1048576
+    },
+    "backbone.language_backbone.encoder.transformer.3.pre_norm_ffn.4.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.4.pre_norm_mha.0.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.4.pre_norm_mha.0.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.4.pre_norm_mha.1.qkv_proj.weight": {
+      "shape": [
+        1536,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 786432
+    },
+    "backbone.language_backbone.encoder.transformer.4.pre_norm_mha.1.qkv_proj.bias": {
+      "shape": [
+        1536
+      ],
+      "dtype": "torch.float32",
+      "numel": 1536
+    },
+    "backbone.language_backbone.encoder.transformer.4.pre_norm_mha.1.out_proj.weight": {
+      "shape": [
+        512,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 262144
+    },
+    "backbone.language_backbone.encoder.transformer.4.pre_norm_mha.1.out_proj.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.4.pre_norm_ffn.0.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.4.pre_norm_ffn.0.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.4.pre_norm_ffn.1.weight": {
+      "shape": [
+        2048,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 1048576
+    },
+    "backbone.language_backbone.encoder.transformer.4.pre_norm_ffn.1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "backbone.language_backbone.encoder.transformer.4.pre_norm_ffn.4.weight": {
+      "shape": [
+        512,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 1048576
+    },
+    "backbone.language_backbone.encoder.transformer.4.pre_norm_ffn.4.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.layer_scale": {
+      "shape": [
+        512,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.layer_scale": {
+      "shape": [
+        512,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.norm.rbr_skip.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.norm.rbr_skip.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.norm.rbr_skip.running_mean": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.norm.rbr_skip.running_var": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.norm.rbr_skip.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.mixer.rbr_skip.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.mixer.rbr_skip.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.mixer.rbr_skip.running_mean": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.mixer.rbr_skip.running_var": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.mixer.rbr_skip.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.mixer.rbr_conv.0.conv.weight": {
+      "shape": [
+        512,
+        1,
+        1,
+        11
+      ],
+      "dtype": "torch.float32",
+      "numel": 5632
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.mixer.rbr_conv.0.bn.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.mixer.rbr_conv.0.bn.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.mixer.rbr_conv.0.bn.running_mean": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.mixer.rbr_conv.0.bn.running_var": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.token_mixer.mixer.rbr_conv.0.bn.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.language_backbone.encoder.transformer.5.convffn.conv.conv.weight": {
+      "shape": [
+        512,
+        1,
+        1,
+        11
+      ],
+      "dtype": "torch.float32",
+      "numel": 5632
+    },
+    "backbone.language_backbone.encoder.transformer.5.convffn.conv.bn.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.convffn.conv.bn.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.convffn.conv.bn.running_mean": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.convffn.conv.bn.running_var": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.transformer.5.convffn.conv.bn.num_batches_tracked": {
+      "shape": [],
+      "dtype": "torch.int64",
+      "numel": 1
+    },
+    "backbone.language_backbone.encoder.transformer.5.convffn.fc1.weight": {
+      "shape": [
+        2048,
+        512,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 1048576
+    },
+    "backbone.language_backbone.encoder.transformer.5.convffn.fc1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "backbone.language_backbone.encoder.transformer.5.convffn.fc2.weight": {
+      "shape": [
+        512,
+        2048,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 1048576
+    },
+    "backbone.language_backbone.encoder.transformer.5.convffn.fc2.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.final_layer_norm.weight": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.encoder.final_layer_norm.bias": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "backbone.language_backbone.projector.weight": {
+      "shape": [
+        256,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 131072
+    },
+    "backbone.language_backbone.projector.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.0.self_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.encoder.layers.0.self_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.encoder.layers.0.self_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.encoder.layers.0.self_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.0.cross_attn_image.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.encoder.layers.0.cross_attn_image.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.encoder.layers.0.cross_attn_image.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.encoder.layers.0.cross_attn_image.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.0.linear1.weight": {
+      "shape": [
+        2048,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.encoder.layers.0.linear1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "transformer.encoder.layers.0.linear2.weight": {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.encoder.layers.0.linear2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.0.norm1.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.0.norm1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.0.norm2.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.0.norm2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.0.norm3.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.0.norm3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.1.self_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.encoder.layers.1.self_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.encoder.layers.1.self_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.encoder.layers.1.self_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.1.cross_attn_image.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.encoder.layers.1.cross_attn_image.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.encoder.layers.1.cross_attn_image.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.encoder.layers.1.cross_attn_image.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.1.linear1.weight": {
+      "shape": [
+        2048,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.encoder.layers.1.linear1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "transformer.encoder.layers.1.linear2.weight": {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.encoder.layers.1.linear2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.1.norm1.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.1.norm1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.1.norm2.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.1.norm2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.1.norm3.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.1.norm3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.2.self_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.encoder.layers.2.self_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.encoder.layers.2.self_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.encoder.layers.2.self_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.2.cross_attn_image.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.encoder.layers.2.cross_attn_image.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.encoder.layers.2.cross_attn_image.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.encoder.layers.2.cross_attn_image.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.2.linear1.weight": {
+      "shape": [
+        2048,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.encoder.layers.2.linear1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "transformer.encoder.layers.2.linear2.weight": {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.encoder.layers.2.linear2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.2.norm1.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.2.norm1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.2.norm2.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.2.norm2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.2.norm3.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.2.norm3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.3.self_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.encoder.layers.3.self_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.encoder.layers.3.self_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.encoder.layers.3.self_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.3.cross_attn_image.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.encoder.layers.3.cross_attn_image.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.encoder.layers.3.cross_attn_image.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.encoder.layers.3.cross_attn_image.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.3.linear1.weight": {
+      "shape": [
+        2048,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.encoder.layers.3.linear1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "transformer.encoder.layers.3.linear2.weight": {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.encoder.layers.3.linear2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.3.norm1.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.3.norm1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.3.norm2.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.3.norm2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.3.norm3.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.3.norm3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.4.self_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.encoder.layers.4.self_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.encoder.layers.4.self_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.encoder.layers.4.self_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.4.cross_attn_image.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.encoder.layers.4.cross_attn_image.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.encoder.layers.4.cross_attn_image.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.encoder.layers.4.cross_attn_image.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.4.linear1.weight": {
+      "shape": [
+        2048,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.encoder.layers.4.linear1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "transformer.encoder.layers.4.linear2.weight": {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.encoder.layers.4.linear2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.4.norm1.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.4.norm1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.4.norm2.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.4.norm2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.4.norm3.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.4.norm3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.5.self_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.encoder.layers.5.self_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.encoder.layers.5.self_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.encoder.layers.5.self_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.5.cross_attn_image.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.encoder.layers.5.cross_attn_image.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.encoder.layers.5.cross_attn_image.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.encoder.layers.5.cross_attn_image.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.5.linear1.weight": {
+      "shape": [
+        2048,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.encoder.layers.5.linear1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "transformer.encoder.layers.5.linear2.weight": {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.encoder.layers.5.linear2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.5.norm1.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.5.norm1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.5.norm2.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.5.norm2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.5.norm3.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.encoder.layers.5.norm3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.0.cross_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.0.cross_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.0.cross_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.0.cross_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.0.norm1.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.0.norm1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.0.ca_text.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.0.ca_text.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.0.ca_text.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.0.ca_text.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.0.catext_norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.0.catext_norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.0.self_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.0.self_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.0.self_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.0.self_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.0.norm2.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.0.norm2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.0.linear1.weight": {
+      "shape": [
+        2048,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.decoder.layers.0.linear1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "transformer.decoder.layers.0.linear2.weight": {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.decoder.layers.0.linear2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.0.norm3.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.0.norm3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.1.cross_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.1.cross_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.1.cross_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.1.cross_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.1.norm1.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.1.norm1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.1.ca_text.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.1.ca_text.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.1.ca_text.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.1.ca_text.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.1.catext_norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.1.catext_norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.1.self_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.1.self_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.1.self_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.1.self_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.1.norm2.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.1.norm2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.1.linear1.weight": {
+      "shape": [
+        2048,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.decoder.layers.1.linear1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "transformer.decoder.layers.1.linear2.weight": {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.decoder.layers.1.linear2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.1.norm3.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.1.norm3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.2.cross_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.2.cross_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.2.cross_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.2.cross_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.2.norm1.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.2.norm1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.2.ca_text.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.2.ca_text.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.2.ca_text.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.2.ca_text.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.2.catext_norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.2.catext_norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.2.self_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.2.self_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.2.self_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.2.self_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.2.norm2.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.2.norm2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.2.linear1.weight": {
+      "shape": [
+        2048,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.decoder.layers.2.linear1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "transformer.decoder.layers.2.linear2.weight": {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.decoder.layers.2.linear2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.2.norm3.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.2.norm3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.3.cross_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.3.cross_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.3.cross_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.3.cross_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.3.norm1.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.3.norm1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.3.ca_text.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.3.ca_text.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.3.ca_text.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.3.ca_text.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.3.catext_norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.3.catext_norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.3.self_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.3.self_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.3.self_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.3.self_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.3.norm2.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.3.norm2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.3.linear1.weight": {
+      "shape": [
+        2048,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.decoder.layers.3.linear1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "transformer.decoder.layers.3.linear2.weight": {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.decoder.layers.3.linear2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.3.norm3.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.3.norm3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.4.cross_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.4.cross_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.4.cross_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.4.cross_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.4.norm1.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.4.norm1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.4.ca_text.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.4.ca_text.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.4.ca_text.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.4.ca_text.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.4.catext_norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.4.catext_norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.4.self_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.4.self_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.4.self_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.4.self_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.4.norm2.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.4.norm2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.4.linear1.weight": {
+      "shape": [
+        2048,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.decoder.layers.4.linear1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "transformer.decoder.layers.4.linear2.weight": {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.decoder.layers.4.linear2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.4.norm3.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.4.norm3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.5.cross_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.5.cross_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.5.cross_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.5.cross_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.5.norm1.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.5.norm1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.5.ca_text.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.5.ca_text.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.5.ca_text.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.5.ca_text.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.5.catext_norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.5.catext_norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.5.self_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "transformer.decoder.layers.5.self_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "transformer.decoder.layers.5.self_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.layers.5.self_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.5.norm2.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.5.norm2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.5.linear1.weight": {
+      "shape": [
+        2048,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.decoder.layers.5.linear1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "transformer.decoder.layers.5.linear2.weight": {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "transformer.decoder.layers.5.linear2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.5.norm3.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.layers.5.norm3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.bbox_embed.layers.0.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.bbox_embed.layers.0.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.bbox_embed.layers.1.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.bbox_embed.layers.1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.bbox_embed.layers.2.weight": {
+      "shape": [
+        4,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 1024
+    },
+    "transformer.decoder.bbox_embed.layers.2.bias": {
+      "shape": [
+        4
+      ],
+      "dtype": "torch.float32",
+      "numel": 4
+    },
+    "transformer.decoder.query_embed.weight": {
+      "shape": [
+        200,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 51200
+    },
+    "transformer.decoder.reference_points.weight": {
+      "shape": [
+        200,
+        4
+      ],
+      "dtype": "torch.float32",
+      "numel": 800
+    },
+    "transformer.decoder.boxRPB_embed_x.layers.0.weight": {
+      "shape": [
+        256,
+        2
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "transformer.decoder.boxRPB_embed_x.layers.0.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.boxRPB_embed_x.layers.1.weight": {
+      "shape": [
+        8,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "transformer.decoder.boxRPB_embed_x.layers.1.bias": {
+      "shape": [
+        8
+      ],
+      "dtype": "torch.float32",
+      "numel": 8
+    },
+    "transformer.decoder.boxRPB_embed_y.layers.0.weight": {
+      "shape": [
+        256,
+        2
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "transformer.decoder.boxRPB_embed_y.layers.0.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.boxRPB_embed_y.layers.1.weight": {
+      "shape": [
+        8,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "transformer.decoder.boxRPB_embed_y.layers.1.bias": {
+      "shape": [
+        8
+      ],
+      "dtype": "torch.float32",
+      "numel": 8
+    },
+    "transformer.decoder.presence_token.weight": {
+      "shape": [
+        1,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.presence_token_head.layers.0.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.presence_token_head.layers.0.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.presence_token_head.layers.1.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.presence_token_head.layers.1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.presence_token_head.layers.2.weight": {
+      "shape": [
+        1,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.presence_token_head.layers.2.bias": {
+      "shape": [
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 1
+    },
+    "transformer.decoder.presence_token_out_norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.presence_token_out_norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.ref_point_head.layers.0.weight": {
+      "shape": [
+        256,
+        512
+      ],
+      "dtype": "torch.float32",
+      "numel": 131072
+    },
+    "transformer.decoder.ref_point_head.layers.0.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "transformer.decoder.ref_point_head.layers.1.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "transformer.decoder.ref_point_head.layers.1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.pixel_decoder.conv_layers.0.weight": {
+      "shape": [
+        256,
+        256,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 589824
+    },
+    "segmentation_head.pixel_decoder.conv_layers.0.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.pixel_decoder.conv_layers.1.weight": {
+      "shape": [
+        256,
+        256,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 589824
+    },
+    "segmentation_head.pixel_decoder.conv_layers.1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.pixel_decoder.conv_layers.2.weight": {
+      "shape": [
+        256,
+        256,
+        3,
+        3
+      ],
+      "dtype": "torch.float32",
+      "numel": 589824
+    },
+    "segmentation_head.pixel_decoder.conv_layers.2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.pixel_decoder.norms.0.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.pixel_decoder.norms.0.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.pixel_decoder.norms.1.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.pixel_decoder.norms.1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.pixel_decoder.norms.2.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.pixel_decoder.norms.2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.mask_predictor.mask_embed.layers.0.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "segmentation_head.mask_predictor.mask_embed.layers.0.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.mask_predictor.mask_embed.layers.1.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "segmentation_head.mask_predictor.mask_embed.layers.1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.mask_predictor.mask_embed.layers.2.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "segmentation_head.mask_predictor.mask_embed.layers.2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.cross_attend_prompt.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "segmentation_head.cross_attend_prompt.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "segmentation_head.cross_attend_prompt.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "segmentation_head.cross_attend_prompt.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.cross_attn_norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.cross_attn_norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.semantic_seg_head.weight": {
+      "shape": [
+        1,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "segmentation_head.semantic_seg_head.bias": {
+      "shape": [
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 1
+    },
+    "segmentation_head.instance_seg_head.weight": {
+      "shape": [
+        256,
+        256,
+        1,
+        1
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "segmentation_head.instance_seg_head.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "dot_prod_scoring.prompt_mlp.layers.0.weight": {
+      "shape": [
+        2048,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "dot_prod_scoring.prompt_mlp.layers.0.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "dot_prod_scoring.prompt_mlp.layers.1.weight": {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "dot_prod_scoring.prompt_mlp.layers.1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "dot_prod_scoring.prompt_mlp.out_norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "dot_prod_scoring.prompt_mlp.out_norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "dot_prod_scoring.prompt_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "dot_prod_scoring.prompt_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "dot_prod_scoring.hs_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "dot_prod_scoring.hs_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.label_embed.weight": {
+      "shape": [
+        2,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "geometry_encoder.cls_embed.weight": {
+      "shape": [
+        1,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.points_direct_project.weight": {
+      "shape": [
+        256,
+        2
+      ],
+      "dtype": "torch.float32",
+      "numel": 512
+    },
+    "geometry_encoder.points_direct_project.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.points_pool_project.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "geometry_encoder.points_pool_project.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.points_pos_enc_project.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "geometry_encoder.points_pos_enc_project.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.boxes_direct_project.weight": {
+      "shape": [
+        256,
+        4
+      ],
+      "dtype": "torch.float32",
+      "numel": 1024
+    },
+    "geometry_encoder.boxes_direct_project.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.boxes_pool_project.weight": {
+      "shape": [
+        256,
+        256,
+        7,
+        7
+      ],
+      "dtype": "torch.float32",
+      "numel": 3211264
+    },
+    "geometry_encoder.boxes_pool_project.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.boxes_pos_enc_project.weight": {
+      "shape": [
+        256,
+        258
+      ],
+      "dtype": "torch.float32",
+      "numel": 66048
+    },
+    "geometry_encoder.boxes_pos_enc_project.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.final_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "geometry_encoder.final_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.img_pre_norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.img_pre_norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.0.self_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "geometry_encoder.encode.0.self_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "geometry_encoder.encode.0.self_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "geometry_encoder.encode.0.self_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.0.cross_attn_image.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "geometry_encoder.encode.0.cross_attn_image.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "geometry_encoder.encode.0.cross_attn_image.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "geometry_encoder.encode.0.cross_attn_image.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.0.linear1.weight": {
+      "shape": [
+        2048,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "geometry_encoder.encode.0.linear1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "geometry_encoder.encode.0.linear2.weight": {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "geometry_encoder.encode.0.linear2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.0.norm1.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.0.norm1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.0.norm2.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.0.norm2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.0.norm3.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.0.norm3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.1.self_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "geometry_encoder.encode.1.self_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "geometry_encoder.encode.1.self_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "geometry_encoder.encode.1.self_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.1.cross_attn_image.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "geometry_encoder.encode.1.cross_attn_image.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "geometry_encoder.encode.1.cross_attn_image.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "geometry_encoder.encode.1.cross_attn_image.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.1.linear1.weight": {
+      "shape": [
+        2048,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "geometry_encoder.encode.1.linear1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "geometry_encoder.encode.1.linear2.weight": {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "geometry_encoder.encode.1.linear2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.1.norm1.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.1.norm1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.1.norm2.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.1.norm2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.1.norm3.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.1.norm3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.2.self_attn.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "geometry_encoder.encode.2.self_attn.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "geometry_encoder.encode.2.self_attn.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "geometry_encoder.encode.2.self_attn.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.2.cross_attn_image.in_proj_weight": {
+      "shape": [
+        768,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 196608
+    },
+    "geometry_encoder.encode.2.cross_attn_image.in_proj_bias": {
+      "shape": [
+        768
+      ],
+      "dtype": "torch.float32",
+      "numel": 768
+    },
+    "geometry_encoder.encode.2.cross_attn_image.out_proj.weight": {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 65536
+    },
+    "geometry_encoder.encode.2.cross_attn_image.out_proj.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.2.linear1.weight": {
+      "shape": [
+        2048,
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "geometry_encoder.encode.2.linear1.bias": {
+      "shape": [
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 2048
+    },
+    "geometry_encoder.encode.2.linear2.weight": {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "torch.float32",
+      "numel": 524288
+    },
+    "geometry_encoder.encode.2.linear2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.2.norm1.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.2.norm1.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.2.norm2.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.2.norm2.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.2.norm3.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode.2.norm3.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode_norm.weight": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    },
+    "geometry_encoder.encode_norm.bias": {
+      "shape": [
+        256
+      ],
+      "dtype": "torch.float32",
+      "numel": 256
+    }
+  }
+}
