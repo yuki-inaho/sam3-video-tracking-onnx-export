@@ -1,6 +1,7 @@
 import json
 import subprocess
 import sys
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -36,6 +37,7 @@ def test_runtime_import_does_not_load_torch():
         [sys.executable, "-c", "import runtime, sys; assert 'torch' not in sys.modules"],
         capture_output=True,
         text=True,
+        cwd=Path(__file__).resolve().parents[1],
     )
     assert p.returncode == 0, p.stderr
 
