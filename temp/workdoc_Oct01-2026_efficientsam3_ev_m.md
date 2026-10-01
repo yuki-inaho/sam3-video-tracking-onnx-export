@@ -173,10 +173,10 @@ docs/ONBOARDING.md と機能 guide を更新、公開情報検査、zstd 梱包�
 - [x] 🛠 **エラー時対処**: private metadata を whitelist で除外して再梱包する。
 
 ### 手順 18: commit と push（E5）
-- [ ] 🖐 **操作**: 両 feature branch の review済み差分を commit して origin へ push する。
-- [ ] 🔎 **確認**: remote SHA と local HEAD が一致する。途中の docs-only commit も許可済み。
-- [ ] 🧪 **テスト**: `git diff --check`、公開情報検査、branch status を確認する。
-- [ ] 🛠 **エラー時対処**: conflict は変更単位で解決、force push しない。
+- [x] 🖐 **操作**: 両 feature branch の review済み差分を commit して origin へ push する。
+- [x] 🔎 **確認**: remote SHA と local HEAD が一致する。途中の docs-only commit も許可済み。
+- [x] 🧪 **テスト**: `git diff --check`、公開情報検査、branch status を確認する。
+- [x] 🛠 **エラー時対処**: conflict は変更単位で解決、force push しない。
 
 ### 手順 19: PR と merge（E5）
 - [ ] 🖐 **操作**: C++ develop / ONNX main への PR を作成しレビューと必須 CI 通過後 merge する。
@@ -240,6 +240,8 @@ git diff --check
 | 2026-10-01 | 10:56:06 JST+0900 | Codex | 手順14–16完了・手順17開始 | profile16threads10949.7ms、4threads9751.2ms、PNG byte一致。grouped batched案は遅く採用せず。1×1はim2colを省く等価行列積。6frameはdistinct output、frame0再実行PNG一致。最終CTest5/5、境界12 passed/1 skip、ruff成功。ONNXmodel-free36 passed/19 skip。両ONBOARDING/guide整備、native default fetchと通常画像CLI実行成功。公開reportをdocsへ保存しzstd梱包復元へ進む。 |
 
 | 2026-10-01 | 11:03:15 JST+0900 | Codex | 手順17完了・手順18開始 | zstd3archive test成功。C++2143/ONNX87files SHA照合、tar owner名なし、GGUF復元byte一致。復元sourceをGGML_NATIVE=OFF/SAM31=OFFでbuild、実モデル1maskが元のmaskとIoU1.0。復元ONNX tests15 passed/1 skip。default sourceの再変換GGUFもbyte一致。C++実装9721449/docs85ba22b、ONNX5a7d41bを既にpush。最終evidence commitへ進む。 |
+
+| 2026-10-01 | 11:05:04 JST+0900 | Codex | 手順18完了・手順19開始 | C++f146d92/ONNX4a565b6のlocalとremote SHA一致、差分なし。public identity/inventory/strict loadを保存、公開対象のprivate/token検査で一致なし。ONNX実モデルpytest再実行1 passed/40.09s。必須CI contextsは両branchとも空。両PRを作成し検証根拠を記載する。 |
 
 ## 8. 設計ゲート
 
