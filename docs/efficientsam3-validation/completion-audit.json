@@ -1,0 +1,71 @@
+{
+  "audited_at": "2026-10-01 11:54:59 JST+0900",
+  "scope": "completion audit, model-free boundaries, onboarding, source packaging privacy",
+  "inference_implementation_changed": false,
+  "existing_real_model_evidence": {
+    "native_efficient": "docs/efficientsam3-validation/native-e2e.json",
+    "onnx_efficient": "docs/efficientsam3-validation/onnx-e2e.json",
+    "sam31": "sam3.cpp:docs/sam31-validation/e2e.json",
+    "sam31_official_full_parity_verified": false
+  },
+  "verification": {
+    "onnx_unit": {
+      "passed": 23,
+      "skipped": 1,
+      "skip_reason": "real-model test requires explicit opt-in"
+    },
+    "annotation_source_regression": {
+      "passed": 36,
+      "skipped": 19,
+      "skip_reason": "official source checkout not initialized"
+    },
+    "native_boundary": {
+      "passed": 12,
+      "elapsed_seconds": 1.32
+    },
+    "sam31_ctest": {
+      "passed_groups": 5,
+      "failed_groups": 0,
+      "elapsed_seconds": 3.29
+    },
+    "sam31_ctest_initial_failure": "shared quant library was not included in the selected build targets; built sam31_quant and reran successfully",
+    "ruff_changed_tests": true,
+    "javascript_syntax": true,
+    "relative_links": true,
+    "private_value_check": true,
+    "git_diff_check": true,
+    "sam31_source_packaging": {
+      "passed": true,
+      "source_manifest_files": 2146,
+      "owner_metadata_cleared": true,
+      "zstd_integrity": true,
+      "recreated_models_byte_exact": true
+    }
+  },
+  "delivery_scope": {
+    "previous_deliveries_checked_before_deletion": {
+      "efficientsam3-delivery": {
+        "verified_files": 42,
+        "decompressed_gguf_sha256": "f78a2dec600b03ecc1a2b2609f921eaefac6c1d98e51e70e0a72804798b78913"
+      },
+      "sam31-delivery": {
+        "verified_files": 3,
+        "decompressed_gguf_sha256": "e59728d18a3e0f6bfd603eee86490b6116b9141d4e4cd3acdc0309ea443ec370"
+      }
+    },
+    "local_deliveries_deleted_by_requester": true,
+    "permanent_model_or_archive_retention_required": false,
+    "model_acquisition": "public URLs, pinned revisions and SHA-256 remain in model guides; inputs may also be provided by requester",
+    "recreation_stopped": true
+  },
+  "review_prs": {
+    "native": "https://github.com/yuki-inaho/sam3.cpp/pull/5",
+    "onnx": "https://github.com/yuki-inaho/sam3-video-tracking-onnx-export/pull/7"
+  },
+  "publication_state_at_audit": "branches pushed; supplemental PRs open; merge and temporary checkout cleanup follow this audit",
+  "limitations": [
+    "No new real-model E2E or live Playwright session was run in this audit. Existing merged model reports and annotation browser verification retain their recorded scope.",
+    "SAM3.1 synthetic-mask smoke is not full official PyTorch numerical parity.",
+    "Performance numbers are observations from recorded conditions, not guarantees."
+  ]
+}
