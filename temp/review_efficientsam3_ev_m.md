@@ -35,3 +35,16 @@
 **Recommended Patch Scope**
 
 - 手順5完了時に第8章の入出力/ファイル/実行コマンドを確定し、このレビューを更新する。
+
+## 実装後の再レビュー（2026-10-01）
+
+**Verdict:** PASS（D1–D5達成）
+
+- 必須799 tensorのstrict検査と全payload照合、実ONNX/native画像・6frame比較、有限値、入力依存、frame0再現、計測、復元buildを確認した。
+- nativeはgraph分離、CPU vector受け渡し、PVS/両tracker拒否、既存API dispatchを確認。拒否漏れとエラー時解放順を修正した。
+- 高速化を未計測で主張しない。grouped batched案は撤回し、4/16threadの計測は各1回と明記した。
+- 手順15の実checkpoint必須の既存テストは環境不足で失敗。model-free回帰36 passed/19 skippedとSAM31 CTest5 groupsを根拠とし、未実行の実重み回帰を成功に数えていない。
+- work logを第7章に集約し、途中のred/import failureと未完了の公開項目を残した。各DoDの証跡はdocs/efficientsam3-validationに追跡できる。
+- source archiveのtar uid/gid/利用者名を消去し、tokens/cache/元checkpoint trainer metadataを含めていない。
+
+**Residual Findings:** mandatory CI contextsは両対象branchに無い。ローカルの実モデルゲートを使用する。PR#3/#5のmerged状態とstaging整理・pruneを確認し、手順19/20とD5を更新した。checkoutの終了処理は提出先cleanup.jsonへ記録する。
